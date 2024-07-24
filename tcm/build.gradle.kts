@@ -2,4 +2,9 @@
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.jetbrains.kotlin.android) apply false
+    alias(libs.plugins.javacpp.platform) apply false
+}
+
+ext {
+    set("javacppPlatform" , "android-arm") // defaults to Loader.getPlatform()
 }
