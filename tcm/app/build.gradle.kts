@@ -43,14 +43,14 @@ android {
     }
 
     // This generates per-abi APKs if both android-arm and android-x86 libs are provided.
-    //    splits {
-    //        abi {
-    //            isEnable = true
-    //            reset()
-    //            include("x86", "armeabi")
-    //            isUniversalApk = false
-    //        }
-    //    }
+//    splits {
+//        abi {
+//            isEnable = true
+//            reset()
+//            include("x86", "armeabi")
+//            isUniversalApk = false
+//        }
+//    }
 
 }
 
@@ -102,11 +102,15 @@ dependencies {
     // IIRC, they are in the JARs, with "-platform" filtered using the "javacppPlatform" (set
     // in the main build.gradlekts) and used by the JavaCPP Gradle Plugin, then extracted using that
     // javacppExtract rule above and then imported using the fileTree(libs) rule.
-    // Something like that. It's quite cryptic.
+    // Something like that. It's quite convoluted.
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    // This provides the java imports available.
+    implementation(libs.javacv.platform)
+    implementation(libs.ffmpeg.platform)
+    implementation(libs.opencv.platform)
+    // This provides the JNI libs needed at runtime.
     // For some reason only one "platform" needs to be specified below.
     // (e.g. trying to hava javacpp of javacv + ffmpeg makes it fail).
-    implementation(libs.javacv.platform)
     javacpp(libs.opencv.platform)
 
     testImplementation(libs.junit)

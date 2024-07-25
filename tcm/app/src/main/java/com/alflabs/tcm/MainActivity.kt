@@ -8,24 +8,24 @@ import androidx.appcompat.app.AppCompatActivity
 import com.alflabs.tcm.record.GrabberThread
 import com.alflabs.tcm.util.ILogger
 import org.bytedeco.javacv.FFmpegLogCallback
-import java.net.URL
 
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var grabberThread: GrabberThread
+    private var grabberThread: GrabberThread? = null
     private lateinit var startBtn: Button
     private lateinit var stopBtn: Button
     private lateinit var statusTxt: TextView
 
     companion object {
         const val TAG = "MainActivity"
+
+        // From https://www.ffmpeg.org/doxygen/4.0/group__lavu__log__constants.html
+        const val AV_LOG_TRACE = 56
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        FFmpegLogCallback.set()
 
 //        enableEdgeToEdge()
         setContentView(R.layout.activity_main)
@@ -43,20 +43,37 @@ class MainActivity : AppCompatActivity() {
         startBtn.setOnClickListener { onStartButton() }
         stopBtn.setOnClickListener { onStopButton() }
 
-        val url : String = "rtsp://U:P@IP:554/stream2"
-        grabberThread = GrabberThread(getLogger(), url)
+        addStatus("\n@@ ABIs: ${android.os.Build.SUPPORTED_ABIS.toList()}")
+
+        try {
+            FFmpegLogCallback.setLevel(AV_LOG_TRACE)    // Warning: very verbose in logcat
+            FFmpegLogCallback.set()
+        } catch (t: Throwable) {
+            addStatus("ERROR: $t")
+        }
     }
 
     fun onStartButton() {
         Log.d(TAG, "@@ on START button")
         addStatus("## Start")
-        grabberThread.start()
+
+        try {
+            val U = ""
+            val P = ""
+            val url = "rtsp://$U:$P@192.168.3.128:554/stream2"
+            grabberThread = GrabberThread(getLogger(), url)
+        } catch (t: Throwable) {
+            addStatus("ERROR: $t")
+        }
+
+        grabberThread?.start()
     }
 
     fun onStopButton() {
         Log.d(TAG, "@@ on STOP button")
         addStatus("## Stop")
-        grabberThread.stop()
+        grabberThread?.stop()
+        grabberThread = null
     }
 
     fun addStatus(s : String) {

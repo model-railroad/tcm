@@ -5,7 +5,6 @@ import com.alflabs.tcm.util.ThreadLoop
 import org.bytedeco.javacv.FFmpegFrameGrabber
 import org.bytedeco.javacv.Frame
 import org.bytedeco.javacv.FrameGrabber
-import java.net.URL
 
 
 class GrabberThread(private val logger: ILogger, private val url: String): ThreadLoop() {
@@ -24,9 +23,15 @@ class GrabberThread(private val logger: ILogger, private val url: String): Threa
         var grabber : FFmpegFrameGrabber? = null
 
         try {
+            logger.log(TAG, "Grabber for URL: $url")
             grabber = FFmpegFrameGrabber(url)
-            grabber.format = "h264"
-            grabber.setOption("stimeout" , "5000000") // microseconds cf https://www.ffmpeg.org/ffmpeg-protocols.html#rtsp
+//            grabber.format = "mp4"
+            grabber.format = "rtsp"
+            // http://ffmpeg.org/ffmpeg-all.html#rtsp
+            grabber.setOption("rtsp_transport", "tcp")  // "udp" or "tcp"
+            grabber.setOption("rw_timeout" , "5000000") // microseconds
+            grabber.setOption("timeout" , "5000000") // microseconds
+            grabber.setOption("stimeout" , "5000000") // microseconds
             grabber.timeout = 5*1000 // milliseconds
             logger.log(TAG, "start")
             grabber.start()
@@ -52,16 +57,18 @@ class GrabberThread(private val logger: ILogger, private val url: String): Threa
             grabber.flush()
 
         } catch (e: FrameGrabber.Exception) {
+            try {
+                grabber?.release()
+            } catch (ignore: FrameGrabber.Exception) {}
             logger.log(TAG, e.toString())
         } finally {
-            if (grabber != null) {
-                try {
-                    grabber.stop();
-                } catch (ignore: FrameGrabber.Exception) {}
-                try {
-                    grabber.release();
-                } catch (ignore: FrameGrabber.Exception) {}
-            }
+            try {
+                grabber?.stop()
+            } catch (ignore: FrameGrabber.Exception) {}
+            try {
+                grabber?.release()
+                grabber = null
+            } catch (ignore: FrameGrabber.Exception) {}
         }
     }
 

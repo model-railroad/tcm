@@ -6,5 +6,5 @@ plugins {
 }
 
 ext {
-    set("javacppPlatform" , "android-arm") // defaults to Loader.getPlatform()
+    set("javacppPlatform" , "android-arm,android-x86") // defaults to Loader.getPlatform()
 }
