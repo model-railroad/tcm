@@ -1,3 +1,20 @@
+/*
+ * Project: TCM
+ * Copyright (C) 2024 alf.labs gmail com,
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 
 plugins {
@@ -38,19 +55,20 @@ android {
     }
 
     // This line prevents some JavaCV native-image/* files from being included which create errors.
-    packagingOptions {
-        exclude("META-INF/native-image/**/*.json")
+    packaging {
+        jniLibs  .excludes.add("META-INF/native-image/**/*.json")
+        resources.excludes.add("META-INF/native-image/**/*.json")
     }
 
     // This generates per-abi APKs if both android-arm and android-x86 libs are provided.
-//    splits {
-//        abi {
-//            isEnable = true
-//            reset()
-//            include("x86", "armeabi")
-//            isUniversalApk = false
-//        }
-//    }
+    // splits {
+    //     abi {
+    //         isEnable = true
+    //         reset()
+    //         include("x86", "armeabi")
+    //         isUniversalApk = false
+    //     }
+    // }
 
 }
 
@@ -62,29 +80,21 @@ tasks.register<Copy>("javacppExtract") {
     dependsOn(configurations["javacpp"])
 
     doFirst {
-        println("@@ javacppExtract: inputs = ${inputs.files.map { it.path.toString() }}")
-        println("@@ javacppExtract: outputs = ${outputs.files.map { it.path.toString() }}")
-        println("@@ javacppExtract: buildDir 1 = $buildDir")
-        println("@@ javacppExtract: buildDir 2 = ${layout.buildDirectory.get()}")
+        println("@@ javacppExtract: input ${inputs.files.files.size} files")
     }
 
-    from(configurations["javacpp"].map {
-        println("@@ javacppExtract: map = ${it.path}")
-        zipTree(it).also { ft ->
-            println("@@ javacppExtract:    zipTree output = ${ft.files.map { f -> f.path.toString() }}")
-        }
-    })
+    from(configurations["javacpp"].map { zipTree(it) })
     include("lib/**")
-    into("$buildDir/javacpp/")
+    into("${layout.buildDirectory.get()}/javacpp/")
 
     doLast {
-        val f = configurations["javacpp"].map { it.path.toString() }
-        println("@@ javacppExtract: files = $f")
+         val f = configurations["javacpp"].map { it.path.toString() }
+         println("@@ javacppExtract: output ${f.size} files")
     }
 }
 
 android {
-    sourceSets["main"].jniLibs.srcDir("$buildDir/javacpp/lib/")
+    sourceSets["main"].jniLibs.srcDir("${layout.buildDirectory.get()}/javacpp/lib/")
     project.tasks.preBuild.dependsOn("javacppExtract")
 }
 
