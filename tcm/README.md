@@ -21,6 +21,9 @@ MVP:
 + App: Structure Main Activity w/ 2 bitmap views + 2 FPS measurers, Start/Stop.
 - Main: Pause grabber threads on activity pause, restore automatically.
 - App: Autostart on boot.
+- App: Kiosk mode (remove nav bar, optional overlay status bar)
+- App: Keep screen on.
+- App: Keep screen on only when specific IP/server is known to be active. Configure via prefs.
 - Main: Ability to rotate bitmaps, zoom (fill vs fit), and offset. Configure via prefs.
 - Admin: Fill readme
 - Admin: Deploy MVP.
