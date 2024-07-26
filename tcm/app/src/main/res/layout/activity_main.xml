@@ -7,6 +7,18 @@
         android:layout_height="match_parent"
         tools:context=".activity.MainActivity">
 
+    <ImageButton
+            android:id="@+id/prefs_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/ic_prefs_light"
+            android:contentDescription="@string/prefs__button_title"
+        />
+
     <Button
             android:id="@+id/start_btn"
             android:layout_width="wrap_content"

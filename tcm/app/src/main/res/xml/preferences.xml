@@ -1,0 +1,29 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Note: keys cannot change once published. -->
+
+    <PreferenceCategory app:title="@string/prefs__system_header">
+
+        <SwitchPreferenceCompat
+                app:key="pref_system__start_on_boot"
+                app:summaryOff="@string/prefs__start_on_boot_off"
+                app:summaryOn="@string/prefs__start_on_boot_on"
+                app:title="@string/prefs__start_on_boot_title" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/prefs__cameras_header">
+
+        <EditTextPreference
+                app:key="pref_cameras__url_1"
+                app:title="@string/prefs__url_camera_1"
+                app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+                app:key="pref_cameras__url_2"
+                app:title="@string/prefs__url_camera_2"
+                app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">Track Cam Monitor</string>
+
+    <!-- Preferences -->
+    <string name="prefs__button_title">Preferences</string>
+    <string name="prefs__activity_title">Preferences</string>
+
+    <string name="prefs__system_header">System</string>
+    <string name="prefs__start_on_boot_title">Start Automatically on Boot</string>
+    <string name="prefs__start_on_boot_on">ON: App starts automatically on boot</string>
+    <string name="prefs__start_on_boot_off">OFF: App does not start automatically on boot</string>
+
+    <string name="prefs__cameras_header">Cameras</string>
+    <string name="prefs__url_camera_1">URL Stream Camera 1</string>
+    <string name="prefs__url_camera_2">URL Stream Camera 2</string>
 </resources>
