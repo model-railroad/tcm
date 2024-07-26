@@ -90,13 +90,6 @@ android {
 
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
-    // implementation("com.google.guava:guava:33.2.1-android")
-
     // JavaCV - OpenCV stuff
     // Note: JavaCV-platform does NOT provide any NDK JNI for Android directly.
     // IIRC, they are in the JARs, with "-platform" filtered using the "javacppPlatform" (set
@@ -112,6 +105,14 @@ dependencies {
     // For some reason only one "platform" needs to be specified below.
     // (e.g. trying to hava javacpp of javacv + ffmpeg makes it fail).
     javacpp(libs.opencv.platform)
+
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.preference)
+    implementation(libs.androidx.preference.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

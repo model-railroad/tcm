@@ -1,10 +1,11 @@
-package com.alflabs.tcm
+package com.alflabs.tcm.activity
 
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.alflabs.tcm.R
 import com.alflabs.tcm.record.GrabberThread
 import com.alflabs.tcm.util.ILogger
 import org.bytedeco.javacv.FFmpegLogCallback

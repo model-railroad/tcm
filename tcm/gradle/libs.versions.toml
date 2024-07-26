@@ -11,7 +11,9 @@ activity = "1.8.0"
 constraintlayout = "2.1.4"
 javacvVersion = "1.5.10"        # See https://github.com/bytedeco/javacv/releases for latest version
 opencvVersion = "4.9.0-1.5.10"  # No idea where to find new version numbers.
-ffmpegVersion = "6.1.1-1.5.10"  # Automatic update resolution works right here.
+ffmpegVersion = "6.1.1-1.5.10"
+preference = "1.2.1"
+preferenceKtx = "1.2.1"  # Automatic update resolution works right here.
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -25,6 +27,8 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 javacv-platform = { group = "org.bytedeco", name = "javacv-platform", version.ref = "javacvVersion" }
 opencv-platform = { group= "org.bytedeco", name= "opencv-platform", version.ref = "opencvVersion" }
 ffmpeg-platform = { group= "org.bytedeco", name= "ffmpeg-platform", version.ref = "ffmpegVersion" }
+androidx-preference = { group = "androidx.preference", name = "preference", version.ref = "preference" }
+androidx-preference-ktx = { group = "androidx.preference", name = "preference-ktx", version.ref = "preferenceKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
