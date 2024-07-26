@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.alflabs.tcm.R
 import com.alflabs.tcm.app.AppPrefsValues
 import com.alflabs.tcm.record.GrabberThread
+import com.alflabs.tcm.util.FpsMeasurer
 import com.alflabs.tcm.util.ILogger
 import org.bytedeco.javacv.FFmpegLogCallback
 
@@ -19,8 +20,10 @@ import org.bytedeco.javacv.FFmpegLogCallback
 class MainActivity : AppCompatActivity() {
 
     private lateinit var statusTxt: TextView
-    private lateinit var videoCams: List<ImageView>
+    private lateinit var videoBmps: List<ImageView>
+    private lateinit var videoFpss: List<TextView>
     private var grabberThreads = mutableListOf<GrabberThread>()
+    private var fpsMeasurers = mutableMapOf<Int, FpsMeasurer>()
 
     companion object {
         const val TAG = "MainActivity"
@@ -46,7 +49,8 @@ class MainActivity : AppCompatActivity() {
         val stopBtn = findViewById<Button>(R.id.stop_btn)
         val prefsBtn = findViewById<ImageButton>(R.id.prefs_btn)
         statusTxt = findViewById(R.id.status_text)
-        videoCams = listOf<ImageView>(findViewById(R.id.video_cam1), findViewById(R.id.video_cam2))
+        videoBmps = listOf(findViewById(R.id.video_cam1), findViewById(R.id.video_cam2))
+        videoFpss = listOf(findViewById(R.id.fps_cam1), findViewById(R.id.fps_cam2))
 
         startBtn.setOnClickListener { onStartButton() }
         stopBtn.setOnClickListener { onStopButton() }
@@ -77,7 +81,9 @@ class MainActivity : AppCompatActivity() {
 
         val prefs = AppPrefsValues(this)
 
-        videoCams.forEachIndexed { i, imageView ->
+        videoFpss.forEach { it.text = "Started" }
+
+        videoBmps.forEachIndexed { i, imageView ->
             val index = i + 1
             try {
                 val url = prefs.camerasUrl(index)
@@ -89,6 +95,7 @@ class MainActivity : AppCompatActivity() {
                         }
                 }
                 grabberThreads.add(grabberThread)
+                fpsMeasurers[index] = FpsMeasurer()
             } catch (t: Throwable) {
                 addStatus("ERROR with Grabber $index: $t")
             }
@@ -102,6 +109,8 @@ class MainActivity : AppCompatActivity() {
         addStatus("## Stop")
         grabberThreads.forEach { it.stop() }
         grabberThreads.clear()
+        fpsMeasurers.clear()
+        videoFpss.forEach { it.text = "Stopped" }
     }
 
     private fun addStatus(s : String) {
@@ -127,7 +136,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun drawCamBitmap(index: Int, bmp: Bitmap, view: ImageView) {
+        val fpsMeasurer: FpsMeasurer? = fpsMeasurers[index]
+        fpsMeasurer?.ping()
         view.setImageBitmap(bmp)
+        fpsMeasurer?.let { videoFpss[index - 1].text = it.lastFps }
     }
 
 }

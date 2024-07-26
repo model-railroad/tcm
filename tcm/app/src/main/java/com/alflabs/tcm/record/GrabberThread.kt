@@ -16,6 +16,15 @@ class GrabberThread(
 
     companion object {
         const val TAG = "GrabberThread"
+
+        // https://ffmpeg.org/doxygen/trunk/pixfmt_8h_source.html
+        const val AV_PIX_FMT_RGB24 = 75 - 73
+        const val AV_PIX_FMT_BGR24 = 76 - 73
+        const val AV_PIX_FMT_ARGB =  99 - 73    // Matches Android Bitmap Config ARGB_8888
+        const val AV_PIX_FMT_RGBA = 100 - 73
+        const val AV_PIX_FMT_ABGR = 101 - 73
+        const val AV_PIX_FMT_BGRA = 102 - 73
+
     }
 
     override fun beforeThreadLoop() {
@@ -36,8 +45,9 @@ class GrabberThread(
             grabber.setOption("rw_timeout" , "5000000") // microseconds
             grabber.setOption("timeout" , "5000000") // microseconds
             grabber.setOption("stimeout" , "5000000") // microseconds
+            // Match the Android Bitmap Config ARGB_8888, which speeds up the converter.
+            grabber.pixelFormat = AV_PIX_FMT_ARGB
             grabber.timeout = 5*1000 // milliseconds
-            logger.log(TAG, "start")
             grabber.start()
 
             val pixelFormat = grabber.getPixelFormat()
@@ -54,7 +64,6 @@ class GrabberThread(
                 frame = grabber.grabImage()
                 if (frame === null) break;
                 // use frame
-
                 val bmp = converter.convert(frame)
                 draw(bmp)
             }
