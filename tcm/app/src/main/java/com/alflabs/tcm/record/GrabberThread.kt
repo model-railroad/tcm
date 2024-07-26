@@ -1,13 +1,18 @@
 package com.alflabs.tcm.record
 
+import android.graphics.Bitmap
 import com.alflabs.tcm.util.ILogger
 import com.alflabs.tcm.util.ThreadLoop
+import org.bytedeco.javacv.AndroidFrameConverter
 import org.bytedeco.javacv.FFmpegFrameGrabber
 import org.bytedeco.javacv.Frame
 import org.bytedeco.javacv.FrameGrabber
 
 
-class GrabberThread(private val logger: ILogger, private val url: String): ThreadLoop() {
+class GrabberThread(
+    private val logger: ILogger,
+    private val url: String,
+    private val draw : (Bitmap) -> Unit): ThreadLoop() {
 
     companion object {
         const val TAG = "GrabberThread"
@@ -15,17 +20,16 @@ class GrabberThread(private val logger: ILogger, private val url: String): Threa
 
     override fun beforeThreadLoop() {
         logger.log(TAG, "beforeThreadLoop")
-//        FFmpegFrameGrabber.tryLoad()
     }
 
     override fun runInThreadLoop() {
         logger.log(TAG, "runInThreadLoop")
         var grabber : FFmpegFrameGrabber? = null
+        val converter = AndroidFrameConverter()
 
         try {
             logger.log(TAG, "Grabber for URL: $url")
             grabber = FFmpegFrameGrabber(url)
-//            grabber.format = "mp4"
             grabber.format = "rtsp"
             // http://ffmpeg.org/ffmpeg-all.html#rtsp
             grabber.setOption("rtsp_transport", "tcp")  // "udp" or "tcp"
@@ -50,7 +54,9 @@ class GrabberThread(private val logger: ILogger, private val url: String): Threa
                 frame = grabber.grabImage()
                 if (frame === null) break;
                 // use frame
-                logger.log(TAG, "Grabber: process frame $frame")
+
+                val bmp = converter.convert(frame)
+                draw(bmp)
             }
 
             logger.log(TAG, "end while: quit ($mQuit) or frame ($frame)")
@@ -63,12 +69,9 @@ class GrabberThread(private val logger: ILogger, private val url: String): Threa
             logger.log(TAG, e.toString())
         } finally {
             try {
-                grabber?.stop()
+                grabber?.close() // implementation calls stop + release
             } catch (ignore: FrameGrabber.Exception) {}
-            try {
-                grabber?.release()
-                grabber = null
-            } catch (ignore: FrameGrabber.Exception) {}
+            converter.close()
         }
     }
 

@@ -13,4 +13,6 @@
     <string name="prefs__cameras_header">Cameras</string>
     <string name="prefs__url_camera_1">URL Stream Camera 1</string>
     <string name="prefs__url_camera_2">URL Stream Camera 2</string>
+    <string name="main__video_camera_1">Video Camera 1</string>
+    <string name="main__video_camera_2">Video Camera 2</string>
 </resources>

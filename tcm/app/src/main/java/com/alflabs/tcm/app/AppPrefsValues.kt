@@ -36,6 +36,13 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
 
     fun systemStartOnBoot() : Boolean = prefs.getBoolean(PREF_SYSTEM__START_ON_BOOT, true)
 
+    fun camerasUrl(index: Int) : String =
+        when (index) {
+            1 -> camerasUrl1()
+            2 -> camerasUrl2()
+            else -> throw IndexOutOfBoundsException("Cameral URL Index $index out of bounds")
+        }
+
     fun camerasUrl1() : String = prefs.getString(PREF_CAMERAS__URL_1, "") ?: ""
 
     fun camerasUrl2() : String = prefs.getString(PREF_CAMERAS__URL_2, "") ?: ""
