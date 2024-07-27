@@ -34,13 +34,15 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
         }
     }
 
-    fun systemStartOnBoot() : Boolean = prefs.getBoolean(PREF_SYSTEM__START_ON_BOOT, true)
+    fun systemStartOnBoot() : Boolean = prefs.getBoolean(PREF_SYSTEM__START_ON_BOOT, false)
+
+    fun systemHideNavBar() : Boolean = prefs.getBoolean(PREF_SYSTEM__HIDE_NAV_BAR, false)
 
     fun camerasUrl(index: Int) : String =
         when (index) {
             1 -> camerasUrl1()
             2 -> camerasUrl2()
-            else -> throw IndexOutOfBoundsException("Cameral URL Index $index out of bounds")
+            else -> throw IndexOutOfBoundsException("Camera URL Index $index out of bounds")
         }
 
     fun camerasUrl1() : String = prefs.getString(PREF_CAMERAS__URL_1, "") ?: ""
@@ -63,6 +65,7 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
     companion object {
         const val PREF_SYSTEM__START_ON_BOOT = "pref_system__start_on_boot"
         const val PREF_SYSTEM__HOME = "pref_system__home"
+        const val PREF_SYSTEM__HIDE_NAV_BAR = "pref_system__hide_nav_bar"
         const val PREF_CAMERAS__COUNT = "pref_cameras__count"
         const val PREF_CAMERAS__URL_1 = "pref_cameras__url_1"
         const val PREF_CAMERAS__URL_2 = "pref_cameras__url_2"

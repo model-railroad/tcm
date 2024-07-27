@@ -7,11 +7,14 @@
 
     <string name="prefs__system_header">System</string>
     <string name="prefs__start_on_boot_title">Start Automatically on Boot</string>
-    <string name="prefs__start_on_boot_on">ON: App starts automatically on boot</string>
-    <string name="prefs__start_on_boot_off">OFF: App does not start automatically on boot</string>
+    <string name="prefs__start_on_boot_on">On: App starts automatically on boot</string>
+    <string name="prefs__start_on_boot_off">Off: App does not start automatically on boot</string>
     <string name="prefs__home_title">Replace Home Launcher</string>
-    <string name="prefs__home_on">ON: Replaces the default Home Launcher</string>
-    <string name="prefs__home_off">OFF: Does not replace the default Home Launcher</string>
+    <string name="prefs__home_on">On: Replaces the default Home Launcher</string>
+    <string name="prefs__home_off">Off: Does not replace the default Home Launcher</string>
+    <string name="prefs__hide_nav_bar_title">Hide Navigation Bar</string>
+    <string name="prefs__hide_nav_bar_on">On: Do not display navigation bar (e.g. home &amp; back icons)</string>
+    <string name="prefs__hide_nav_bar_off">Off: Display navigation bar (e.g. home &amp; back icons)</string>
 
     <string name="prefs__cameras_header">Cameras</string>
     <string name="prefs__cameras_count">Number of Active Cameras</string>

@@ -174,7 +174,7 @@ MVP:
 - Main: Ability to rotate bitmaps, zoom (fill vs fit), and offset. Configure via prefs.
 + App: Autostart on boot.
 + App: Replace Home Launcher.
-- App: Pseudo Kiosk mode (remove nav bar, optional overlay status bar)
++ App: Hide nav bar, overlap translucent status bar
 + Main: Restructure video streaming to be controlled by the activity lifecycle (starts/pause).
 - App: Monitor power state. Use it to control video streaming.
 - App: Add support for Wake Lock and WiFi lock.
