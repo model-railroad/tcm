@@ -26,8 +26,10 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.alflabs.tcm.BuildConfig
 import com.alflabs.tcm.R
 import com.alflabs.tcm.app.AppPrefsValues
+import com.alflabs.tcm.app.BootReceiver
 import com.alflabs.tcm.record.GrabberThread
 import com.alflabs.tcm.util.FpsMeasurer
 import com.alflabs.tcm.util.ILogger
@@ -43,7 +45,8 @@ class MainActivity : AppCompatActivity() {
     private var fpsMeasurers = mutableMapOf<Int, FpsMeasurer>()
 
     companion object {
-        const val TAG = "MainActivity"
+        private val TAG: String = MainActivity::class.java.simpleName
+        private val DEBUG: Boolean = BuildConfig.DEBUG
 
         // From https://www.ffmpeg.org/doxygen/4.0/group__lavu__log__constants.html
         const val AV_LOG_TRACE = 56
@@ -73,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         stopBtn.setOnClickListener { onStopButton() }
         prefsBtn.setOnClickListener { onPrefsButton() }
 
-        addStatus("\n@@ ABIs: ${android.os.Build.SUPPORTED_ABIS.toList()}")
+        if (DEBUG) addStatus("\n@@ ABIs: ${android.os.Build.SUPPORTED_ABIS.toList()}")
 
         try {
            // FFmpegLogCallback.setLevel(AV_LOG_TRACE)    // Warning: very verbose in logcat
@@ -89,7 +92,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onStartButton() {
-        Log.d(TAG, "@@ on START button")
+        if (DEBUG) Log.d(TAG, "@@ on START button")
         addStatus("## Start")
 
         if (grabberThreads.isNotEmpty()) {
@@ -122,7 +125,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onStopButton() {
-        Log.d(TAG, "@@ on STOP button")
+        if (DEBUG) Log.d(TAG, "@@ on STOP button")
         addStatus("## Stop")
         grabberThreads.forEach { it.stop() }
         grabberThreads.clear()

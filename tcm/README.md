@@ -157,6 +157,7 @@ MVP:
 + App: Prefs Activity to enter camera URLs.
 + App: Ability to display JavaCV frame as Android Bitmap.
 + App: Structure Main Activity w/ 2 bitmap views + 2 FPS measurers, Start/Stop.
+- App: Configure number of cameras (1 or 2) via prefs.
 - Main: Pause grabber threads on activity pause, restore automatically.
 - Main: Ability to rotate bitmaps, zoom (fill vs fit), and offset. Configure via prefs.
 - App: Autostart on boot.

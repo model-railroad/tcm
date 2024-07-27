@@ -32,7 +32,7 @@ class GrabberThread(
     private val draw : (Bitmap) -> Unit): ThreadLoop() {
 
     companion object {
-        const val TAG = "GrabberThread"
+        private val TAG: String = GrabberThread::class.java.simpleName
 
         // https://ffmpeg.org/doxygen/trunk/pixfmt_8h_source.html
         const val AV_PIX_FMT_RGB24 = 75 - 73
