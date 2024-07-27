@@ -17,7 +17,7 @@
  */
 package com.alflabs.tcm.record
 
-import android.graphics.Bitmap
+import com.alflabs.tcm.activity.VideoViewHolder
 import com.alflabs.tcm.util.ILogger
 import com.alflabs.tcm.util.ThreadLoop
 import org.bytedeco.javacv.AndroidFrameConverter
@@ -29,7 +29,8 @@ import org.bytedeco.javacv.FrameGrabber
 class GrabberThread(
     private val logger: ILogger,
     private val url: String,
-    private val draw : (Bitmap) -> Unit): ThreadLoop() {
+    private val renderer : VideoViewHolder
+): ThreadLoop() {
 
     companion object {
         private val TAG: String = GrabberThread::class.java.simpleName
@@ -82,7 +83,7 @@ class GrabberThread(
                 if (frame === null) break;
                 // use frame
                 val bmp = converter.convert(frame)
-                draw(bmp)
+                renderer.render(bmp)
             }
 
             logger.log(TAG, "end while: quit ($mQuit) or frame ($frame)")
@@ -90,7 +91,7 @@ class GrabberThread(
 
         } catch (e: FrameGrabber.Exception) {
             try {
-                grabber?.release()
+                grabber?.close()
             } catch (ignore: FrameGrabber.Exception) {}
             logger.log(TAG, e.toString())
         } finally {
@@ -98,6 +99,7 @@ class GrabberThread(
                 grabber?.close() // implementation calls stop + release
             } catch (ignore: FrameGrabber.Exception) {}
             converter.close()
+            logger.log(TAG, "runInThreadLoop - closed")
         }
     }
 

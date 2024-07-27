@@ -170,12 +170,12 @@ MVP:
 + App: Ability to display JavaCV frame as Android Bitmap.
 + App: Structure Main Activity w/ 2 bitmap views + 2 FPS measurers, Start/Stop.
 + App: Configure number of cameras (1 or 2) via prefs.
-- Main: Pause grabber threads on activity pause, restore automatically.
++ Main: Pause grabber threads on activity pause, restore automatically.
 - Main: Ability to rotate bitmaps, zoom (fill vs fit), and offset. Configure via prefs.
 + App: Autostart on boot.
 + App: Replace Home Launcher.
 - App: Pseudo Kiosk mode (remove nav bar, optional overlay status bar)
-- Main: Restructure video streaming to be controlled by the activity lifecycle (starts/pause).
++ Main: Restructure video streaming to be controlled by the activity lifecycle (starts/pause).
 - App: Monitor power state. Use it to control video streaming.
 - App: Add support for Wake Lock and WiFi lock.
 + Admin: Fill readme

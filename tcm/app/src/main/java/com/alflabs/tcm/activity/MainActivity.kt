@@ -18,41 +18,34 @@
 package com.alflabs.tcm.activity
 
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.alflabs.tcm.BuildConfig
 import com.alflabs.tcm.R
-import com.alflabs.tcm.app.AppPrefsValues
-import com.alflabs.tcm.record.GrabberThread
-import com.alflabs.tcm.util.FpsMeasurer
+import com.alflabs.tcm.app.MonitorMixin
 import com.alflabs.tcm.util.ILogger
-import org.bytedeco.javacv.FFmpegLogCallback
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var statusTxt: TextView
-    private lateinit var videoBmps: List<ImageView>
-    private lateinit var videoFpss: List<TextView>
-    private var grabberThreads = mutableListOf<GrabberThread>()
-    private var fpsMeasurers = mutableMapOf<Int, FpsMeasurer>()
+    private lateinit var monitorMixin: MonitorMixin
+    lateinit var videoViewHolders: List<VideoViewHolder>
+        private set
 
     companion object {
         private val TAG: String = MainActivity::class.java.simpleName
         private val DEBUG: Boolean = BuildConfig.DEBUG
-
-        // From https://www.ffmpeg.org/doxygen/4.0/group__lavu__log__constants.html
-        const val AV_LOG_TRACE = 56
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        monitorMixin = MonitorMixin(this)
+        monitorMixin.onCreate()
 
         // enableEdgeToEdge()
         setContentView(R.layout.activity_main)
@@ -68,21 +61,47 @@ class MainActivity : AppCompatActivity() {
         val stopBtn = findViewById<Button>(R.id.stop_btn)
         val prefsBtn = findViewById<ImageButton>(R.id.prefs_btn)
         statusTxt = findViewById(R.id.status_text)
-        videoBmps = listOf(findViewById(R.id.video_cam1), findViewById(R.id.video_cam2))
-        videoFpss = listOf(findViewById(R.id.fps_cam1), findViewById(R.id.fps_cam2))
+
+        videoViewHolders = listOf(
+            VideoViewHolder(1, findViewById(R.id.video_cam1), findViewById(R.id.fps_cam1)),
+            VideoViewHolder(2, findViewById(R.id.video_cam2), findViewById(R.id.fps_cam2)),
+        )
 
         startBtn.setOnClickListener { onStartButton() }
         stopBtn.setOnClickListener { onStopButton() }
         prefsBtn.setOnClickListener { onPrefsButton() }
 
         if (DEBUG) addStatus("\n@@ ABIs: ${android.os.Build.SUPPORTED_ABIS.toList()}")
+    }
 
-        try {
-           // FFmpegLogCallback.setLevel(AV_LOG_TRACE)    // Warning: very verbose in logcat
-            FFmpegLogCallback.set()
-        } catch (t: Throwable) {
-            addStatus("ERROR: $t")
-        }
+    // Invoked after onCreate or onRestart
+    override fun onStart() {
+        super.onStart()
+        monitorMixin.onStart()
+    }
+
+    // Invoked after onStart or onPause
+    override fun onResume() {
+        super.onResume()
+        monitorMixin.onResume()
+    }
+
+    // Next state is either onResume or onStop
+    override fun onPause() {
+        super.onPause()
+        monitorMixin.onPause()
+    }
+
+    // Next state is either onCreate > Start, onRestart > Start, or onDestroy
+    override fun onStop() {
+        super.onStop()
+        monitorMixin.onStop()
+    }
+
+    // The end of the activity
+    override fun onDestroy() {
+        super.onDestroy()
+        monitorMixin.onDestroy()
     }
 
     private fun onPrefsButton() {
@@ -91,55 +110,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onStartButton() {
-        val prefs = AppPrefsValues(this)
-
         if (DEBUG) Log.d(TAG, "@@ on START button")
-        addStatus("## Start")
-
-        if (grabberThreads.isNotEmpty()) {
-            onStopButton()
-        }
-
-        videoFpss.forEach { it.text = "Started" }
-
-        val camerasCount = prefs.camerasCount()
-        videoBmps.forEachIndexed { i, imageView ->
-            val index = i + 1
-            if (index > camerasCount) return@forEachIndexed
-            try {
-                val url = prefs.camerasUrl(index)
-                val grabberThread = GrabberThread(
-                    getLogger(),
-                    url) { bmp ->
-                        imageView.post {
-                            drawCamBitmap(index, bmp, imageView)
-                        }
-                }
-                grabberThreads.add(grabberThread)
-                fpsMeasurers[index] = FpsMeasurer()
-            } catch (t: Throwable) {
-                addStatus("ERROR with Grabber $index: $t")
-            }
-        }
-
-        grabberThreads.forEach { it.start() }
+        monitorMixin.onStartStreaming()
     }
 
     private fun onStopButton() {
         if (DEBUG) Log.d(TAG, "@@ on STOP button")
-        addStatus("## Stop")
-        grabberThreads.forEach { it.stop() }
-        grabberThreads.clear()
-        fpsMeasurers.clear()
-        videoFpss.forEach { it.text = "Stopped" }
+        monitorMixin.onStopStreaming()
     }
 
-    private fun addStatus(s : String) {
+    fun addStatus(s : String) {
         Log.d(TAG, "Status: $s")
         statusTxt.text = statusTxt.text.toString() + s + "\n"
     }
 
-    private fun getLogger() : ILogger {
+    fun getLogger() : ILogger {
         return object : ILogger {
             override fun log(msg: String) {
                 statusTxt.post {
@@ -155,12 +140,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-    private fun drawCamBitmap(index: Int, bmp: Bitmap, view: ImageView) {
-        val fpsMeasurer: FpsMeasurer? = fpsMeasurers[index]
-        fpsMeasurer?.ping()
-        view.setImageBitmap(bmp)
-        fpsMeasurer?.let { videoFpss[index - 1].text = it.lastFps }
-    }
-
 }

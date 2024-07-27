@@ -19,4 +19,6 @@
     <string name="prefs__url_camera_2">URL Stream Camera 2</string>
     <string name="main__video_camera_1">Video Camera 1</string>
     <string name="main__video_camera_2">Video Camera 2</string>
+    <string name="main__starting_cam">Starting Cam %1$d</string>
+    <string name="main__stopped_cam">Stopped Cam %1$d</string>
 </resources>
