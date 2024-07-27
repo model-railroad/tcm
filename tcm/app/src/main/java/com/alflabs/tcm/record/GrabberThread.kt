@@ -17,6 +17,7 @@
  */
 package com.alflabs.tcm.record
 
+import android.os.SystemClock
 import com.alflabs.tcm.activity.VideoViewHolder
 import com.alflabs.tcm.util.ILogger
 import com.alflabs.tcm.util.ThreadLoop
@@ -43,6 +44,8 @@ class GrabberThread(
         const val AV_PIX_FMT_ABGR = 101 - 73
         const val AV_PIX_FMT_BGRA = 102 - 73
 
+        const val FFMPEG_TIMEOUT_µS = "1000000"    // Microseconds
+        const val PAUSE_BEFORE_RETRY_MS = 1000L
     }
 
     override fun beforeThreadLoop() {
@@ -56,13 +59,16 @@ class GrabberThread(
 
         try {
             logger.log(TAG, "Grabber for URL: $url")
+
+            renderer.setStatus("Connecting")
+
             grabber = FFmpegFrameGrabber(url)
             grabber.format = "rtsp"
             // http://ffmpeg.org/ffmpeg-all.html#rtsp
             grabber.setOption("rtsp_transport", "tcp")  // "udp" or "tcp"
-            grabber.setOption("rw_timeout" , "5000000") // microseconds
-            grabber.setOption("timeout" , "5000000") // microseconds
-            grabber.setOption("stimeout" , "5000000") // microseconds
+            grabber.setOption("rw_timeout" , FFMPEG_TIMEOUT_µS) // microseconds
+            grabber.setOption("timeout" , FFMPEG_TIMEOUT_µS) // microseconds
+            grabber.setOption("stimeout" , FFMPEG_TIMEOUT_µS) // microseconds
             // Match the Android Bitmap Config ARGB_8888, which speeds up the converter.
             grabber.pixelFormat = AV_PIX_FMT_ARGB
             grabber.timeout = 5*1000 // milliseconds
@@ -78,9 +84,15 @@ class GrabberThread(
             // Note that frame is reused for each frame recording
             var frame: Frame? = null
 
+            var firstImage = true
+
             while (!mQuit) {
                 frame = grabber.grabImage()
                 if (frame === null) break;
+                if (firstImage) {
+                    renderer.setStatus("")
+                    firstImage = false
+                }
                 // use frame
                 val bmp = converter.convert(frame)
                 renderer.render(bmp)
@@ -90,16 +102,35 @@ class GrabberThread(
             grabber.flush()
 
         } catch (e: FrameGrabber.Exception) {
+            renderer.setStatus("Disconnected")
+
             try {
                 grabber?.close()
             } catch (ignore: FrameGrabber.Exception) {}
-            logger.log(TAG, e.toString())
+            logger.log(TAG, "Grabber Exception: $e")
+            if (e.toString().contains("Could not open input")) {
+                // Insert a delay before retrying unless asked to quit
+                logger.log(TAG, "Pause $PAUSE_BEFORE_RETRY_MS ms before retry")
+                pause(PAUSE_BEFORE_RETRY_MS)
+            }
         } finally {
             try {
                 grabber?.close() // implementation calls stop + release
             } catch (ignore: FrameGrabber.Exception) {}
             converter.close()
             logger.log(TAG, "runInThreadLoop - closed")
+
+            renderer.setStatus("Disconnected")
+        }
+    }
+
+    private fun pause(delayMS: Long) {
+        val endMS = SystemClock.elapsedRealtime() + delayMS
+        while (!mQuit && SystemClock.elapsedRealtime() < endMS) {
+            try {
+                Thread.sleep(10L)
+            } catch (ignore: Exception) {
+            }
         }
     }
 

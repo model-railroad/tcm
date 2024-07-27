@@ -178,6 +178,7 @@ MVP:
 + Main: Restructure video streaming to be controlled by the activity lifecycle (starts/pause).
 - App: Monitor power state. Use it to control video streaming.
 - App: Add support for Wake Lock and WiFi lock.
++ App: Handle camera lost + reconnection
 + Admin: Fill readme
 - Admin: Deploy MVP.
 

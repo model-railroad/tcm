@@ -26,6 +26,7 @@ import com.alflabs.tcm.util.FpsMeasurer
 class VideoViewHolder(
     private val cameraIndex: Int,
     private val imageView: ImageView,
+    private val statusView: TextView,
     private val fpsView: TextView) {
 
     private val fpsMeasurer = FpsMeasurer()
@@ -38,7 +39,14 @@ class VideoViewHolder(
         }
     }
 
+    fun setStatus(status: String) {
+        statusView.post {
+            statusView.text = status
+        }
+    }
+
     fun onStart() {
+        setStatus("Starting")
         fpsView.text = fpsView.context.getString(R.string.main__starting_cam, cameraIndex)
     }
 

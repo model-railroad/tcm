@@ -82,8 +82,18 @@ class MainActivity : AppCompatActivity() {
         statusTxt = findViewById(R.id.status_text)
 
         videoViewHolders = listOf(
-            VideoViewHolder(1, findViewById(R.id.video_cam1), findViewById(R.id.fps_cam1)),
-            VideoViewHolder(2, findViewById(R.id.video_cam2), findViewById(R.id.fps_cam2)),
+            VideoViewHolder(
+                1,
+                findViewById(R.id.video_cam1),
+                findViewById(R.id.status_cam1),
+                findViewById(R.id.fps_cam1),
+                ),
+            VideoViewHolder(
+                2,
+                findViewById(R.id.video_cam2),
+                findViewById(R.id.status_cam2),
+                findViewById(R.id.fps_cam2),
+                ),
         )
 
         startBtn.setOnClickListener { onStartButton() }

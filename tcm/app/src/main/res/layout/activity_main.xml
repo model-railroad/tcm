@@ -10,24 +10,51 @@
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-        >
-        <ImageView
-                android:id="@+id/video_cam1"
+            android:orientation="horizontal">
+        <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:scaleType="centerCrop"
-                android:contentDescription="@string/main__video_camera_1"
+                android:layout_weight="1">
+            <ImageView
+                    android:id="@+id/video_cam1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="@string/main__video_camera_1"
+                    />
+            <TextView
+                    android:id="@+id/status_cam1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textStyle="bold"
+                    android:textColor="@color/red"
+                    tools:text="Status 1"
                 />
-        <ImageView
-                android:id="@+id/video_cam2"
+        </FrameLayout>
+        <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:scaleType="centerCrop"
-                android:contentDescription="@string/main__video_camera_2"
-                />
+                android:layout_weight="1">
+            <ImageView
+                    android:id="@+id/video_cam2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="@string/main__video_camera_2"
+                    />
+            <TextView
+                    android:id="@+id/status_cam2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textStyle="bold"
+                    android:textColor="@color/red"
+                    tools:text="Status 2"
+                    />
+        </FrameLayout>
     </LinearLayout>
 
     <TextView
