@@ -9,6 +9,9 @@
     <string name="prefs__start_on_boot_title">Start Automatically on Boot</string>
     <string name="prefs__start_on_boot_on">ON: App starts automatically on boot</string>
     <string name="prefs__start_on_boot_off">OFF: App does not start automatically on boot</string>
+    <string name="prefs__home_title">Replace Home Launcher</string>
+    <string name="prefs__home_on">ON: Replaces the default Home Launcher</string>
+    <string name="prefs__home_off">OFF: Does not replace the default Home Launcher</string>
 
     <string name="prefs__cameras_header">Cameras</string>
     <string name="prefs__url_camera_1">URL Stream Camera 1</string>

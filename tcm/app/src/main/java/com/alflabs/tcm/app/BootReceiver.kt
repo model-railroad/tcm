@@ -24,11 +24,19 @@ import android.util.Log
 import com.alflabs.tcm.BuildConfig
 import com.alflabs.tcm.activity.MainActivity
 
+/**
+ * Implements a Boot Receiver to start the MainActivity.
+ *
+ * Use of the Boot Receiver to start an activity from Background does not work
+ * starting with API 29 (Android 10, Q). We can only use on 28 and below (Android 9, P).
+ */
 class BootReceiver : BroadcastReceiver() {
 
     companion object {
         private val TAG: String = BootReceiver::class.java.simpleName
         private val DEBUG: Boolean = BuildConfig.DEBUG
+
+        const val MAX_USAGE_API = 28  // Android 9, P
     }
 
     override fun onReceive(context: Context, intent: Intent) {

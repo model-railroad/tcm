@@ -10,6 +10,12 @@
                 app:summaryOn="@string/prefs__start_on_boot_on"
                 app:title="@string/prefs__start_on_boot_title" />
 
+        <SwitchPreferenceCompat
+                app:key="pref_system__home"
+                app:summaryOff="@string/prefs__home_off"
+                app:summaryOn="@string/prefs__home_on"
+                app:title="@string/prefs__home_title" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/prefs__cameras_header">

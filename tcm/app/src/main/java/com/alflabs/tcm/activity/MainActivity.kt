@@ -29,7 +29,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.alflabs.tcm.BuildConfig
 import com.alflabs.tcm.R
 import com.alflabs.tcm.app.AppPrefsValues
-import com.alflabs.tcm.app.BootReceiver
 import com.alflabs.tcm.record.GrabberThread
 import com.alflabs.tcm.util.FpsMeasurer
 import com.alflabs.tcm.util.ILogger

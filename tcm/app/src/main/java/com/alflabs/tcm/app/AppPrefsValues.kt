@@ -48,8 +48,9 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
     fun camerasUrl2() : String = prefs.getString(PREF_CAMERAS__URL_2, "") ?: ""
 
     companion object {
-        const val PREF_SYSTEM__START_ON_BOOT: String = "pref_system__start_on_boot"
-        const val PREF_CAMERAS__URL_1: String = "url_camera_1"
-        const val PREF_CAMERAS__URL_2: String = "url_camera_2"
+        const val PREF_SYSTEM__START_ON_BOOT = "pref_system__start_on_boot"
+        const val PREF_SYSTEM__HOME = "pref_system__home"
+        const val PREF_CAMERAS__URL_1 = "url_camera_1"
+        const val PREF_CAMERAS__URL_2 = "url_camera_2"
     }
 }

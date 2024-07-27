@@ -59,20 +59,32 @@ and should be considered unsecured. This can be achieve two ways:
   make sure that the Google Play account has a PIN to install paid apps (GP does not support
   a PIN to install free apps, unfortunately).
 
-Note that this is not a real locked Kiosk mode.
-Anyone with access to the tablet can change anything.
+Note that this is not a locked Kiosk mode: Anyone with access to the tablet can change anything.
 Publicly visible devices at the Randall Museum Model Railroad are consequently placed behind a
 locked glass.
 
 
-### Start at Boot
+### Start at Boot / Home Launcher
 
-The implementation of the "Start at Boot" feature uses the typical Android pattern:
+On Android API 21 up to 28 (Android 5/L TO 9/P), the implementation of the "Start at Boot" feature
+uses the typical Android pattern:
 
 - A "Boot Receiver" is declared in the app's AndroidManifest to respond to `BOOT_COMPLETED`.
 - This requires the `RECEIVE_BOOT_COMPLETED` permission.
 - The Boot Receiver class checks the app's preferences. If the preference to start
   at boot is activated, the MainActivity is started using an intent.
+
+This mechanism however is no longer possible starting with API 29 (Android 10/Q).
+Instead, on these devices, the application can be set as the default home launcher via the
+preferences. This is done using the `RoleManager` which only allows the application to set
+itself as the home launcher app by presenting a chooser dialog to the user.
+There is no way to use the same `RoleManager` to "reset" the home launcher to the default
+tablet app. Instead, when the preference is unchecked in TCM, the Android Settings "Default App"
+screen is shown, which allows the user to change the launcher app.
+
+As indicated in the previous section, even when the app is set as a home launcher, the user
+can still "escape" the app by accessing the settings from the drop-down notification bar.
+This is not a locked Kiosk mode: Anyone with access to the tablet can change anything.
 
 
 ### Foreground/Background Behavior
@@ -160,7 +172,8 @@ MVP:
 - App: Configure number of cameras (1 or 2) via prefs.
 - Main: Pause grabber threads on activity pause, restore automatically.
 - Main: Ability to rotate bitmaps, zoom (fill vs fit), and offset. Configure via prefs.
-- App: Autostart on boot.
++ App: Autostart on boot.
++ App: Replace Home Launcher.
 - App: Pseudo Kiosk mode (remove nav bar, optional overlay status bar)
 - Main: Restructure video streaming to be controlled by the activity lifecycle (starts/pause).
 - App: Monitor power state. Use it to control video streaming.

@@ -17,12 +17,26 @@
  */
 package com.alflabs.tcm.activity
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreferenceCompat
+import com.alflabs.tcm.BuildConfig
 import com.alflabs.tcm.R
+import com.alflabs.tcm.app.AppPrefsValues
+import com.alflabs.tcm.app.BootReceiver
+import com.alflabs.tcm.app.LauncherRole
 
 class PrefsActivity : AppCompatActivity() {
+
+    companion object {
+        private val TAG: String = PrefsActivity::class.java.simpleName
+        private val DEBUG: Boolean = BuildConfig.DEBUG
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,8 +51,42 @@ class PrefsActivity : AppCompatActivity() {
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
+
+        private val startForResult = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { activityResult -> if (DEBUG) Log.d(TAG, "@@ activityResult = $activityResult") }
+
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.preferences, rootKey)
+
+            val bootPref = findPreference<SwitchPreferenceCompat>(AppPrefsValues.PREF_SYSTEM__START_ON_BOOT)
+            bootPref?.apply {
+                isEnabled = Build.VERSION.SDK_INT <= BootReceiver.MAX_USAGE_API
+                if (!isEnabled) isChecked = false
+            }
+
+            val homePref = findPreference<SwitchPreferenceCompat>(AppPrefsValues.PREF_SYSTEM__HOME)
+            homePref?.apply {
+                if (Build.VERSION.SDK_INT >= LauncherRole.MIN_USAGE_API) {
+                    val launcherRole = LauncherRole(context)
+                    isEnabled = launcherRole.isRoleAvailable()
+                    isChecked = isEnabled && launcherRole.isRoleHeld()
+
+                    setOnPreferenceChangeListener { _, newValue ->
+                        newValue as Boolean
+                        Log.d(TAG, "@@ HomePref changed to $newValue")
+                        launcherRole.onRolePrefChanged(newValue)?.let { intent ->
+                            val i = if (newValue) intent else Intent.createChooser(intent, "Select")
+                            startForResult.launch(i)
+                        }
+                        return@setOnPreferenceChangeListener true
+                    }
+                } else {
+                    isEnabled = false
+                    isChecked = false
+                }
+            }
+
         }
     }
 }
