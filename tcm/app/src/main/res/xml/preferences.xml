@@ -1,4 +1,5 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Note: keys cannot change once published. -->
 
@@ -19,6 +20,11 @@
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/prefs__cameras_header">
+
+        <ListPreference
+                app:key="pref_cameras__count"
+                app:title="@string/prefs__cameras_count"
+                app:useSimpleSummaryProvider="true" />
 
         <EditTextPreference
                 app:key="pref_cameras__url_1"

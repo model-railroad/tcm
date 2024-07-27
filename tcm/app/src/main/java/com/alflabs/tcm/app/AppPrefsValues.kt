@@ -47,10 +47,24 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
 
     fun camerasUrl2() : String = prefs.getString(PREF_CAMERAS__URL_2, "") ?: ""
 
+    fun camerasCount() : Int {
+        try {
+            // This may throw ClassCastException if camera count is not an Int preference.
+            return prefs.getInt(PREF_CAMERAS__COUNT, MonitorMixin.MAX_CAMERAS)
+        } catch (ignore: Exception) { }
+        try {
+            // This will throw if String is not a valid Int representation
+            return prefs.getString(PREF_CAMERAS__COUNT, MonitorMixin.MAX_CAMERAS.toString())?.toInt()
+                ?: MonitorMixin.MAX_CAMERAS
+        } catch (ignore: Exception) { }
+        return MonitorMixin.MAX_CAMERAS
+    }
+
     companion object {
         const val PREF_SYSTEM__START_ON_BOOT = "pref_system__start_on_boot"
         const val PREF_SYSTEM__HOME = "pref_system__home"
-        const val PREF_CAMERAS__URL_1 = "url_camera_1"
-        const val PREF_CAMERAS__URL_2 = "url_camera_2"
+        const val PREF_CAMERAS__COUNT = "pref_cameras__count"
+        const val PREF_CAMERAS__URL_1 = "pref_cameras__url_1"
+        const val PREF_CAMERAS__URL_2 = "pref_cameras__url_2"
     }
 }

@@ -91,6 +91,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onStartButton() {
+        val prefs = AppPrefsValues(this)
+
         if (DEBUG) Log.d(TAG, "@@ on START button")
         addStatus("## Start")
 
@@ -98,12 +100,12 @@ class MainActivity : AppCompatActivity() {
             onStopButton()
         }
 
-        val prefs = AppPrefsValues(this)
-
         videoFpss.forEach { it.text = "Started" }
 
+        val camerasCount = prefs.camerasCount()
         videoBmps.forEachIndexed { i, imageView ->
             val index = i + 1
+            if (index > camerasCount) return@forEachIndexed
             try {
                 val url = prefs.camerasUrl(index)
                 val grabberThread = GrabberThread(
