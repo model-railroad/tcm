@@ -50,7 +50,7 @@ abstract class ThreadLoop : IStartStop {
             val t: Thread = mThread!!
             mThread = null
             mQuit = true
-            // -- needed? -- t.interrupt()
+            t.interrupt()
             t.join()
         }
     }

@@ -38,6 +38,8 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
 
     fun systemHideNavBar() : Boolean = prefs.getBoolean(PREF_SYSTEM__HIDE_NAV_BAR, false)
 
+    fun systemWifiSSID() : String = prefs.getString(PREF_SYSTEM__WIFI_SSID, "") ?: ""
+
     fun camerasUrl(index: Int) : String =
         when (index) {
             1 -> camerasUrl1()
@@ -66,6 +68,7 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
         const val PREF_SYSTEM__START_ON_BOOT = "pref_system__start_on_boot"
         const val PREF_SYSTEM__HOME = "pref_system__home"
         const val PREF_SYSTEM__HIDE_NAV_BAR = "pref_system__hide_nav_bar"
+        const val PREF_SYSTEM__WIFI_SSID = "pref_system__wifi_ssid"
         const val PREF_CAMERAS__COUNT = "pref_cameras__count"
         const val PREF_CAMERAS__URL_1 = "pref_cameras__url_1"
         const val PREF_CAMERAS__URL_2 = "pref_cameras__url_2"

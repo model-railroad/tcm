@@ -23,6 +23,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
@@ -32,6 +33,7 @@ import com.alflabs.tcm.app.AppPrefsValues
 import com.alflabs.tcm.app.BootReceiver
 import com.alflabs.tcm.app.LauncherRole
 import com.alflabs.tcm.app.MonitorMixin
+import com.alflabs.tcm.app.WakeWifiLockHandler
 
 class PrefsActivity : AppCompatActivity() {
 
@@ -64,7 +66,11 @@ class PrefsActivity : AppCompatActivity() {
             val bootPref = findPreference<SwitchPreferenceCompat>(AppPrefsValues.PREF_SYSTEM__START_ON_BOOT)
             bootPref?.apply {
                 isEnabled = Build.VERSION.SDK_INT <= BootReceiver.MAX_USAGE_API
-                if (!isEnabled) isChecked = false
+                if (!isEnabled) {
+                    isChecked = false
+                    summaryProvider = null
+                    summary = "Feature No Longer Supported"
+                }
             }
 
             val homePref = findPreference<SwitchPreferenceCompat>(AppPrefsValues.PREF_SYSTEM__HOME)
@@ -86,6 +92,8 @@ class PrefsActivity : AppCompatActivity() {
                 } else {
                     isEnabled = false
                     isChecked = false
+                    summaryProvider = null
+                    summary = "Feature Not Supported"
                 }
             }
 
@@ -96,6 +104,16 @@ class PrefsActivity : AppCompatActivity() {
                 countPref.entryValues = countPref.entries
                 countPref.setDefaultValue(MonitorMixin.MAX_CAMERAS)
                 if (countPref.value == null) countPref.value = MonitorMixin.MAX_CAMERAS.toString()
+            }
+
+            val ssidPref = findPreference<EditTextPreference>(AppPrefsValues.PREF_SYSTEM__WIFI_SSID)
+            ssidPref?.apply {
+                isEnabled = Build.VERSION.SDK_INT <= WakeWifiLockHandler.MAX_API_WIFI_SSID
+                if (!isEnabled) {
+                    text = ""
+                    summaryProvider = null
+                    summary = "Feature No Longer Supported"
+                }
             }
         }
     }

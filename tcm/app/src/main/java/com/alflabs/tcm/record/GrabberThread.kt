@@ -45,7 +45,7 @@ class GrabberThread(
         const val AV_PIX_FMT_BGRA = 102 - 73
 
         const val FFMPEG_TIMEOUT_µS = "1000000"    // Microseconds
-        const val PAUSE_BEFORE_RETRY_MS = 1000L
+        const val PAUSE_BEFORE_RETRY_MS = 5000L
     }
 
     override fun beforeThreadLoop() {

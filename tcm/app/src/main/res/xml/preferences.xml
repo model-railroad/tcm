@@ -23,6 +23,14 @@
                 app:summaryOn="@string/prefs__hide_nav_bar_on"
                 app:title="@string/prefs__hide_nav_bar_title" />
 
+        <EditTextPreference
+                app:key="pref_system__wifi_ssid"
+                app:title="@string/prefs__wifi_ssid_title"
+                android:inputType="text"
+                android:singleLine="true"
+                android:maxLines="1"
+                app:useSimpleSummaryProvider="true" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/prefs__cameras_header">
@@ -35,11 +43,17 @@
         <EditTextPreference
                 app:key="pref_cameras__url_1"
                 app:title="@string/prefs__url_camera_1"
+                android:inputType="text"
+                android:singleLine="true"
+                android:maxLines="1"
                 app:useSimpleSummaryProvider="true" />
 
         <EditTextPreference
                 app:key="pref_cameras__url_2"
                 app:title="@string/prefs__url_camera_2"
+                android:inputType="text"
+                android:singleLine="true"
+                android:maxLines="1"
                 app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>

@@ -48,11 +48,16 @@ class MonitorMixin(private val activity: MainActivity) {
 
     private var camerasCount : Int = 0
     private var grabberThreads = mutableListOf<GrabberThread>()
+    lateinit var wakeWifiLockHandler : WakeWifiLockHandler
+        private set
 
     fun onCreate() {
         if (DEBUG) Log.d(TAG, "onCreate")
         val prefs = AppPrefsValues(activity)
         camerasCount = prefs.camerasCount()
+
+        wakeWifiLockHandler = WakeWifiLockHandler(activity)
+        wakeWifiLockHandler.onCreate()
     }
 
     // Invoked after onCreate or onRestart
@@ -111,10 +116,18 @@ class MonitorMixin(private val activity: MainActivity) {
         }
 
         grabberThreads.forEach { it.start() }
+
+        wakeWifiLockHandler.lockWake()
+        wakeWifiLockHandler.lockWifi()
+        wakeWifiLockHandler.enableSelectedWifiNetwork()
     }
 
     fun onStopStreaming() {
         if (DEBUG) Log.d(TAG, "onStopStreaming ${grabberThreads.size} grabber threads")
+
+        wakeWifiLockHandler.releaseWifi()
+        wakeWifiLockHandler.releaseWake()
+
         grabberThreads.forEach { it.stop() }
         grabberThreads.clear()
 
