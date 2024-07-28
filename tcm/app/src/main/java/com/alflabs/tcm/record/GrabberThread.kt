@@ -44,8 +44,9 @@ class GrabberThread(
         const val AV_PIX_FMT_ABGR = 101 - 73
         const val AV_PIX_FMT_BGRA = 102 - 73
 
-        const val FFMPEG_TIMEOUT_µS = "1000000"    // Microseconds
-        const val PAUSE_BEFORE_RETRY_MS = 5000L
+        const val FFMPEG_TIMEOUT_MS = 1000 * 3      // 3 seconds
+        const val FFMPEG_TIMEOUT_µS = "3000000"     // in microseconds
+        const val PAUSE_BEFORE_RETRY_MS = 1000L * 5 // 5 seconds
     }
 
     override fun beforeThreadLoop() {
@@ -71,7 +72,7 @@ class GrabberThread(
             grabber.setOption("stimeout" , FFMPEG_TIMEOUT_µS) // microseconds
             // Match the Android Bitmap Config ARGB_8888, which speeds up the converter.
             grabber.pixelFormat = AV_PIX_FMT_ARGB
-            grabber.timeout = 5*1000 // milliseconds
+            grabber.timeout = FFMPEG_TIMEOUT_MS
             grabber.start()
 
             val pixelFormat = grabber.getPixelFormat()

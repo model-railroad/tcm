@@ -23,6 +23,12 @@
                 app:summaryOn="@string/prefs__hide_nav_bar_on"
                 app:title="@string/prefs__hide_nav_bar_title" />
 
+        <SwitchPreferenceCompat
+                app:key="pref_system__only_on_ac_power"
+                app:summaryOff="@string/prefs__only_on_ac_power_off"
+                app:summaryOn="@string/prefs__only_on_ac_power_on"
+                app:title="@string/prefs__only_on_ac_power_title" />
+
         <EditTextPreference
                 app:key="pref_system__wifi_ssid"
                 app:title="@string/prefs__wifi_ssid_title"

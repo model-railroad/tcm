@@ -20,9 +20,12 @@ package com.alflabs.tcm.app
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiManager.WifiLock
+import android.os.BatteryManager
 import android.os.Build
 import android.os.PowerManager
 import android.os.PowerManager.WakeLock

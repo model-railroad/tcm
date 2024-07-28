@@ -160,7 +160,7 @@ class MainActivity : AppCompatActivity() {
 
     fun addStatus(s : String) {
         Log.d(TAG, "Status: $s")
-        statusTxt.text = statusTxt.text.toString() + s + "\n"
+        statusTxt.text = "$s\n${statusTxt.text}"
     }
 
     fun getLogger() : ILogger {

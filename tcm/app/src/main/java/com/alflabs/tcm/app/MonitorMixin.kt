@@ -50,6 +50,7 @@ class MonitorMixin(private val activity: MainActivity) {
     private var grabberThreads = mutableListOf<GrabberThread>()
     lateinit var wakeWifiLockHandler : WakeWifiLockHandler
         private set
+    private var batteryMonitorThread : BatteryMonitorThread? = null
 
     fun onCreate() {
         if (DEBUG) Log.d(TAG, "onCreate")
@@ -58,6 +59,17 @@ class MonitorMixin(private val activity: MainActivity) {
 
         wakeWifiLockHandler = WakeWifiLockHandler(activity)
         wakeWifiLockHandler.onCreate()
+
+        if (prefs.systemDisconnectOnBattery()) {
+            batteryMonitorThread = BatteryMonitorThread(activity.getLogger(), activity) {
+                isPlugged -> activity.runOnUiThread {
+                    when(isPlugged) {
+                        true -> onStartStreaming()
+                        false -> onStopStreaming()
+                    }
+                }
+            }
+        }
     }
 
     // Invoked after onCreate or onRestart
@@ -74,7 +86,10 @@ class MonitorMixin(private val activity: MainActivity) {
     // Invoked after onStart or onPause
     fun onResume() {
         if (DEBUG) Log.d(TAG, "onResume")
-        if (START_AUTOMATICALLY) {
+        if (batteryMonitorThread != null) {
+            batteryMonitorThread?.start()
+            batteryMonitorThread?.requestInitialState()
+        } else if (START_AUTOMATICALLY) {
             onStartStreaming()
         }
     }
@@ -82,6 +97,7 @@ class MonitorMixin(private val activity: MainActivity) {
     // Next state is either onResume or onStop
     fun onPause() {
         if (DEBUG) Log.d(TAG, "onPause")
+        batteryMonitorThread?.stop()
         onStopStreaming()
     }
 

@@ -115,8 +115,9 @@ will only be charging during that time, and thus video processing should only oc
 the tablet is powered.
 
 To monitor the charging state, Android provides the `ACTION_BATTERY_CHANGED` intent and
-the `BatteryManager.isCharging()` function. We do not need any AndroidManifest broadcast to
-monitor the charging state outside of the application's lifecycle.
+the `BatteryManager.isCharging()` function (only API 23 and above).
+We do not need any AndroidManifest broadcast to monitor the charging state outside of the
+application's lifecycle.
 This can be periodically checked using a `PeriodicWorkRequest` and the `WorkManager`.
 
 The behavior should be:
@@ -125,7 +126,7 @@ The behavior should be:
 - When the main activity is paused, stop the PeriodicWorkRequest.
 - When power is on:
   - Acquire a wake lock, to prevent the display from sleeping.
-  - Attempt to connect to the desired WiFi network, if specified.
+  - Attempt to connect to the desired WiFi network, if specified (only on API < 29).
   - Acquire a WiFi lock, to keep the WiFi active.
   - Start video streaming.
 - When power is off, or the main activity is paused:
@@ -134,6 +135,8 @@ The behavior should be:
     (we do not specifically disconnected from the wifi network).
   - Release the wake lock, to ensure the screen can dim and enter sleep mode.
 
+Starting with Android 10 (API 29), it is no longer possible to use the WiFiManager
+feature to force enable the wifi and automatically select an SSID to connect to.
 
 
 
@@ -141,7 +144,7 @@ The behavior should be:
 
 __TCM__ is licensed under the __GNU GPL v3 license__.
 
-    Copyright (C) 2008-2017 alf.labs gmail com,
+    Copyright (C) 2023-2024 alf.labs gmail com,
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -176,7 +179,7 @@ MVP:
 + App: Replace Home Launcher.
 + App: Hide nav bar, overlap translucent status bar
 + Main: Restructure video streaming to be controlled by the activity lifecycle (starts/pause).
-- App: Monitor power state. Use it to control video streaming.
++ App: Monitor power state. Use it to control video streaming.
 + App: Add support for Wake Lock and WiFi lock.
 + App: Handle camera lost + reconnection
 + Admin: Fill readme
