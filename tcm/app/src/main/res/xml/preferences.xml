@@ -37,6 +37,12 @@
                 android:maxLines="1"
                 app:useSimpleSummaryProvider="true" />
 
+        <SwitchPreferenceCompat
+                app:key="pref_system__debug_display"
+                app:summaryOff="@string/prefs__debug_display_off"
+                app:summaryOn="@string/prefs__debug_display_on"
+                app:title="@string/prefs__debug_display_title" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/prefs__cameras_header">

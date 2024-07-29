@@ -37,6 +37,7 @@ import com.alflabs.tcm.util.ILogger
 
 class MainActivity : AppCompatActivity() {
 
+    private var debugDisplay = false
     private lateinit var statusTxt: TextView
     private lateinit var monitorMixin: MonitorMixin
     lateinit var videoViewHolders: List<VideoViewHolder>
@@ -49,6 +50,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val prefs = AppPrefsValues(this)
+        debugDisplay = prefs.systemDebugDisplay()
         monitorMixin = MonitorMixin(this)
         monitorMixin.onCreate()
 
@@ -57,7 +60,6 @@ class MainActivity : AppCompatActivity() {
         // Note: an alternative is to set it via style theme resources as such:
         // <item name="android:statusBarColor">@android:color/transparent</item>
         // However by doing it programmatically we can respect the app preferences.
-        val prefs = AppPrefsValues(this)
         if (prefs.systemHideNavBar()) {
             enableEdgeToEdge(
                 statusBarStyle = SystemBarStyle.dark(Color.argb(0x40, 0x20, 0x20, 0x20))
@@ -96,8 +98,11 @@ class MainActivity : AppCompatActivity() {
                 ),
         )
 
+        statusTxt.visibility = if (debugDisplay) View.VISIBLE else View.INVISIBLE
+        startBtn.visibility = if (debugDisplay) View.VISIBLE else View.INVISIBLE
+        stopBtn .visibility = if (debugDisplay) View.VISIBLE else View.INVISIBLE
         startBtn.setOnClickListener { onStartButton() }
-        stopBtn.setOnClickListener { onStopButton() }
+        stopBtn .setOnClickListener { onStopButton() }
         prefsBtn.setOnClickListener { onPrefsButton() }
 
         if (DEBUG) addStatus("\n@@ ABIs: ${android.os.Build.SUPPORTED_ABIS.toList()}")
@@ -160,12 +165,14 @@ class MainActivity : AppCompatActivity() {
 
     fun addStatus(s : String) {
         Log.d(TAG, "Status: $s")
+        if (!debugDisplay) return
         statusTxt.text = "$s\n${statusTxt.text}"
     }
 
     fun getLogger() : ILogger {
         return object : ILogger {
             override fun log(msg: String) {
+                if (!debugDisplay) return
                 statusTxt.post {
                     addStatus(msg)
                 }
@@ -173,6 +180,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun log(tag: String, msg: String) {
+                if (!debugDisplay) return
                 statusTxt.post {
                     addStatus("$tag : $msg")
                 }

@@ -46,12 +46,13 @@ the screen layout for different form factors.
 To achieve the desired "unattended" behavior, the tablet is typically configured as
 follows in the Android system settings:
 
-- Display > Screen Timeout : Never
+- Display > Screen Timeout : 15 seconds
 - Display > Screen Saver : None
 - Security > Screen Lock : None
+- Developer Options > Keep Screen On When Charging
 
-The tablet is to be treated as "appliances" -- it should only contain this application,
-and should be considered unsecured. This can be achieve two ways:
+The tablet is to be treated as an "appliances" -- it should only contain this application,
+and should be considered unsecured. This can be achieved two ways:
 
 - Do not have a specific account on it. E.g. add an account to install the TCM app via Google Play
   then __remove__ the account (Android Settings > Accounts).
@@ -182,6 +183,7 @@ MVP:
 + App: Monitor power state. Use it to control video streaming.
 + App: Add support for Wake Lock and WiFi lock.
 + App: Handle camera lost + reconnection
++ App: Debug display preference.
 + Admin: Fill readme
 - Admin: Deploy MVP.
 

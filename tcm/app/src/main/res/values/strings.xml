@@ -18,6 +18,9 @@
     <string name="prefs__only_on_ac_power_title">Stream only on AC Power</string>
     <string name="prefs__only_on_ac_power_on">On: Video streaming runs automatically on AC Power</string>
     <string name="prefs__only_on_ac_power_off">Off: Video streaming does not run automatically on AC Power</string>
+    <string name="prefs__debug_display_title">Debug Display</string>
+    <string name="prefs__debug_display_on">On: Display debug controls and state</string>
+    <string name="prefs__debug_display_off">Off: Does not display debug controls and state</string>
     <string name="prefs__wifi_ssid_title">SSID of Wifi Network to monitor</string>
 
     <string name="prefs__cameras_header">Cameras</string>

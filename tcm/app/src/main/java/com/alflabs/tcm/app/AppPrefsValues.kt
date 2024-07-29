@@ -34,6 +34,8 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
         }
     }
 
+    fun systemDebugDisplay() : Boolean = prefs.getBoolean(PREF_SYSTEM__DEBUG_DISPLAY, false)
+
     fun systemStartOnBoot() : Boolean = prefs.getBoolean(PREF_SYSTEM__START_ON_BOOT, false)
 
     fun systemHideNavBar() : Boolean = prefs.getBoolean(PREF_SYSTEM__HIDE_NAV_BAR, false)
@@ -67,8 +69,9 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
     }
 
     companion object {
-        const val PREF_SYSTEM__START_ON_BOOT = "pref_system__start_on_boot"
+        const val PREF_SYSTEM__DEBUG_DISPLAY = "pref_system__debug_display"
         const val PREF_SYSTEM__HOME = "pref_system__home"
+        const val PREF_SYSTEM__START_ON_BOOT = "pref_system__start_on_boot"
         const val PREF_SYSTEM__HIDE_NAV_BAR = "pref_system__hide_nav_bar"
         const val PREF_SYSTEM__WIFI_SSID = "pref_system__wifi_ssid"
         const val PREF_SYSTEM__ONLY_ON_AC_POWER = "pref_system__only_on_ac_power"
