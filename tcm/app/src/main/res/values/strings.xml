@@ -24,9 +24,15 @@
     <string name="prefs__wifi_ssid_title">SSID of Wifi Network to monitor</string>
 
     <string name="prefs__cameras_header">Cameras</string>
-    <string name="prefs__cameras_count">Number of Active Cameras</string>
+    <string name="prefs__cameras_count_title">Number of Active Cameras</string>
     <string name="prefs__url_camera_1">URL Stream Camera 1</string>
     <string name="prefs__url_camera_2">URL Stream Camera 2</string>
+    <string name="prefs__cameras_rotation_title_1">Rotation Camera 1</string>
+    <string name="prefs__cameras_rotation_title_2">Rotation Camera 2</string>
+    <string name="prefs__zoom_camera_1">Zoom Camera 1</string>
+    <string name="prefs__zoom_camera_2">Zoom Camera 2</string>
+    <string name="prefs__offset_camera_1">Offset X;Y Camera 1</string>
+    <string name="prefs__offset_camera_2">Offset X;Y Camera 2</string>
     <string name="main__video_camera_1">Video Camera 1</string>
     <string name="main__video_camera_2">Video Camera 2</string>
     <string name="main__starting_cam">Starting Cam %1$d</string>

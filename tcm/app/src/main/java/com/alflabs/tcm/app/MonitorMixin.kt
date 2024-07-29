@@ -37,6 +37,7 @@ class MonitorMixin(private val activity: MainActivity) {
     companion object {
         private val TAG: String = MonitorMixin::class.java.simpleName
         private val DEBUG: Boolean = BuildConfig.DEBUG
+        private val DEBUG_FFMPEG = false
 
         const val MAX_CAMERAS = 2
 
@@ -75,11 +76,13 @@ class MonitorMixin(private val activity: MainActivity) {
     // Invoked after onCreate or onRestart
     fun onStart() {
         if (DEBUG) Log.d(TAG, "onStart")
-        try {
-            // FFmpegLogCallback.setLevel(AV_LOG_TRACE)    // Warning: very verbose in logcat
-            FFmpegLogCallback.set()
-        } catch (t: Throwable) {
-            activity.addStatus("ERROR: $t")
+        if (DEBUG_FFMPEG) {
+            try {
+                // FFmpegLogCallback.setLevel(AV_LOG_TRACE)    // Warning: very verbose in logcat
+                FFmpegLogCallback.set()
+            } catch (t: Throwable) {
+                activity.addStatus("ERROR: $t")
+            }
         }
     }
 

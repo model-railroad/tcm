@@ -23,16 +23,54 @@ import com.alflabs.tcm.util.BasePrefsValues
 class AppPrefsValues(context: Context) : BasePrefsValues(context) {
 
     /** Retrieve string for key or null.  */
-    fun getString(key: String): String? {
+    private fun getString(key: String): String? {
         return prefs.getString(key, null)
     }
 
     /** Sets or removes (null) a key string.  */
-    fun setString(key: String, value: String?) {
+    private fun setString(key: String, value: String?) {
         synchronized(editLock()) {
             endEdit(startEdit().putString(key, value))
         }
     }
+
+    /** Retrieve int for key or default.  */
+    private fun getInt(key: String, defaultValue: Int): Int {
+        try {
+            // This may throw ClassCastException if camera count is not an Int preference.
+            return prefs.getInt(key, defaultValue)
+        } catch (ignore: Exception) { }
+        return prefs.getString(key, defaultValue.toString())?.toIntOrNull()
+            ?: defaultValue
+    }
+
+    /** Retrieve float for key or default.  */
+    private fun getFloat(key: String, defaultValue: Float): Float {
+        try {
+            // This may throw ClassCastException if camera count is not an Int preference.
+            return prefs.getFloat(key, defaultValue)
+        } catch (ignore: Exception) { }
+        return prefs.getString(key, defaultValue.toString())?.toFloatOrNull()
+            ?: defaultValue
+    }
+
+    /** Retrieve float X;Y tuple for key or default.  */
+    private fun getTuple(key: String, defaultValue: XYTuple): XYTuple {
+        val s = getString(key)
+        if (s == null) return defaultValue
+        try {
+            val splits = s.split(';')
+            if (splits.size == 2) {
+                return XYTuple(
+                    splits[0].toFloatOrNull() ?: defaultValue.x,
+                    splits[1].toFloatOrNull() ?: defaultValue.y,
+                    )
+            }
+        } catch (ignore: Exception) { }
+        return defaultValue
+    }
+
+    data class XYTuple(val x: Float, val y: Float)
 
     fun systemDebugDisplay() : Boolean = prefs.getBoolean(PREF_SYSTEM__DEBUG_DISPLAY, false)
 
@@ -44,29 +82,35 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
 
     fun systemWifiSSID() : String = prefs.getString(PREF_SYSTEM__WIFI_SSID, "") ?: ""
 
+    fun camerasCount() = getInt(PREF_CAMERAS__COUNT, MonitorMixin.MAX_CAMERAS)
+
     fun camerasUrl(index: Int) : String =
         when (index) {
-            1 -> camerasUrl1()
-            2 -> camerasUrl2()
+            1 -> prefs.getString(PREF_CAMERAS__URL_1, "") ?: ""
+            2 -> prefs.getString(PREF_CAMERAS__URL_2, "") ?: ""
             else -> throw IndexOutOfBoundsException("Camera URL Index $index out of bounds")
         }
 
-    fun camerasUrl1() : String = prefs.getString(PREF_CAMERAS__URL_1, "") ?: ""
+    fun camerasRotation(index: Int) : Int =
+        when (index) {
+            1 -> getInt(PREF_CAMERAS__ROTATION_1, 0)
+            2 -> getInt(PREF_CAMERAS__ROTATION_2, 0)
+            else -> throw IndexOutOfBoundsException("Camera Rotation Index $index out of bounds")
+        }
 
-    fun camerasUrl2() : String = prefs.getString(PREF_CAMERAS__URL_2, "") ?: ""
+    fun camerasZoom(index: Int) : Float =
+        when (index) {
+            1 -> getFloat(PREF_CAMERAS__ZOOM_1, 1.0f)
+            2 -> getFloat(PREF_CAMERAS__ZOOM_2, 1.0f)
+            else -> throw IndexOutOfBoundsException("Camera Zoom Index $index out of bounds")
+        }
 
-    fun camerasCount() : Int {
-        try {
-            // This may throw ClassCastException if camera count is not an Int preference.
-            return prefs.getInt(PREF_CAMERAS__COUNT, MonitorMixin.MAX_CAMERAS)
-        } catch (ignore: Exception) { }
-        try {
-            // This will throw if String is not a valid Int representation
-            return prefs.getString(PREF_CAMERAS__COUNT, MonitorMixin.MAX_CAMERAS.toString())?.toInt()
-                ?: MonitorMixin.MAX_CAMERAS
-        } catch (ignore: Exception) { }
-        return MonitorMixin.MAX_CAMERAS
-    }
+    fun camerasOffset(index: Int) : XYTuple =
+        when (index) {
+            1 -> getTuple(PREF_CAMERAS__OFFSET_1, XYTuple(0f, 0f))
+            2 -> getTuple(PREF_CAMERAS__OFFSET_2, XYTuple(0f, 0f))
+            else -> throw IndexOutOfBoundsException("Camera Offset Index $index out of bounds")
+        }
 
     companion object {
         const val PREF_SYSTEM__DEBUG_DISPLAY = "pref_system__debug_display"
@@ -78,5 +122,11 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
         const val PREF_CAMERAS__COUNT = "pref_cameras__count"
         const val PREF_CAMERAS__URL_1 = "pref_cameras__url_1"
         const val PREF_CAMERAS__URL_2 = "pref_cameras__url_2"
+        const val PREF_CAMERAS__ROTATION_1 = "pref_cameras__rotation_1"
+        const val PREF_CAMERAS__ROTATION_2 = "pref_cameras__rotation_2"
+        const val PREF_CAMERAS__ZOOM_1 = "pref_cameras__zoom_1"
+        const val PREF_CAMERAS__ZOOM_2 = "pref_cameras__zoom_2"
+        const val PREF_CAMERAS__OFFSET_1 = "pref_cameras__offset_1"
+        const val PREF_CAMERAS__OFFSET_2 = "pref_cameras__offset_2"
     }
 }

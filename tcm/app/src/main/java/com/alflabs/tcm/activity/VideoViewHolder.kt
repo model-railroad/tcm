@@ -18,18 +18,30 @@
 package com.alflabs.tcm.activity
 
 import android.graphics.Bitmap
+import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
+import com.alflabs.tcm.BuildConfig
 import com.alflabs.tcm.R
+import com.alflabs.tcm.app.AppPrefsValues
 import com.alflabs.tcm.util.FpsMeasurer
 
 class VideoViewHolder(
+    prefs: AppPrefsValues,
     private val cameraIndex: Int,
     private val imageView: ImageView,
     private val statusView: TextView,
     private val fpsView: TextView) {
 
+    companion object {
+        private val TAG: String = VideoViewHolder::class.java.simpleName
+        private val DEBUG: Boolean = BuildConfig.DEBUG
+    }
+
     private val fpsMeasurer = FpsMeasurer()
+    private val rotation = prefs.camerasRotation(cameraIndex)
+    private val zoom = prefs.camerasZoom(cameraIndex)
+    private val offset = prefs.camerasOffset(cameraIndex)
 
     fun render(bmp: Bitmap) {
         imageView.post {
@@ -46,11 +58,17 @@ class VideoViewHolder(
     }
 
     fun onStart() {
+        if (DEBUG) Log.d(TAG, "VideoViewHolder $cameraIndex -- START")
         setStatus("Starting")
+        imageView.scaleType = ImageView.ScaleType.CENTER
+        imageView.rotation = rotation.toFloat()
+        imageView.scaleX = zoom
+        imageView.scaleY = zoom
         fpsView.text = fpsView.context.getString(R.string.main__starting_cam, cameraIndex)
     }
 
     fun onStop() {
+        if (DEBUG) Log.d(TAG, "VideoViewHolder $cameraIndex -- STOP")
         fpsView.text = fpsView.context.getString(R.string.main__stopped_cam, cameraIndex)
     }
 }

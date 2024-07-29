@@ -85,12 +85,14 @@ class MainActivity : AppCompatActivity() {
 
         videoViewHolders = listOf(
             VideoViewHolder(
+                prefs,
                 1,
                 findViewById(R.id.video_cam1),
                 findViewById(R.id.status_cam1),
                 findViewById(R.id.fps_cam1),
                 ),
             VideoViewHolder(
+                prefs,
                 2,
                 findViewById(R.id.video_cam2),
                 findViewById(R.id.status_cam2),

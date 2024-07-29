@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="pref_cameras__rotation_strings">
+        <item>Rotation CCW</item>
+        <item>No Rotation</item>
+        <item>Rotation CW</item>
+    </string-array>
+
+    <!-- Must match AppPrefsValues.BootAction (case insensitive) -->
+    <string-array name="pref_cameras__rotation_values">
+        <item>-90</item>
+        <item>0</item>
+        <item>90</item>
+    </string-array>
+
+</resources>

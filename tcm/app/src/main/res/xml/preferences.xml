@@ -49,7 +49,7 @@
 
         <ListPreference
                 app:key="pref_cameras__count"
-                app:title="@string/prefs__cameras_count"
+                app:title="@string/prefs__cameras_count_title"
                 app:useSimpleSummaryProvider="true" />
 
         <EditTextPreference
@@ -60,12 +60,62 @@
                 android:maxLines="1"
                 app:useSimpleSummaryProvider="true" />
 
+        <ListPreference
+                app:key="pref_cameras__rotation_1"
+                app:title="@string/prefs__cameras_rotation_title_1"
+                android:entries="@array/pref_cameras__rotation_strings"
+                android:entryValues="@array/pref_cameras__rotation_values"
+                app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+                app:key="pref_cameras__zoom_1"
+                app:title="@string/prefs__zoom_camera_1"
+                android:inputType="numberDecimal"
+                android:singleLine="true"
+                android:maxLines="1"
+                app:defaultValue="1"
+                app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+                app:key="pref_cameras__offset_1"
+                app:title="@string/prefs__offset_camera_1"
+                android:inputType="text"
+                android:singleLine="true"
+                android:maxLines="1"
+                app:defaultValue="0;0"
+                app:useSimpleSummaryProvider="true" />
+
         <EditTextPreference
                 app:key="pref_cameras__url_2"
                 app:title="@string/prefs__url_camera_2"
                 android:inputType="text"
                 android:singleLine="true"
                 android:maxLines="1"
+                app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+                app:key="pref_cameras__rotation_2"
+                app:title="@string/prefs__cameras_rotation_title_2"
+                android:entries="@array/pref_cameras__rotation_strings"
+                android:entryValues="@array/pref_cameras__rotation_values"
+                app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+                app:key="pref_cameras__zoom_2"
+                app:title="@string/prefs__zoom_camera_2"
+                android:inputType="numberDecimal"
+                android:singleLine="true"
+                android:maxLines="1"
+                app:defaultValue="1"
+                app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+                app:key="pref_cameras__offset_2"
+                app:title="@string/prefs__offset_camera_2"
+                android:inputType="text"
+                android:singleLine="true"
+                android:maxLines="1"
+                app:defaultValue="0;0"
                 app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
