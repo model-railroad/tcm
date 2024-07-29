@@ -18,6 +18,7 @@
 package com.alflabs.tcm.activity
 
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
@@ -39,10 +40,15 @@ class VideoViewHolder(
     }
 
     private val fpsMeasurer = FpsMeasurer()
+    private var mat: Matrix? = null
 
     fun render(bmp: Bitmap) {
         imageView.post {
             fpsMeasurer.ping()
+            if (mat == null) {
+                mat = computeImageMatrix(bmp.width, bmp.height, imageView.width, imageView.height)
+                imageView.imageMatrix = mat
+            }
             imageView.setImageBitmap(bmp)
             fpsView.text = fpsMeasurer.lastFps
         }
@@ -57,21 +63,42 @@ class VideoViewHolder(
     fun onStart() {
         if (DEBUG) Log.d(TAG, "VideoViewHolder $cameraIndex -- START")
         setStatus("Starting")
+        fpsView.text = fpsView.context.getString(R.string.main__starting_cam, cameraIndex)
 
         // Note: Any preferences should be used in onStart, which is called after PrefsActivity.
-        val rotation = prefs.camerasRotation(cameraIndex)
-        val zoom = prefs.camerasZoom(cameraIndex)
-        val offset = prefs.camerasOffset(cameraIndex)
-
-        imageView.scaleType = ImageView.ScaleType.CENTER
-        imageView.rotation = rotation.toFloat()
-        imageView.scaleX = zoom
-        imageView.scaleY = zoom
-        fpsView.text = fpsView.context.getString(R.string.main__starting_cam, cameraIndex)
+        imageView.scaleType = ImageView.ScaleType.MATRIX
+        // Force recomputing matrix before displaying the first image
+        // (we don't know the image size here before the first rendering; we do have that info
+        // in GrabberThread but only after the stream connection started.)
+        mat = null
     }
 
     fun onStop() {
         if (DEBUG) Log.d(TAG, "VideoViewHolder $cameraIndex -- STOP")
         fpsView.text = fpsView.context.getString(R.string.main__stopped_cam, cameraIndex)
+    }
+
+    private fun computeImageMatrix(bmpW: Int, bmpH: Int, viewW: Int, viewH: Int): Matrix {
+        val rotation = prefs.camerasRotation(cameraIndex).toFloat()
+        val zoom = prefs.camerasZoom(cameraIndex)
+        val offset = prefs.camerasOffset(cameraIndex)
+        val mat = Matrix()
+
+        // Center image on view (0,0) to apply rotation & scale
+        mat.setTranslate(
+            bmpW * -0.5f,
+            bmpH * -0.5f)
+
+        mat.postRotate(rotation)
+
+        mat.postScale(zoom, zoom)
+
+        // Center image on middle of view + apply requested offset (in pixels)
+        mat.postTranslate(
+            viewW * 0.5f + offset.x,
+            viewH * 0.5f + offset.y,
+        )
+
+        return mat
     }
 }

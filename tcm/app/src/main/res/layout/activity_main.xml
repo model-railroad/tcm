@@ -19,7 +19,6 @@
                     android:id="@+id/video_cam1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
                     android:contentDescription="@string/main__video_camera_1"
                     />
             <TextView
@@ -41,7 +40,6 @@
                     android:id="@+id/video_cam2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
                     android:contentDescription="@string/main__video_camera_2"
                     />
             <TextView

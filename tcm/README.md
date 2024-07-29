@@ -175,7 +175,7 @@ MVP:
 + App: Structure Main Activity w/ 2 bitmap views + 2 FPS measurers, Start/Stop.
 + App: Configure number of cameras (1 or 2) via prefs.
 + Main: Pause grabber threads on activity pause, restore automatically.
-- Main: Ability to rotate bitmaps, zoom (fill vs fit), and offset. Configure via prefs.
++ Main: Ability to rotate bitmaps, zoom (manual), and offset. Configure via prefs.
 + App: Autostart on boot.
 + App: Replace Home Launcher.
 + App: Hide nav bar, overlap translucent status bar
@@ -188,6 +188,8 @@ MVP:
 - Admin: Deploy MVP.
 
 Phase 2 (optional):
+- Gamma correction on input images (via OpenCV LUT f.ex.)
+- Reintroduce preference to fill/fit in image view.
 - Use OpenCV to detect motion.
 - Highlight videos w/ detected motion.
 - Limit detection to specific part of recorded frame.
