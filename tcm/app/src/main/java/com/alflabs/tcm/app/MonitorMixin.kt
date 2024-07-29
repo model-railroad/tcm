@@ -49,8 +49,8 @@ class MonitorMixin(private val activity: MainActivity) {
 
     private var camerasCount : Int = 0
     private var grabberThreads = mutableListOf<GrabberThread>()
-    lateinit var wakeWifiLockHandler : WakeWifiLockHandler
-        private set
+//    lateinit var wakeWifiLockHandler : WakeWifiLockHandler
+//        private set
     private var batteryMonitorThread : BatteryMonitorThread? = null
 
     fun onCreate() {
@@ -58,8 +58,8 @@ class MonitorMixin(private val activity: MainActivity) {
         val prefs = AppPrefsValues(activity)
         camerasCount = prefs.camerasCount()
 
-        wakeWifiLockHandler = WakeWifiLockHandler(activity)
-        wakeWifiLockHandler.onCreate()
+//        wakeWifiLockHandler = WakeWifiLockHandler(activity)
+//        wakeWifiLockHandler.onCreate()
 
         if (prefs.systemDisconnectOnBattery()) {
             batteryMonitorThread = BatteryMonitorThread(activity.getLogger(), activity) {
@@ -136,16 +136,16 @@ class MonitorMixin(private val activity: MainActivity) {
 
         grabberThreads.forEach { it.start() }
 
-        wakeWifiLockHandler.lockWake()
-        wakeWifiLockHandler.lockWifi()
-        wakeWifiLockHandler.enableSelectedWifiNetwork()
+//        wakeWifiLockHandler.lockWake()
+//        wakeWifiLockHandler.lockWifi()
+//        wakeWifiLockHandler.enableSelectedWifiNetwork()
     }
 
     fun onStopStreaming() {
         if (DEBUG) Log.d(TAG, "onStopStreaming ${grabberThreads.size} grabber threads")
 
-        wakeWifiLockHandler.releaseWifi()
-        wakeWifiLockHandler.releaseWake()
+//        wakeWifiLockHandler.releaseWifi()
+//        wakeWifiLockHandler.releaseWake()
 
         grabberThreads.forEach { it.stop() }
         grabberThreads.clear()

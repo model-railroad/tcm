@@ -188,6 +188,7 @@ MVP:
 - Admin: Deploy MVP.
 
 Phase 2 (optional):
+- Force activity display orientation (via prefs).
 - Gamma correction on input images (via OpenCV LUT f.ex.)
 - Reintroduce preference to fill/fit in image view.
 - Use OpenCV to detect motion.

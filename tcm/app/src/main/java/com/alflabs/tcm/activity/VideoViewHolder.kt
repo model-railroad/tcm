@@ -63,6 +63,7 @@ class VideoViewHolder(
     fun onStart() {
         if (DEBUG) Log.d(TAG, "VideoViewHolder $cameraIndex -- START")
         setStatus("Starting")
+        imageView.keepScreenOn = true
         fpsView.text = fpsView.context.getString(R.string.main__starting_cam, cameraIndex)
 
         // Note: Any preferences should be used in onStart, which is called after PrefsActivity.
@@ -75,6 +76,7 @@ class VideoViewHolder(
 
     fun onStop() {
         if (DEBUG) Log.d(TAG, "VideoViewHolder $cameraIndex -- STOP")
+        imageView.keepScreenOn = false
         fpsView.text = fpsView.context.getString(R.string.main__stopped_cam, cameraIndex)
     }
 

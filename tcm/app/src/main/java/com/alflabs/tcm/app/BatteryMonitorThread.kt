@@ -35,15 +35,15 @@ class BatteryMonitorThread(
         private val TAG: String = BatteryMonitorThread::class.java.simpleName
 
         const val ON_POWER_PAUSE_MS   = 1000L * 5  // 5 seconds
-        const val ON_BATTERY_PAUSE_MS = 1000L * 60  // 1 minute
+        const val ON_BATTERY_PAUSE_MS = 1000L * 30  // 30 seconds -- TBD change to 1 min in prod
     }
 
     @Volatile
     private var isPlugged = false
 
     override fun beforeThreadLoop() {
-        logger.log(TAG, "beforeThreadLoop")
         isPlugged = isPlugged()
+        logger.log(TAG, "beforeThreadLoop -- isPlugged $isPlugged")
     }
 
     override fun runInThreadLoop() {
@@ -78,6 +78,7 @@ class BatteryMonitorThread(
         // 0 for battery or a bitmask for {AC, Dock, USB}. We don't care how the device is
         // charging as long as it is powered by something.
         val plugged = battStatus?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) ?: 0
+        logger.log(TAG, "@@ check isPlugged  = $plugged")  // DEBUG
         return plugged != 0
     }
 }
