@@ -50,8 +50,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val prefs = AppPrefsValues(this)
-        debugDisplay = prefs.systemDebugDisplay()
         monitorMixin = MonitorMixin(this)
         monitorMixin.onCreate()
 
@@ -60,6 +58,7 @@ class MainActivity : AppCompatActivity() {
         // Note: an alternative is to set it via style theme resources as such:
         // <item name="android:statusBarColor">@android:color/transparent</item>
         // However by doing it programmatically we can respect the app preferences.
+        val prefs = AppPrefsValues(this)
         if (prefs.systemHideNavBar()) {
             enableEdgeToEdge(
                 statusBarStyle = SystemBarStyle.dark(Color.argb(0x40, 0x20, 0x20, 0x20))
@@ -78,34 +77,24 @@ class MainActivity : AppCompatActivity() {
         // }
 
 
-        val startBtn = findViewById<Button>(R.id.start_btn)
-        val stopBtn = findViewById<Button>(R.id.stop_btn)
-        val prefsBtn = findViewById<ImageButton>(R.id.prefs_btn)
         statusTxt = findViewById(R.id.status_text)
 
         videoViewHolders = listOf(
             VideoViewHolder(
-                prefs,
                 1,
+                prefs,
                 findViewById(R.id.video_cam1),
                 findViewById(R.id.status_cam1),
                 findViewById(R.id.fps_cam1),
                 ),
             VideoViewHolder(
-                prefs,
                 2,
+                prefs,
                 findViewById(R.id.video_cam2),
                 findViewById(R.id.status_cam2),
                 findViewById(R.id.fps_cam2),
                 ),
         )
-
-        statusTxt.visibility = if (debugDisplay) View.VISIBLE else View.INVISIBLE
-        startBtn.visibility = if (debugDisplay) View.VISIBLE else View.INVISIBLE
-        stopBtn .visibility = if (debugDisplay) View.VISIBLE else View.INVISIBLE
-        startBtn.setOnClickListener { onStartButton() }
-        stopBtn .setOnClickListener { onStopButton() }
-        prefsBtn.setOnClickListener { onPrefsButton() }
 
         if (DEBUG) addStatus("\n@@ ABIs: ${android.os.Build.SUPPORTED_ABIS.toList()}")
     }
@@ -113,6 +102,25 @@ class MainActivity : AppCompatActivity() {
     // Invoked after onCreate or onRestart
     override fun onStart() {
         super.onStart()
+
+        // Note: Any UI that can be changed by editing preferences should be set/reset in
+        // onStart rather than onCreate. onStart is called when coming back from PrefsActivity.
+        val prefs = AppPrefsValues(this)
+        debugDisplay = prefs.systemDebugDisplay()
+        if (DEBUG) Log.d(TAG, "onStart -- debugDisplay = $debugDisplay")
+
+        statusTxt.visibility = if (debugDisplay) View.VISIBLE else View.INVISIBLE
+        if (!debugDisplay) statusTxt.text = ""
+
+        val startBtn = findViewById<Button>(R.id.start_btn)
+        val stopBtn = findViewById<Button>(R.id.stop_btn)
+        val prefsBtn = findViewById<ImageButton>(R.id.prefs_btn)
+        startBtn.visibility = if (debugDisplay) View.VISIBLE else View.INVISIBLE
+        stopBtn .visibility = if (debugDisplay) View.VISIBLE else View.INVISIBLE
+        startBtn.setOnClickListener { onStartButton() }
+        stopBtn .setOnClickListener { onStopButton() }
+        prefsBtn.setOnClickListener { onPrefsButton() }
+
         monitorMixin.onStart()
     }
 

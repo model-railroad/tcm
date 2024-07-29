@@ -27,8 +27,8 @@ import com.alflabs.tcm.app.AppPrefsValues
 import com.alflabs.tcm.util.FpsMeasurer
 
 class VideoViewHolder(
-    prefs: AppPrefsValues,
     private val cameraIndex: Int,
+    private val prefs: AppPrefsValues,
     private val imageView: ImageView,
     private val statusView: TextView,
     private val fpsView: TextView) {
@@ -39,9 +39,6 @@ class VideoViewHolder(
     }
 
     private val fpsMeasurer = FpsMeasurer()
-    private val rotation = prefs.camerasRotation(cameraIndex)
-    private val zoom = prefs.camerasZoom(cameraIndex)
-    private val offset = prefs.camerasOffset(cameraIndex)
 
     fun render(bmp: Bitmap) {
         imageView.post {
@@ -60,6 +57,12 @@ class VideoViewHolder(
     fun onStart() {
         if (DEBUG) Log.d(TAG, "VideoViewHolder $cameraIndex -- START")
         setStatus("Starting")
+
+        // Note: Any preferences should be used in onStart, which is called after PrefsActivity.
+        val rotation = prefs.camerasRotation(cameraIndex)
+        val zoom = prefs.camerasZoom(cameraIndex)
+        val offset = prefs.camerasOffset(cameraIndex)
+
         imageView.scaleType = ImageView.ScaleType.CENTER
         imageView.rotation = rotation.toFloat()
         imageView.scaleX = zoom
