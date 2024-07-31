@@ -83,6 +83,7 @@ class MainActivity : AppCompatActivity() {
             VideoViewHolder(
                 1,
                 prefs,
+                findViewById(R.id.container_cam1),
                 findViewById(R.id.video_cam1),
                 findViewById(R.id.status_cam1),
                 findViewById(R.id.fps_cam1),
@@ -90,6 +91,7 @@ class MainActivity : AppCompatActivity() {
             VideoViewHolder(
                 2,
                 prefs,
+                findViewById(R.id.container_cam2),
                 findViewById(R.id.video_cam2),
                 findViewById(R.id.status_cam2),
                 findViewById(R.id.fps_cam2),
@@ -109,14 +111,14 @@ class MainActivity : AppCompatActivity() {
         debugDisplay = prefs.systemDebugDisplay()
         if (DEBUG) Log.d(TAG, "onStart -- debugDisplay = $debugDisplay")
 
-        statusTxt.visibility = if (debugDisplay) View.VISIBLE else View.INVISIBLE
+        statusTxt.visibility = if (debugDisplay) View.VISIBLE else View.GONE
         if (!debugDisplay) statusTxt.text = ""
 
         val startBtn = findViewById<Button>(R.id.start_btn)
         val stopBtn = findViewById<Button>(R.id.stop_btn)
         val prefsBtn = findViewById<ImageButton>(R.id.prefs_btn)
-        startBtn.visibility = if (debugDisplay) View.VISIBLE else View.INVISIBLE
-        stopBtn .visibility = if (debugDisplay) View.VISIBLE else View.INVISIBLE
+        startBtn.visibility = if (debugDisplay) View.VISIBLE else View.GONE
+        stopBtn .visibility = if (debugDisplay) View.VISIBLE else View.GONE
         startBtn.setOnClickListener { onStartButton() }
         stopBtn .setOnClickListener { onStopButton() }
         prefsBtn.setOnClickListener { onPrefsButton() }

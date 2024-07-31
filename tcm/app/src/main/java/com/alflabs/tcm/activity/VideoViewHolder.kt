@@ -20,6 +20,8 @@ package com.alflabs.tcm.activity
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.util.Log
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.alflabs.tcm.BuildConfig
@@ -30,6 +32,7 @@ import com.alflabs.tcm.util.FpsMeasurer
 class VideoViewHolder(
     private val cameraIndex: Int,
     private val prefs: AppPrefsValues,
+    private val container: ViewGroup,
     private val imageView: ImageView,
     private val statusView: TextView,
     private val fpsView: TextView) {
@@ -58,6 +61,10 @@ class VideoViewHolder(
         statusView.post {
             statusView.text = status
         }
+    }
+
+    fun setVisible(visible: Boolean) {
+        container.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
     fun onStart() {

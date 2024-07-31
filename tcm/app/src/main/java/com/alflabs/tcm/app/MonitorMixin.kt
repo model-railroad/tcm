@@ -55,22 +55,10 @@ class MonitorMixin(private val activity: MainActivity) {
 
     fun onCreate() {
         if (DEBUG) Log.d(TAG, "onCreate")
-        val prefs = AppPrefsValues(activity)
-        camerasCount = prefs.camerasCount()
 
 //        wakeWifiLockHandler = WakeWifiLockHandler(activity)
 //        wakeWifiLockHandler.onCreate()
 
-        if (prefs.systemDisconnectOnBattery()) {
-            batteryMonitorThread = BatteryMonitorThread(activity.getLogger(), activity) {
-                isPlugged -> activity.runOnUiThread {
-                    when(isPlugged) {
-                        true -> onStartStreaming()
-                        false -> onStopStreaming()
-                    }
-                }
-            }
-        }
     }
 
     // Invoked after onCreate or onRestart
@@ -84,6 +72,25 @@ class MonitorMixin(private val activity: MainActivity) {
                 activity.addStatus("ERROR: $t")
             }
         }
+
+        val prefs = AppPrefsValues(activity)
+        camerasCount = prefs.camerasCount()
+
+        if (prefs.systemDisconnectOnBattery() && batteryMonitorThread == null) {
+            batteryMonitorThread = BatteryMonitorThread(activity.getLogger(), activity) {
+                    isPlugged -> activity.runOnUiThread {
+                    when(isPlugged) {
+                        true -> onStartStreaming()
+                        false -> onStopStreaming()
+                    }
+                }
+            }
+        }
+
+        for (index in 1..MAX_CAMERAS) {
+            activity.videoViewHolders[index - 1].setVisible(index <= camerasCount)
+        }
+
     }
 
     // Invoked after onStart or onPause
