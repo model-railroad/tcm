@@ -32,6 +32,19 @@
                     android:textColor="@color/red"
                     tools:text="Status 1"
                 />
+            <TextView
+                    android:id="@+id/label_cam1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:gravity="center_horizontal"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:shadowColor="@color/black"
+                    android:shadowRadius="10"
+                    tools:text="Label 1"
+                    />
         </FrameLayout>
         <FrameLayout
                 android:id="@+id/container_cam2"
@@ -53,6 +66,19 @@
                     android:textStyle="bold"
                     android:textColor="@color/red"
                     tools:text="Status 2"
+                    />
+            <TextView
+                    android:id="@+id/label_cam2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:gravity="center_horizontal"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:shadowColor="@color/black"
+                    android:shadowRadius="10"
+                    tools:text="Label 2"
                     />
         </FrameLayout>
     </LinearLayout>

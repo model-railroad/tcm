@@ -91,6 +91,13 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
             else -> throw IndexOutOfBoundsException("Camera URL Index $index out of bounds")
         }
 
+    fun camerasLabel(index: Int) : String =
+        when (index) {
+            1 -> prefs.getString(PREF_CAMERAS__LABEL_1, "") ?: ""
+            2 -> prefs.getString(PREF_CAMERAS__LABEL_2, "") ?: ""
+            else -> throw IndexOutOfBoundsException("Camera LABEL Index $index out of bounds")
+        }
+
     fun camerasRotation(index: Int) : Int =
         when (index) {
             1 -> getInt(PREF_CAMERAS__ROTATION_1, 0)
@@ -122,6 +129,8 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
         const val PREF_CAMERAS__COUNT = "pref_cameras__count"
         const val PREF_CAMERAS__URL_1 = "pref_cameras__url_1"
         const val PREF_CAMERAS__URL_2 = "pref_cameras__url_2"
+        const val PREF_CAMERAS__LABEL_1 = "pref_cameras__label_1"
+        const val PREF_CAMERAS__LABEL_2 = "pref_cameras__label_2"
         const val PREF_CAMERAS__ROTATION_1 = "pref_cameras__rotation_1"
         const val PREF_CAMERAS__ROTATION_2 = "pref_cameras__rotation_2"
         const val PREF_CAMERAS__ZOOM_1 = "pref_cameras__zoom_1"

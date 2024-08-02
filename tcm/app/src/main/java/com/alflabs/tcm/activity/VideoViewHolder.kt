@@ -34,6 +34,7 @@ class VideoViewHolder(
     private val prefs: AppPrefsValues,
     private val container: ViewGroup,
     private val imageView: ImageView,
+    private val labelView: TextView,
     private val statusView: TextView,
     private val fpsView: TextView) {
 
@@ -72,6 +73,8 @@ class VideoViewHolder(
         setStatus("Starting")
         imageView.keepScreenOn = true
         fpsView.text = fpsView.context.getString(R.string.main__starting_cam, cameraIndex)
+
+        labelView.text = prefs.camerasLabel(cameraIndex)
 
         // Note: Any preferences should be used in onStart, which is called after PrefsActivity.
         imageView.scaleType = ImageView.ScaleType.MATRIX

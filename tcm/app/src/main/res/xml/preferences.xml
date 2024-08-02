@@ -60,6 +60,14 @@
                 android:maxLines="1"
                 app:useSimpleSummaryProvider="true" />
 
+        <EditTextPreference
+                app:key="pref_cameras__label_1"
+                app:title="@string/prefs__label_camera_1"
+                android:inputType="text"
+                android:singleLine="true"
+                android:maxLines="1"
+                app:useSimpleSummaryProvider="true" />
+
         <ListPreference
                 app:key="pref_cameras__rotation_1"
                 app:title="@string/prefs__cameras_rotation_title_1"
@@ -88,6 +96,14 @@
         <EditTextPreference
                 app:key="pref_cameras__url_2"
                 app:title="@string/prefs__url_camera_2"
+                android:inputType="text"
+                android:singleLine="true"
+                android:maxLines="1"
+                app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+                app:key="pref_cameras__label_2"
+                app:title="@string/prefs__label_camera_2"
                 android:inputType="text"
                 android:singleLine="true"
                 android:maxLines="1"
