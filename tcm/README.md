@@ -1,8 +1,8 @@
-# TCM - Train Cam Monitor
+# TCM - Track Cam Monitor
 
 ## What is it
 
-"TCM" (aka the "Train Cam Monitor") is a simple Android application that
+"TCM" (aka the "Track Cam Monitor") is a simple Android application that
 connects to two RTSP cameras and displays their video feed on-screen.
 
 The application is tailored to view specific train tracks on the Randall Museum
@@ -12,7 +12,10 @@ located at the main operating yard. In this case, a tablet is mounted to the fas
 of the layout where the operators are and that allows them to view the track on the
 other side of the layout.
 
-The same system should be useful for example to view hidden staging yards.
+![Track Cam Monitor Running on a 10-inch Tablet](https://www.alfray.com/trains/blog/randall/2024-08-02_experiment_track_cam_monitor_549b913988a239288fc8cc33248014aba5828fd9i.jpg)
+
+For a description of the deployment on the Randall Museum Model Railroad,
+please check out the [blog annoucenemnt here](https://www.alfray.com/trains/blog/randall/2024-08-02_experiment_track_cam_monitor.html).
 
 There are a number of Android application that already allow one to view multiple
 cameras RTSP feeds, and so there's no novelty in that.
@@ -23,9 +26,6 @@ The following features are unique to TCM:
   not techies and we can't expect them to boot a tablet and run a specific app.
   Instead, the TCM application is designed to automatically start when the tablet
   boots.
-- A wake lock is used to keep the screen from turning off when the videos are shown.
-- A WiFi lock is used to prevent the WiFi from disconnecting during use.
-- A specific WiFi SSID can be designed and the software makes the tablet connect to that automatically.
 - The application disconnects from the video cameras automatically when the tablet power is off.
   In our case, the museum's layout is only powered from 9am to 5pm. When the layout's power is off,
   the tablet automatically stops processing video and enters a sleep mode (to preserve battery)
@@ -46,10 +46,10 @@ the screen layout for different form factors.
 To achieve the desired "unattended" behavior, the tablet is typically configured as
 follows in the Android system settings:
 
-- Display > Screen Timeout : 15 seconds
+- Display > Screen Timeout : 30 seconds
 - Display > Screen Saver : None
 - Security > Screen Lock : None
-- Developer Options > Keep Screen On When Charging
+- Developer Options > Keep Screen On When Charging : Off
 
 The tablet is to be treated as an "appliances" -- it should only contain this application,
 and should be considered unsecured. This can be achieved two ways:
@@ -119,25 +119,25 @@ To monitor the charging state, Android provides the `ACTION_BATTERY_CHANGED` int
 the `BatteryManager.isCharging()` function (only API 23 and above).
 We do not need any AndroidManifest broadcast to monitor the charging state outside of the
 application's lifecycle.
-This can be periodically checked using a `PeriodicWorkRequest` and the `WorkManager`.
+This is periodically checked using a thread in the main activity.
+
 
 The behavior should be:
 
-- When the main activity starts, start a PeriodicWorkRequest to check the power state.
-- When the main activity is paused, stop the PeriodicWorkRequest.
+- When the main activity starts, start a thread to check the power state.
+    - The thread runs the check in a loop with a fairly long pause, which timeout
+      depends on whether the app is streaming or idle.
+- When the main activity is paused, stop the thread.
 - When power is on:
-  - Acquire a wake lock, to prevent the display from sleeping.
-  - Attempt to connect to the desired WiFi network, if specified (only on API < 29).
-  - Acquire a WiFi lock, to keep the WiFi active.
+  - Acquire a wake lock via the View.screen_on attribute, to prevent the display from sleeping.
   - Start video streaming.
 - When power is off, or the main activity is paused:
   - Stop video streaming.
-  - Release the WiFi lock. WiFi should disconnect/enter sleep mode as controlled by Android.
-    (we do not specifically disconnected from the wifi network).
-  - Release the wake lock, to ensure the screen can dim and enter sleep mode.
+  - Release the View.screen_on wake lock, to ensure the screen can dim and enter sleep mode.
 
 Starting with Android 10 (API 29), it is no longer possible to use the WiFiManager
-feature to force enable the wifi and automatically select an SSID to connect to.
+feature to force enable the wifi and automatically select an SSID to connect to, and thus this
+feature is no longer offered.
 
 
 
@@ -185,7 +185,7 @@ MVP:
 + App: Handle camera lost + reconnection
 + App: Debug display preference.
 + Admin: Fill readme
-- Admin: Deploy MVP.
++ Admin: Deploy MVP.
 
 Phase 2 (optional):
 - Force activity display orientation (via prefs).
