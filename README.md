@@ -144,7 +144,7 @@ feature is no longer offered.
 
 ## Current State and Planned Improvements
 
-See the [tcm/README.md](src/master/tcm/README.md) file for more information.
+See the [tcm/README.md](tcm/README.md) file for more information.
 
 
 
