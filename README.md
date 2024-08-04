@@ -15,7 +15,7 @@ other side of the layout.
 ![Track Cam Monitor Running on a 10-inch Tablet](https://www.alfray.com/trains/blog/randall/2024-08-02_experiment_track_cam_monitor_549b913988a239288fc8cc33248014aba5828fd9i.jpg)
 
 For a description of the deployment on the Randall Museum Model Railroad,
-please check out the [blog annoucenemnt here](https://www.alfray.com/trains/blog/randall/2024-08-02_experiment_track_cam_monitor.html).
+please check out the [blog announcement here](https://www.alfray.com/trains/blog/randall/2024-08-02_experiment_track_cam_monitor.html).
 
 The same system could be useful for example to view hidden staging yards.
 
@@ -142,11 +142,6 @@ feature to force enable the wifi and automatically select an SSID to connect to,
 feature is no longer offered.
 
 
-## Current State and Planned Improvements
-
-See the [tcm/README.md](tcm/README.md) file for more information.
-
-
 
 ## License
 
@@ -169,5 +164,41 @@ __TCM__ is licensed under the __GNU GPL v3 license__.
 
 The full GPL license is available in the file "LICENSE-gpl-3.0.txt".
 
+
+## Current State and Planned Improvements
+
+MVP:
+
+- ✅ Setup: Android project w/ working JavaCV JNI libs.
+- ✅ Setup: JavaCV FFmpegFrameGrabber working with target RTSP cameras.
+- ✅ App: Refactor FFmpegFrameGrabber usage into GrabberThread.
+- ✅ App: Add FpsMeasurer to display FPS performance.
+- ✅ App: Prefs Activity to enter camera URLs.
+- ✅ App: Ability to display JavaCV frame as Android Bitmap.
+- ✅ App: Structure Main Activity w/ 2 bitmap views + 2 FPS measurers, Start/Stop.
+- ✅ App: Configure number of cameras (1 or 2) via prefs.
+- ✅ Main: Pause grabber threads on activity pause, restore automatically.
+- ✅ Main: Ability to rotate bitmaps, zoom (manual), and offset. Configure via prefs.
+- ✅ App: Autostart on boot.
+- ✅ App: Replace Home Launcher.
+- ✅ App: Hide nav bar, overlap translucent status bar
+- ✅ Main: Restructure video streaming to be controlled by the activity lifecycle (starts/pause).
+- ✅ App: Monitor power state. Use it to control video streaming.
+- ✅ App: Add support for Wake Lock and WiFi lock.
+- ✅ App: Handle camera lost + reconnection
+- ✅ App: Debug display preference.
+- ✅ Admin: Fill readme
+- ✅ Admin: Deploy MVP.
+- ☐ Admin: Deploy to Google Play.
+
+
+Phase 2 (optional):
+
+- ☐ Force activity display orientation (via prefs).
+- ☐ Gamma correction on input images (via OpenCV LUT f.ex.)
+- ☐ Reintroduce preference to fill/fit in image view.
+- ☐ Use OpenCV to detect motion.
+- ☐ Highlight videos w/ detected motion.
+- ☐ Limit detection to specific part of recorded frame.
 
 ~~
