@@ -21,6 +21,7 @@ import android.util.Log
 import com.alflabs.tcm.BuildConfig
 import com.alflabs.tcm.activity.MainActivity
 import com.alflabs.tcm.record.GrabberThread
+import com.alflabs.tcm.util.GlobalDebug
 import org.bytedeco.javacv.FFmpegLogCallback
 
 /**
@@ -36,8 +37,8 @@ class MonitorMixin(private val activity: MainActivity) {
 
     companion object {
         private val TAG: String = MonitorMixin::class.java.simpleName
-        private val DEBUG: Boolean = BuildConfig.DEBUG
-        private val DEBUG_FFMPEG = false
+        private val DEBUG: Boolean = GlobalDebug.DEBUG
+        private val DEBUG_FFMPEG = DEBUG
 
         const val MAX_CAMERAS = 2
 

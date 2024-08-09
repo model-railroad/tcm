@@ -23,6 +23,7 @@ import android.content.Intent
 import android.util.Log
 import com.alflabs.tcm.BuildConfig
 import com.alflabs.tcm.activity.MainActivity
+import com.alflabs.tcm.util.GlobalDebug
 
 /**
  * Implements a Boot Receiver to start the MainActivity.
@@ -34,7 +35,7 @@ class BootReceiver : BroadcastReceiver() {
 
     companion object {
         private val TAG: String = BootReceiver::class.java.simpleName
-        private val DEBUG: Boolean = BuildConfig.DEBUG
+        private val DEBUG: Boolean = GlobalDebug.DEBUG
 
         const val MAX_USAGE_API = 28  // Android 9, P
     }

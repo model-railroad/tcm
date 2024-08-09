@@ -28,6 +28,7 @@ import com.alflabs.tcm.BuildConfig
 import com.alflabs.tcm.R
 import com.alflabs.tcm.app.AppPrefsValues
 import com.alflabs.tcm.util.FpsMeasurer
+import com.alflabs.tcm.util.GlobalDebug
 
 class VideoViewHolder(
     private val cameraIndex: Int,
@@ -40,7 +41,7 @@ class VideoViewHolder(
 
     companion object {
         private val TAG: String = VideoViewHolder::class.java.simpleName
-        private val DEBUG: Boolean = BuildConfig.DEBUG
+        private val DEBUG: Boolean = GlobalDebug.DEBUG
     }
 
     private val fpsMeasurer = FpsMeasurer()

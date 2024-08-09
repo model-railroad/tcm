@@ -24,6 +24,7 @@ import android.os.Build
 import android.provider.Settings
 import androidx.annotation.RequiresApi
 import com.alflabs.tcm.BuildConfig
+import com.alflabs.tcm.util.GlobalDebug
 
 /**
  * Implements a RoleManager HOME.
@@ -34,7 +35,7 @@ class LauncherRole(private val context: Context) {
 
     companion object {
         private val TAG: String = LauncherRole::class.java.simpleName
-        private val DEBUG: Boolean = BuildConfig.DEBUG
+        private val DEBUG: Boolean = GlobalDebug.DEBUG
 
         const val MIN_USAGE_API = 29  // Android 10, Q
     }

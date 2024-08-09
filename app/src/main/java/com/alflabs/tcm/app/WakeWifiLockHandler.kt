@@ -30,12 +30,13 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.alflabs.tcm.BuildConfig
 import com.alflabs.tcm.activity.MainActivity
+import com.alflabs.tcm.util.GlobalDebug
 
 class WakeWifiLockHandler(private val activity: MainActivity) {
 
     companion object {
         private val TAG: String = WakeWifiLockHandler::class.java.simpleName
-        private val DEBUG: Boolean = BuildConfig.DEBUG
+        private val DEBUG: Boolean = GlobalDebug.DEBUG
 
         const val MAX_API_WIFI_SSID = 28 // Android 9/P
 

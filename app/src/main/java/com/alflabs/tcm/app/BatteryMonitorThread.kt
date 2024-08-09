@@ -78,7 +78,7 @@ class BatteryMonitorThread(
         // 0 for battery or a bitmask for {AC, Dock, USB}. We don't care how the device is
         // charging as long as it is powered by something.
         val plugged = battStatus?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) ?: 0
-        logger.log(TAG, "@@ check isPlugged  = $plugged")  // DEBUG
+        // logger.log(TAG, "@@ check isPlugged  = $plugged")  // DEBUG
         return plugged != 0
     }
 }

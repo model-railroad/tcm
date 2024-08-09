@@ -32,6 +32,7 @@ import com.alflabs.tcm.BuildConfig
 import com.alflabs.tcm.R
 import com.alflabs.tcm.app.AppPrefsValues
 import com.alflabs.tcm.app.MonitorMixin
+import com.alflabs.tcm.util.GlobalDebug
 import com.alflabs.tcm.util.ILogger
 
 
@@ -45,7 +46,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private val TAG: String = MainActivity::class.java.simpleName
-        private val DEBUG: Boolean = BuildConfig.DEBUG
+        private val DEBUG: Boolean = GlobalDebug.DEBUG
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,7 +101,10 @@ class MainActivity : AppCompatActivity() {
                 ),
         )
 
-        if (DEBUG) addStatus("\n@@ ABIs: ${android.os.Build.SUPPORTED_ABIS.toList()}")
+        if (DEBUG) {
+            addStatus("\n@@ API Level: ${android.os.Build.VERSION.SDK_INT}")
+            addStatus("\n@@ ABIs: ${android.os.Build.SUPPORTED_ABIS.toList()}")
+        }
     }
 
     // Invoked after onCreate or onRestart

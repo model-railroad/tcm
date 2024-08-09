@@ -34,12 +34,13 @@ import com.alflabs.tcm.app.BootReceiver
 import com.alflabs.tcm.app.LauncherRole
 import com.alflabs.tcm.app.MonitorMixin
 import com.alflabs.tcm.app.WakeWifiLockHandler
+import com.alflabs.tcm.util.GlobalDebug
 
 class PrefsActivity : AppCompatActivity() {
 
     companion object {
         private val TAG: String = PrefsActivity::class.java.simpleName
-        private val DEBUG: Boolean = BuildConfig.DEBUG
+        private val DEBUG: Boolean = GlobalDebug.DEBUG
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
