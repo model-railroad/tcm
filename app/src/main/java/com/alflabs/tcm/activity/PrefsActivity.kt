@@ -25,9 +25,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
+import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
-import com.alflabs.tcm.BuildConfig
 import com.alflabs.tcm.R
 import com.alflabs.tcm.app.AppPrefsValues
 import com.alflabs.tcm.app.BootReceiver
@@ -41,6 +41,9 @@ class PrefsActivity : AppCompatActivity() {
     companion object {
         private val TAG: String = PrefsActivity::class.java.simpleName
         private val DEBUG: Boolean = GlobalDebug.DEBUG
+
+        // Value from androidx.preference.PreferenceFragment
+        private const val DIALOG_FRAGMENT_TAG = "androidx.preference.PreferenceFragment.DIALOG"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -114,6 +117,21 @@ class PrefsActivity : AppCompatActivity() {
                     text = ""
                     summaryProvider = null
                     summary = "Feature No Longer Supported"
+                }
+            }
+        }
+
+        override fun onDisplayPreferenceDialog(preference: Preference) {
+            try {
+                // That's a weird API that doesn't return a usable error/boolean directly.
+                super.onDisplayPreferenceDialog(preference)
+            } catch (e: IllegalArgumentException) {
+                if (preference is CameraTransformPref) {
+                    // Note: this process mirrors the implementation from
+                    //       androidx.preference.PreferenceFragment:onDisplayPreferenceDialog
+                    val f = CamTransformDialogFragment.newInstance(preference.key)
+                    f.setTargetFragment(this, 0)
+                    f.show(parentFragmentManager, DIALOG_FRAGMENT_TAG)
                 }
             }
         }

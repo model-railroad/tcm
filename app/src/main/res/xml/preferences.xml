@@ -134,6 +134,21 @@
                 app:defaultValue="0;0"
                 app:useSimpleSummaryProvider="true" />
 
+        <com.alflabs.tcm.activity.CameraTransformPref
+                app:key="pref_cameras__transform_1"
+                app:title="Camera 1 Transform"
+                />
+
+        <com.alflabs.tcm.activity.CameraTransformPref
+                app:key="pref_cameras__transform_2"
+                app:title="Camera 2 Transform"
+                />
+
+        <com.alflabs.tcm.activity.CameraTransformPref
+                app:key="pref_cameras__transform_3"
+                app:title="Camera 3 Transform"
+                />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

@@ -201,6 +201,7 @@ Phase 1 (fixes after initial prototype deployment):
 Phase 2 (optional):
 
 - ☐ Consider using a foreground service rather than a thread for main processing?
+- ☐ Replace settings icon by 3-dot menu: settings|start|stop. Dynamic visibility on tap.
 - ☐ Force activity display orientation (via prefs).
 - ☐ Rewrite image transform to be a custom pref dialog with (rot,zoom,pan).
 - ☐ Reintroduce preference to fill/fit in image view.
