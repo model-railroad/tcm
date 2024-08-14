@@ -40,7 +40,7 @@ class MonitorMixin(private val activity: MainActivity) {
         private val DEBUG: Boolean = GlobalDebug.DEBUG
         private val DEBUG_FFMPEG = DEBUG
 
-        const val MAX_CAMERAS = 2
+        const val MAX_CAMERAS = 3
 
         const val START_AUTOMATICALLY = true        // for debugging purposes
 

@@ -68,30 +68,10 @@
                 android:maxLines="1"
                 app:useSimpleSummaryProvider="true" />
 
-        <ListPreference
-                app:key="pref_cameras__rotation_1"
-                app:title="@string/prefs__cameras_rotation_title_1"
-                android:entries="@array/pref_cameras__rotation_strings"
-                android:entryValues="@array/pref_cameras__rotation_values"
-                app:useSimpleSummaryProvider="true" />
-
-        <EditTextPreference
-                app:key="pref_cameras__zoom_1"
-                app:title="@string/prefs__zoom_camera_1"
-                android:inputType="numberDecimal"
-                android:singleLine="true"
-                android:maxLines="1"
-                app:defaultValue="1"
-                app:useSimpleSummaryProvider="true" />
-
-        <EditTextPreference
-                app:key="pref_cameras__offset_1"
-                app:title="@string/prefs__offset_camera_1"
-                android:inputType="text"
-                android:singleLine="true"
-                android:maxLines="1"
-                app:defaultValue="0;0"
-                app:useSimpleSummaryProvider="true" />
+        <com.alflabs.tcm.activity.CameraTransformPref
+                app:key="pref_cameras__transform_1"
+                app:title="@string/prefs__cameras_transform_1"
+                />
 
         <EditTextPreference
                 app:key="pref_cameras__url_2"
@@ -109,44 +89,30 @@
                 android:maxLines="1"
                 app:useSimpleSummaryProvider="true" />
 
-        <ListPreference
-                app:key="pref_cameras__rotation_2"
-                app:title="@string/prefs__cameras_rotation_title_2"
-                android:entries="@array/pref_cameras__rotation_strings"
-                android:entryValues="@array/pref_cameras__rotation_values"
-                app:useSimpleSummaryProvider="true" />
+        <com.alflabs.tcm.activity.CameraTransformPref
+                app:key="pref_cameras__transform_2"
+                app:title="@string/prefs__cameras_transform_2"
+                />
 
         <EditTextPreference
-                app:key="pref_cameras__zoom_2"
-                app:title="@string/prefs__zoom_camera_2"
-                android:inputType="numberDecimal"
-                android:singleLine="true"
-                android:maxLines="1"
-                app:defaultValue="1"
-                app:useSimpleSummaryProvider="true" />
-
-        <EditTextPreference
-                app:key="pref_cameras__offset_2"
-                app:title="@string/prefs__offset_camera_2"
+                app:key="pref_cameras__url_3"
+                app:title="@string/prefs__url_camera_3"
                 android:inputType="text"
                 android:singleLine="true"
                 android:maxLines="1"
-                app:defaultValue="0;0"
+                app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+                app:key="pref_cameras__label_3"
+                app:title="@string/prefs__label_camera_3"
+                android:inputType="text"
+                android:singleLine="true"
+                android:maxLines="1"
                 app:useSimpleSummaryProvider="true" />
 
         <com.alflabs.tcm.activity.CameraTransformPref
-                app:key="pref_cameras__transform_1"
-                app:title="Camera 1 Transform"
-                />
-
-        <com.alflabs.tcm.activity.CameraTransformPref
-                app:key="pref_cameras__transform_2"
-                app:title="Camera 2 Transform"
-                />
-
-        <com.alflabs.tcm.activity.CameraTransformPref
                 app:key="pref_cameras__transform_3"
-                app:title="Camera 3 Transform"
+                app:title="@string/prefs__cameras_transform_3"
                 />
 
     </PreferenceCategory>

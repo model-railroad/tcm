@@ -1,6 +1,15 @@
 <resources>
     <string name="app_name">Track Cam Monitor</string>
 
+
+    <!-- Activities -->
+    <string name="main__video_camera_1">Video Camera 1</string>
+    <string name="main__video_camera_2">Video Camera 2</string>
+    <string name="main__video_camera_3">Video Camera 3</string>
+    <string name="main__starting_cam">Starting Cam %1$d</string>
+    <string name="main__stopped_cam">Stopped Cam %1$d</string>
+
+
     <!-- Preferences -->
     <string name="prefs__button_title">Preferences</string>
     <string name="prefs__activity_title">Preferences</string>
@@ -25,18 +34,13 @@
 
     <string name="prefs__cameras_header">Cameras</string>
     <string name="prefs__cameras_count_title">Number of Active Cameras</string>
-    <string name="prefs__url_camera_1">URL Stream Camera 1</string>
-    <string name="prefs__url_camera_2">URL Stream Camera 2</string>
-    <string name="prefs__label_camera_1">Label Camera 1</string>
-    <string name="prefs__label_camera_2">Label Camera 2</string>
-    <string name="prefs__cameras_rotation_title_1">Rotation Camera 1</string>
-    <string name="prefs__cameras_rotation_title_2">Rotation Camera 2</string>
-    <string name="prefs__zoom_camera_1">Zoom Camera 1</string>
-    <string name="prefs__zoom_camera_2">Zoom Camera 2</string>
-    <string name="prefs__offset_camera_1">Offset X;Y Camera 1</string>
-    <string name="prefs__offset_camera_2">Offset X;Y Camera 2</string>
-    <string name="main__video_camera_1">Video Camera 1</string>
-    <string name="main__video_camera_2">Video Camera 2</string>
-    <string name="main__starting_cam">Starting Cam %1$d</string>
-    <string name="main__stopped_cam">Stopped Cam %1$d</string>
+    <string name="prefs__url_camera_1">Camera 1 - URL Stream</string>
+    <string name="prefs__url_camera_2">Camera 2 - URL Stream</string>
+    <string name="prefs__url_camera_3">Camera 3 - URL Stream</string>
+    <string name="prefs__label_camera_1">Camera 1 - Label</string>
+    <string name="prefs__label_camera_2">Camera 2 - Label</string>
+    <string name="prefs__label_camera_3">Camera 3 - Label</string>
+    <string name="prefs__cameras_transform_1">Camera 1 - Transform</string>
+    <string name="prefs__cameras_transform_2">Camera 2 - Transform</string>
+    <string name="prefs__cameras_transform_3">Camera 3 - Transform</string>
 </resources>

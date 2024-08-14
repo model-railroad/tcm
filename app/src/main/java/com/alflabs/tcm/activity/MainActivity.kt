@@ -28,7 +28,6 @@ import android.widget.TextView
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import com.alflabs.tcm.BuildConfig
 import com.alflabs.tcm.R
 import com.alflabs.tcm.app.AppPrefsValues
 import com.alflabs.tcm.app.MonitorMixin
@@ -99,6 +98,15 @@ class MainActivity : AppCompatActivity() {
                 findViewById(R.id.status_cam2),
                 findViewById(R.id.fps_cam2),
                 ),
+            VideoViewHolder(
+                3,
+                prefs,
+                findViewById(R.id.container_cam3),
+                findViewById(R.id.video_cam3),
+                findViewById(R.id.label_cam3),
+                findViewById(R.id.status_cam3),
+                findViewById(R.id.fps_cam3),
+            ),
         )
 
         if (DEBUG) {

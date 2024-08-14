@@ -18,6 +18,8 @@
 package com.alflabs.tcm.app
 
 import android.content.Context
+import com.alflabs.tcm.activity.CamTransformValues
+import com.alflabs.tcm.activity.CameraTransformPref
 import com.alflabs.tcm.util.BasePrefsValues
 
 class AppPrefsValues(context: Context) : BasePrefsValues(context) {
@@ -54,20 +56,10 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
             ?: defaultValue
     }
 
-    /** Retrieve float X;Y tuple for key or default.  */
-    private fun getTuple(key: String, defaultValue: XYTuple): XYTuple {
+    /** Retrieve camera transform for key or default.  */
+    private fun getTransform(key: String): CamTransformValues {
         val s = getString(key)
-        if (s == null) return defaultValue
-        try {
-            val splits = s.split(';')
-            if (splits.size == 2) {
-                return XYTuple(
-                    splits[0].toFloatOrNull() ?: defaultValue.x,
-                    splits[1].toFloatOrNull() ?: defaultValue.y,
-                    )
-            }
-        } catch (ignore: Exception) { }
-        return defaultValue
+        return CamTransformValues.parse(s ?: CameraTransformPref.STRING_DEFAULT)
     }
 
     data class XYTuple(val x: Float, val y: Float)
@@ -88,6 +80,7 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
         when (index) {
             1 -> prefs.getString(PREF_CAMERAS__URL_1, "") ?: ""
             2 -> prefs.getString(PREF_CAMERAS__URL_2, "") ?: ""
+            3 -> prefs.getString(PREF_CAMERAS__URL_3, "") ?: ""
             else -> throw IndexOutOfBoundsException("Camera URL Index $index out of bounds")
         }
 
@@ -95,28 +88,16 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
         when (index) {
             1 -> prefs.getString(PREF_CAMERAS__LABEL_1, "") ?: ""
             2 -> prefs.getString(PREF_CAMERAS__LABEL_2, "") ?: ""
+            3 -> prefs.getString(PREF_CAMERAS__LABEL_3, "") ?: ""
             else -> throw IndexOutOfBoundsException("Camera LABEL Index $index out of bounds")
         }
 
-    fun camerasRotation(index: Int) : Int =
+    fun camerasTransform(index: Int) : CamTransformValues =
         when (index) {
-            1 -> getInt(PREF_CAMERAS__ROTATION_1, 0)
-            2 -> getInt(PREF_CAMERAS__ROTATION_2, 0)
-            else -> throw IndexOutOfBoundsException("Camera Rotation Index $index out of bounds")
-        }
-
-    fun camerasZoom(index: Int) : Float =
-        when (index) {
-            1 -> getFloat(PREF_CAMERAS__ZOOM_1, 1.0f)
-            2 -> getFloat(PREF_CAMERAS__ZOOM_2, 1.0f)
-            else -> throw IndexOutOfBoundsException("Camera Zoom Index $index out of bounds")
-        }
-
-    fun camerasOffset(index: Int) : XYTuple =
-        when (index) {
-            1 -> getTuple(PREF_CAMERAS__OFFSET_1, XYTuple(0f, 0f))
-            2 -> getTuple(PREF_CAMERAS__OFFSET_2, XYTuple(0f, 0f))
-            else -> throw IndexOutOfBoundsException("Camera Offset Index $index out of bounds")
+            1 -> getTransform(PREF_CAMERAS__TRANSFORM_1)
+            2 -> getTransform(PREF_CAMERAS__TRANSFORM_2)
+            3 -> getTransform(PREF_CAMERAS__TRANSFORM_3)
+            else -> throw IndexOutOfBoundsException("Camera TRANSFORM Index $index out of bounds")
         }
 
     companion object {
@@ -129,13 +110,12 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
         const val PREF_CAMERAS__COUNT = "pref_cameras__count"
         const val PREF_CAMERAS__URL_1 = "pref_cameras__url_1"
         const val PREF_CAMERAS__URL_2 = "pref_cameras__url_2"
+        const val PREF_CAMERAS__URL_3 = "pref_cameras__url_3"
         const val PREF_CAMERAS__LABEL_1 = "pref_cameras__label_1"
         const val PREF_CAMERAS__LABEL_2 = "pref_cameras__label_2"
-        const val PREF_CAMERAS__ROTATION_1 = "pref_cameras__rotation_1"
-        const val PREF_CAMERAS__ROTATION_2 = "pref_cameras__rotation_2"
-        const val PREF_CAMERAS__ZOOM_1 = "pref_cameras__zoom_1"
-        const val PREF_CAMERAS__ZOOM_2 = "pref_cameras__zoom_2"
-        const val PREF_CAMERAS__OFFSET_1 = "pref_cameras__offset_1"
-        const val PREF_CAMERAS__OFFSET_2 = "pref_cameras__offset_2"
+        const val PREF_CAMERAS__LABEL_3 = "pref_cameras__label_3"
+        const val PREF_CAMERAS__TRANSFORM_1 = "pref_cameras__transform_1"
+        const val PREF_CAMERAS__TRANSFORM_2 = "pref_cameras__transform_2"
+        const val PREF_CAMERAS__TRANSFORM_3 = "pref_cameras__transform_3"
     }
 }

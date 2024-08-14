@@ -24,7 +24,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import com.alflabs.tcm.BuildConfig
 import com.alflabs.tcm.R
 import com.alflabs.tcm.app.AppPrefsValues
 import com.alflabs.tcm.util.FpsMeasurer
@@ -92,9 +91,7 @@ class VideoViewHolder(
     }
 
     private fun computeImageMatrix(bmpW: Int, bmpH: Int, viewW: Int, viewH: Int): Matrix {
-        val rotation = prefs.camerasRotation(cameraIndex).toFloat()
-        val zoom = prefs.camerasZoom(cameraIndex)
-        val offset = prefs.camerasOffset(cameraIndex)
+        val transform = prefs.camerasTransform(cameraIndex)
         val mat = Matrix()
 
         // Center image on view (0,0) to apply rotation & scale
@@ -102,14 +99,14 @@ class VideoViewHolder(
             bmpW * -0.5f,
             bmpH * -0.5f)
 
-        mat.postRotate(rotation)
+        mat.postRotate(transform.rotation.toFloat())
 
-        mat.postScale(zoom, zoom)
+        mat.postScale(transform.scale, transform.scale)
 
         // Center image on middle of view + apply requested offset (in pixels)
         mat.postTranslate(
-            viewW * 0.5f + offset.x,
-            viewH * 0.5f + offset.y,
+            viewW * 0.5f + transform.panX,
+            viewH * 0.5f + transform.panY,
         )
 
         return mat

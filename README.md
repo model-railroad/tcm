@@ -193,17 +193,17 @@ MVP:
 
 Phase 1 (fixes after initial prototype deployment):
 
-- ☐ Update min API level to 29 / Q / Android 10.
+- ❌ Update min API level to 29 / Q / Android 10.
 - ☐ Add GA support (with pref for GA ID).
 - ☐ Add 3-dot menu instead of single pref button.
-- ☐ Support 3 cameras.
+- ✅ Support 3 cameras.
 
 Phase 2 (optional):
 
 - ☐ Consider using a foreground service rather than a thread for main processing?
 - ☐ Replace settings icon by 3-dot menu: settings|start|stop. Dynamic visibility on tap.
 - ☐ Force activity display orientation (via prefs).
-- ☐ Rewrite image transform to be a custom pref dialog with (rot,zoom,pan).
+- ✅ Rewrite image transform to be a custom pref dialog with (rot,zoom,pan).
 - ☐ Reintroduce preference to fill/fit in image view.
 - ☐ Gamma correction on input images (via OpenCV LUT f.ex.)
 - ☐ Use OpenCV to detect motion.
