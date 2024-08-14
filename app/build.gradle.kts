@@ -87,6 +87,8 @@ tasks.register<Copy>("javacppExtract") {
 
     doFirst {
         println("@@ javacppExtract: input ${inputs.files.files.size} files")
+        // DEBUG -- this prints the files parsed by this rule when looking for lib/** below
+        // println("@@ javacppExtract:\n -${inputs.files.files.joinToString("\n- ") { f -> f.path.toString() }}")
     }
 
     from(configurations["javacpp"].map { zipTree(it) })
@@ -109,9 +111,14 @@ dependencies {
     // JavaCV - OpenCV stuff
     // Note: JavaCV-platform does NOT provide any NDK JNI for Android directly.
     // IIRC, they are in the JARs, with "-platform" filtered using the "javacppPlatform" (set
-    // in the main build.gradlekts) and used by the JavaCPP Gradle Plugin, then extracted using that
-    // javacppExtract rule above and then imported using the fileTree(libs) rule.
+    // in the main build.gradle.kts) and used by the JavaCPP Gradle Plugin, then extracted using
+    // that javacppExtract rule above and then imported using the fileTree(libs) rule.
     // Something like that. It's quite convoluted.
+    // Bottom line:
+    // 1- See comments in gradle/libs.versions.toml
+    // 2- To find what JNI jar/so gets added, build, and then look into
+    //   app/build/tmp/.cache/expanded/
+    //   app/build/javacpp/lib/{armeabi-v7a,arm64-v8a,x86,x86_64}/
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     // This provides the java imports available.
     implementation(libs.javacv.platform)

@@ -23,5 +23,7 @@ plugins {
 }
 
 ext {
-    set("javacppPlatform" , "android-arm,android-x86") // defaults to Loader.getPlatform()
+    // Add any JavaCV/CPP artifacts with -platform in their name and
+    // a classifier that _starts_ with the names given here.
+    set("javacppPlatform" , "android-arm,android-x86")
 }
