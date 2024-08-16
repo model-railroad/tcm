@@ -37,6 +37,15 @@
                 android:maxLines="1"
                 app:useSimpleSummaryProvider="true" />
 
+        <EditTextPreference
+                app:key="pref_system__ga4_id"
+                app:title="@string/prefs__ga4_id_title"
+                android:inputType="text"
+                android:singleLine="true"
+                android:maxLines="1"
+                app:summary="GA4ID|ClientID|AppSecret"
+                app:useSimpleSummaryProvider="true" />
+
         <SwitchPreferenceCompat
                 app:key="pref_system__debug_display"
                 app:summaryOff="@string/prefs__debug_display_off"

@@ -31,6 +31,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.alflabs.tcm.R
 import com.alflabs.tcm.app.AppPrefsValues
 import com.alflabs.tcm.app.MonitorMixin
+import com.alflabs.tcm.util.Analytics
 import com.alflabs.tcm.util.GlobalDebug
 import com.alflabs.tcm.util.ILogger
 
@@ -38,8 +39,10 @@ import com.alflabs.tcm.util.ILogger
 class MainActivity : AppCompatActivity() {
 
     private var debugDisplay = false
+    private lateinit var logger: ILogger
     private lateinit var statusTxt: TextView
     private lateinit var monitorMixin: MonitorMixin
+    private lateinit var analytics: Analytics
     lateinit var videoViewHolders: List<VideoViewHolder>
         private set
 
@@ -50,6 +53,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        analytics = Analytics(getLogger())
         monitorMixin = MonitorMixin(this)
         monitorMixin.onCreate()
 
@@ -122,6 +126,7 @@ class MainActivity : AppCompatActivity() {
         // Note: Any UI that can be changed by editing preferences should be set/reset in
         // onStart rather than onCreate. onStart is called when coming back from PrefsActivity.
         val prefs = AppPrefsValues(this)
+        analytics.setAnalyticsId(prefs)
         debugDisplay = prefs.systemDebugDisplay()
         if (DEBUG) Log.d(TAG, "onStart -- debugDisplay = $debugDisplay")
 
@@ -137,6 +142,7 @@ class MainActivity : AppCompatActivity() {
         stopBtn .setOnClickListener { onStopButton() }
         prefsBtn.setOnClickListener { onPrefsButton() }
 
+        analytics.start()
         monitorMixin.onStart()
     }
 
@@ -162,6 +168,7 @@ class MainActivity : AppCompatActivity() {
     // The end of the activity
     override fun onDestroy() {
         super.onDestroy()
+        analytics.shutdown()
         monitorMixin.onDestroy()
     }
 
@@ -196,22 +203,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun getLogger() : ILogger {
-        return object : ILogger {
-            override fun log(msg: String) {
-                if (!debugDisplay) return
-                statusTxt.post {
-                    addStatus(msg)
+        if (!this::logger.isInitialized) {
+            logger = object : ILogger {
+                override fun log(msg: String) {
+                    if (!debugDisplay) return
+                    statusTxt.post {
+                        addStatus(msg)
+                    }
+
                 }
 
-            }
-
-            override fun log(tag: String, msg: String) {
-                if (!debugDisplay) return
-                statusTxt.post {
-                    addStatus("$tag : $msg")
+                override fun log(tag: String, msg: String) {
+                    if (!debugDisplay) return
+                    statusTxt.post {
+                        addStatus("$tag : $msg")
+                    }
                 }
             }
         }
+
+        return logger
     }
 
     //----

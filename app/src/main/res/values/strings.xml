@@ -31,6 +31,7 @@
     <string name="prefs__debug_display_on">On: Display debug controls and state</string>
     <string name="prefs__debug_display_off">Off: Does not display debug controls and state</string>
     <string name="prefs__wifi_ssid_title">SSID of Wifi Network to monitor</string>
+    <string name="prefs__ga4_id_title">Google Analytics 4 ID</string>
 
     <string name="prefs__cameras_header">Cameras</string>
     <string name="prefs__cameras_count_title">Number of Active Cameras</string>

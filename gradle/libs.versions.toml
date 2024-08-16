@@ -11,7 +11,9 @@ activity = "1.8.0"
 constraintlayout = "2.1.4"
 preference = "1.2.1"
 preferenceKtx = "1.2.1"  # Automatic update resolution works right here.
+okhttpVersion = "3.10.0"
 javacvPluginVersion = "1.5.10"
+desugarVersion = "2.0.4"
 
 # JavaCV Versions
 # ---------------
@@ -35,6 +37,7 @@ ffmpegVersion = "6.1.1-1.5.10"  # with Android arm64, x86_64 (64-bit only)
 
 
 [libraries]
+android-tool-desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -48,6 +51,7 @@ opencv-platform = { group= "org.bytedeco", name= "opencv-platform", version.ref 
 ffmpeg-platform = { group= "org.bytedeco", name= "ffmpeg-platform", version.ref = "ffmpegVersion" }
 androidx-preference = { group = "androidx.preference", name = "preference", version.ref = "preference" }
 androidx-preference-ktx = { group = "androidx.preference", name = "preference-ktx", version.ref = "preferenceKtx" }
+squareup-okhttp3 = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttpVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

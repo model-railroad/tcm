@@ -54,6 +54,11 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+
+        // Flag to enable support for the new language APIs
+        // (namely: to have java.time.LocalDateTime available on API < 26.
+        // See https://developer.android.com/studio/write/java8-support#library-desugaring
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -129,6 +134,9 @@ dependencies {
     // (e.g. trying to hava javacpp of javacv + ffmpeg makes it fail).
     javacpp(libs.opencv.platform)
 
+    // For isCoreLibraryDesugaringEnabled
+    coreLibraryDesugaring(libs.android.tool.desugar.jdk.libs)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -136,6 +144,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.preference)
     implementation(libs.androidx.preference.ktx)
+    implementation(libs.squareup.okhttp3)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
