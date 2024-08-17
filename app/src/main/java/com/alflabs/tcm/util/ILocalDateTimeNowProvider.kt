@@ -19,6 +19,6 @@ package com.alflabs.tcm.util
 
 import java.time.LocalDateTime
 
-interface ILocalDateTimeNowProvider {
-    val now: LocalDateTime
+fun interface ILocalDateTimeNowProvider {
+    fun now(): LocalDateTime
 }

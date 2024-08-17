@@ -53,10 +53,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        analytics = Analytics(getLogger())
-        monitorMixin = MonitorMixin(this)
+        analytics = Analytics()
+        monitorMixin = MonitorMixin(this, analytics)
         monitorMixin.onCreate()
-
 
         // ComponentActivity.enableEdgeToEdge makes the top system/status bar transparent.
         // Note: an alternative is to set it via style theme resources as such:
@@ -143,6 +142,7 @@ class MainActivity : AppCompatActivity() {
         prefsBtn.setOnClickListener { onPrefsButton() }
 
         analytics.start()
+        analytics.sendEvent(category = "tcm", action = "start")
         monitorMixin.onStart()
     }
 
@@ -156,6 +156,7 @@ class MainActivity : AppCompatActivity() {
     // Next state is either onResume or onStop
     override fun onPause() {
         super.onPause()
+        analytics.sendEvent(category = "tcm", action = "pause")
         monitorMixin.onPause()
     }
 
@@ -163,12 +164,12 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         monitorMixin.onStop()
+        analytics.stop()
     }
 
     // The end of the activity
     override fun onDestroy() {
         super.onDestroy()
-        analytics.shutdown()
         monitorMixin.onDestroy()
     }
 

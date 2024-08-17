@@ -21,12 +21,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import com.alflabs.tcm.util.Analytics
 import com.alflabs.tcm.util.ILogger
 import com.alflabs.tcm.util.ThreadLoop
 
 
 class BatteryMonitorThread(
     private val logger: ILogger,
+    private val analytics: Analytics,
     private val context: Context,
     private val onStateChange: (Boolean)->Unit,
 ): ThreadLoop() {
@@ -51,7 +53,7 @@ class BatteryMonitorThread(
         if (newState != isPlugged) {
             logger.log(TAG, "runInThreadLoop - isPlugged state changed $isPlugged --> $newState")
             isPlugged = newState
-            onStateChange(newState)
+            sendOnStateChange(newState)
         }
 
         try {
@@ -68,7 +70,16 @@ class BatteryMonitorThread(
 
     fun requestInitialState() {
         isPlugged = isPlugged()
-        onStateChange(isPlugged)
+        sendOnStateChange(isPlugged)
+    }
+
+    private fun sendOnStateChange(newState: Boolean) {
+        analytics.sendEvent(
+            category = "tcm_plugged",
+            action = if (newState) "on" else "off",
+            value = "1")
+
+        onStateChange(newState)
     }
 
     private fun isPlugged() : Boolean {

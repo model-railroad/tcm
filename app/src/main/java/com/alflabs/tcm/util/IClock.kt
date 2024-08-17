@@ -17,7 +17,7 @@
  */
 package com.alflabs.tcm.util
 
-interface IClock {
+fun interface IClock {
     /**
      * Returns `SystemClock#elapsedRealtime()`:
      * On Android, returns milliseconds since boot, including time spent in sleep.

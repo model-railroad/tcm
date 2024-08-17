@@ -19,6 +19,7 @@ package com.alflabs.tcm.record
 
 import android.os.SystemClock
 import com.alflabs.tcm.activity.VideoViewHolder
+import com.alflabs.tcm.util.Analytics
 import com.alflabs.tcm.util.ILogger
 import com.alflabs.tcm.util.ThreadLoop
 import org.bytedeco.javacv.AndroidFrameConverter
@@ -29,6 +30,8 @@ import org.bytedeco.javacv.FrameGrabber
 
 class GrabberThread(
     private val logger: ILogger,
+    private val analytics: Analytics,
+    private val camIndex: Int,
     private val url: String,
     private val renderer : VideoViewHolder
 ): ThreadLoop() {
@@ -82,6 +85,12 @@ class GrabberThread(
                     + ", size " + grabber.imageWidth + "x" + grabber.imageHeight
             )
 
+            analytics.sendEvent(
+                category = "tcm_cam",
+                action = "start",
+                label = camIndex.toString(),
+                value = "1")
+
             // Note that frame is reused for each frame recording
             var frame: Frame? = null
 
@@ -100,9 +109,19 @@ class GrabberThread(
             }
 
             logger.log(TAG, "end while: quit ($mQuit) or frame ($frame)")
+            analytics.sendEvent(
+                category = "tcm_cam",
+                action = if (mQuit) "stop" else "error",
+                label = camIndex.toString(),
+                value = "1")
             grabber.flush()
 
         } catch (e: FrameGrabber.Exception) {
+            analytics.sendEvent(
+                category = "tcm_cam",
+                action = "error",
+                label = camIndex.toString(),
+                value = "1")
             renderer.setStatus("Disconnected")
 
             try {

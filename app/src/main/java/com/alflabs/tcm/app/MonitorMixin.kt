@@ -18,9 +18,9 @@
 package com.alflabs.tcm.app
 
 import android.util.Log
-import com.alflabs.tcm.BuildConfig
 import com.alflabs.tcm.activity.MainActivity
 import com.alflabs.tcm.record.GrabberThread
+import com.alflabs.tcm.util.Analytics
 import com.alflabs.tcm.util.GlobalDebug
 import org.bytedeco.javacv.FFmpegLogCallback
 
@@ -33,12 +33,15 @@ import org.bytedeco.javacv.FFmpegLogCallback
  *
  * This is an "activity mixin", tightly connected to the MainActivity lifecycle.
  */
-class MonitorMixin(private val activity: MainActivity) {
+class MonitorMixin(
+    private val activity: MainActivity,
+    private val analytics: Analytics,
+    ) {
 
     companion object {
         private val TAG: String = MonitorMixin::class.java.simpleName
         private val DEBUG: Boolean = GlobalDebug.DEBUG
-        private val DEBUG_FFMPEG = DEBUG
+        private val DEBUG_FFMPEG = false
 
         const val MAX_CAMERAS = 3
 
@@ -78,7 +81,10 @@ class MonitorMixin(private val activity: MainActivity) {
         camerasCount = prefs.camerasCount()
 
         if (prefs.systemDisconnectOnBattery() && batteryMonitorThread == null) {
-            batteryMonitorThread = BatteryMonitorThread(activity.getLogger(), activity) {
+            batteryMonitorThread = BatteryMonitorThread(
+                activity.getLogger(),
+                analytics,
+                activity) {
                     isPlugged -> activity.runOnUiThread {
                     when(isPlugged) {
                         true -> onStartStreaming()
@@ -134,6 +140,8 @@ class MonitorMixin(private val activity: MainActivity) {
                 activity.videoViewHolders[index - 1].onStart()
                 val gt = GrabberThread(
                     activity.getLogger(),
+                    analytics,
+                    index,
                     prefs.camerasUrl(index),
                     activity.videoViewHolders[index - 1])
                 grabberThreads.add(gt)
