@@ -12,7 +12,7 @@ constraintlayout = "2.1.4"
 preference = "1.2.1"
 preferenceKtx = "1.2.1"  # Automatic update resolution works right here.
 okhttpVersion = "3.10.0"
-javacvPluginVersion = "1.5.10"
+javacvPluginVersion = "1.5.10"      # Use latest JavaCV plugin, independent of JNI libs below.
 desugarVersion = "2.0.4"
 
 # JavaCV Versions
@@ -22,18 +22,24 @@ desugarVersion = "2.0.4"
 # opencv: https://mvnrepository.com/artifact/org.bytedeco/opencv-platform
 # ffmpeg: https://mvnrepository.com/artifact/org.bytedeco/ffmpeg-platform
 #
+# Binaries for JavaCV 1.5.0-6 can work on API 21-22. Later versions cannot.
 # Binaries for JavaCV 1.5.9  have JNI libs for Android arm, arm64, x86, x86_64
 # Binaries for JavaCV 1.5.10 have JNI libs for Android arm64, x86_64 (64-bit only)
+
+# If you want arm-v7 or x86 JNI libs for API 21-22, use this:
+javacvVersion = "1.5.6"
+opencvVersion = "4.5.3-1.5.6"   # with Android arm, arm64, x86, x86_64
+ffmpegVersion = "4.4-1.5.6"     # with Android arm, arm64, x86, x86_64
 
 # If you want arm-v7 or x86 JNI libs for API 23+ only, use this:
 # javacvVersion = "1.5.9"
 # opencvVersion = "4.7.0-1.5.9"   # with Android arm, arm64, x86, x86_64
 # ffmpegVersion = "6.0-1.5.9"     # with Android arm, arm64, x86, x86_64
 
-# If you don't care about x86 and only care about arm/x86-bit ones, use this
-javacvVersion = "1.5.10"        # See https://github.com/bytedeco/javacv/releases for latest version
-opencvVersion = "4.9.0-1.5.10"  # with Android arm64, x86_64 (64-bit only)
-ffmpegVersion = "6.1.1-1.5.10"  # with Android arm64, x86_64 (64-bit only)
+# If you don't care about x86 and only care about arm64/x86_64 ones, use the latests:
+# javacvVersion = "1.5.10"        # See https://github.com/bytedeco/javacv/releases for latest version
+# opencvVersion = "4.9.0-1.5.10"  # with Android arm64, x86_64 (64-bit only)
+# ffmpegVersion = "6.1.1-1.5.10"  # with Android arm64, x86_64 (64-bit only)
 
 
 [libraries]

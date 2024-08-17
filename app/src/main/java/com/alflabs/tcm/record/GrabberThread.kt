@@ -47,8 +47,9 @@ class GrabberThread(
         const val AV_PIX_FMT_ABGR = 101 - 73
         const val AV_PIX_FMT_BGRA = 102 - 73
 
-        const val FFMPEG_TIMEOUT_MS = 1000 * 3      // 3 seconds
-        const val FFMPEG_TIMEOUT_µS = "3000000"     // in microseconds
+        const val FFMPEG_TIMEOUT_S  = 3             // 3 seconds
+        const val FFMPEG_TIMEOUT_MS = 1000 * FFMPEG_TIMEOUT_S
+        const val FFMPEG_TIMEOUT_µS = (1000 * FFMPEG_TIMEOUT_MS).toString()
         const val PAUSE_BEFORE_RETRY_MS = 1000L * 5 // 5 seconds
     }
 
@@ -70,9 +71,8 @@ class GrabberThread(
             grabber.format = "rtsp"
             // http://ffmpeg.org/ffmpeg-all.html#rtsp
             grabber.setOption("rtsp_transport", "tcp")  // "udp" or "tcp"
-            grabber.setOption("rw_timeout" , FFMPEG_TIMEOUT_µS) // microseconds
-            grabber.setOption("timeout" , FFMPEG_TIMEOUT_µS) // microseconds
-            grabber.setOption("stimeout" , FFMPEG_TIMEOUT_µS) // microseconds
+            grabber.setOption("rw_timeout", FFMPEG_TIMEOUT_µS) // microseconds
+            grabber.setOption("stimeout"  , FFMPEG_TIMEOUT_µS) // microseconds
             // Match the Android Bitmap Config ARGB_8888, which speeds up the converter.
             grabber.pixelFormat = AV_PIX_FMT_ARGB
             grabber.timeout = FFMPEG_TIMEOUT_MS
@@ -137,7 +137,10 @@ class GrabberThread(
             try {
                 grabber?.close() // implementation calls stop + release
             } catch (ignore: FrameGrabber.Exception) {}
-            converter.close()
+            // AndroidFrameConverter.close() was only added in JavaCV 1.5.5
+            if (converter is AutoCloseable) {
+                converter.close()
+            }
             logger.log(TAG, "runInThreadLoop - closed")
 
             renderer.setStatus("Disconnected")
