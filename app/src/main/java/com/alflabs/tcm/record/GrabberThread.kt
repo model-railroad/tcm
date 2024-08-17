@@ -86,8 +86,8 @@ class GrabberThread(
             )
 
             analytics.sendEvent(
-                category = "tcm_cam",
-                action = "start",
+                category = "TCM_Cam",
+                action = "Start",
                 label = camIndex.toString(),
                 value = "1")
 
@@ -110,16 +110,16 @@ class GrabberThread(
 
             logger.log(TAG, "end while: quit ($mQuit) or frame ($frame)")
             analytics.sendEvent(
-                category = "tcm_cam",
-                action = if (mQuit) "stop" else "error",
+                category = "TCM_Cam",
+                action = if (mQuit) "Stop" else "Error",
                 label = camIndex.toString(),
                 value = "1")
             grabber.flush()
 
         } catch (e: FrameGrabber.Exception) {
             analytics.sendEvent(
-                category = "tcm_cam",
-                action = "error",
+                category = "TCM_Cam",
+                action = "Error",
                 label = camIndex.toString(),
                 value = "1")
             renderer.setStatus("Disconnected")

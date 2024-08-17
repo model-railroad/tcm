@@ -146,7 +146,7 @@ class MainActivity : AppCompatActivity() {
         prefsBtn.setOnClickListener { onPrefsButton() }
 
         analytics.start()
-        analytics.sendEvent(category = "tcm", action = "start")
+        analytics.sendEvent(category = "TCM", action = "Start")
         monitorMixin.onStart()
     }
 
@@ -160,7 +160,7 @@ class MainActivity : AppCompatActivity() {
     // Next state is either onResume or onStop
     override fun onPause() {
         super.onPause()
-        analytics.sendEvent(category = "tcm", action = "pause")
+        analytics.sendEvent(category = "TCM", action = "Pause")
         monitorMixin.onPause()
     }
 
