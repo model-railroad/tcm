@@ -125,6 +125,10 @@ class MainActivity : AppCompatActivity() {
         // Note: Any UI that can be changed by editing preferences should be set/reset in
         // onStart rather than onCreate. onStart is called when coming back from PrefsActivity.
         val prefs = AppPrefsValues(this)
+
+        // For debugging
+        // prefs.setString("pref_system__ga4_id", // 'ga id | client id | app secret'
+
         analytics.setAnalyticsId(prefs)
         debugDisplay = prefs.systemDebugDisplay()
         if (DEBUG) Log.d(TAG, "onStart -- debugDisplay = $debugDisplay")

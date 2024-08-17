@@ -30,7 +30,7 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
     }
 
     /** Sets or removes (null) a key string.  */
-    private fun setString(key: String, value: String?) {
+    fun setString(key: String, value: String?) {
         synchronized(editLock()) {
             endEdit(startEdit().putString(key, value))
         }
