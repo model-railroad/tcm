@@ -17,7 +17,6 @@
  */
 package com.alflabs.tcm.util
 
-import android.os.SystemClock
 import android.util.Log
 import com.alflabs.tcm.app.AppPrefsValues
 import okhttp3.MediaType
@@ -35,13 +34,33 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
+/**
+ * An implementation using GA4 Measurement Protocol (POST HTTPS) _without_ Firebase.
+ *
+ * https://developers.google.com/analytics/devguides/collection/protocol/ga4
+ * https://developers.google.com/analytics/devguides/collection/protocol/ga4/sending-events?client_type=firebase
+ *
+ * Access results at https://analytics.google.com/analytics/web
+ *
+ * GA1 had a clear hierarchy of event category > name > label > value.
+ * GA4 puts an emphasis on event name, with event category & label being sub-parameters, whereas
+ *   value can only be sent as a currency.
+ * In GA4, event categories and labels will NOT appear unless marked as "custom dimensions" in
+ * property settings > data display > custom dimensions:
+ * - add dimension "Event Category" with Event Scope for user param "event_category."
+ * - add dimension "Event Label" with Event Scope for user param "event_label."
+ *
+ */
 class Analytics : ThreadLoop() {
 
     companion object {
         private val TAG: String = Analytics::class.java.simpleName
         private val DEBUG: Boolean = GlobalDebug.DEBUG
 
+        // Verbose debug + "Debug Event" collection.
+        // Debug events are visible in GA4 > Prop Setting > Data Display > Debug View only.
         private const val VERBOSE_DEBUG = false
+
         private const val IDLE_SLEEP_MS = 1000L / 10L
         private const val MAX_ERROR_NUM = 3
 
@@ -52,12 +71,10 @@ class Analytics : ThreadLoop() {
         private val MEDIA_TYPE = MediaType.parse("text/plain")
     }
 
-    private val mClock = IClock { SystemClock.elapsedRealtime() }
-    private val mOkHttpClient = OkHttpClient()
+    private val mOkHttpClient = OkHttpClient()      // Uses android.permission.INTERNET in Manifest
     private val mPayloads = ConcurrentLinkedDeque<Payload>()
     private val mStopLoopOnceEmpty = AtomicBoolean(false)
     private val mLatchEndLoop = CountDownLatch(1)
-    private val mLocalDateTimeNow = ILocalDateTimeNowProvider { LocalDateTime.now() }
     private val mExecutor = Executors.newSingleThreadScheduledExecutor()
 
     private var analyticsId = ""
@@ -116,7 +133,7 @@ class Analytics : ThreadLoop() {
             while (!mQuit) {
                 val payload: Payload? = mPayloads.pollFirst()
                 if (payload == null) break
-                if (!payload.send(mClock.elapsedRealtime())) {
+                if (!payload.send(System.currentTimeMillis())) {
                     if (isNotStopping) {
                         // If it fails, append the payload at the *end* of the queue to retry later
                         // after all newer events.
@@ -175,7 +192,7 @@ class Analytics : ThreadLoop() {
             // TBD revisit later with a proper GA4 implementation.
             // Nothing ever goes wrong generating JSON using a String.format, right?
             val formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
-            val timeWithSeconds = mLocalDateTimeNow.now().format(formatter)
+            val timeWithSeconds = LocalDateTime.now().format(formatter)
             val timeWithMinutes = timeWithSeconds.substring(0, timeWithSeconds.length - 2)
 
             var payload: String = String.format(
@@ -204,7 +221,7 @@ class Analytics : ThreadLoop() {
 
             mPayloads.offerFirst(
                 Payload(
-                    mClock.elapsedRealtime(),
+                    System.currentTimeMillis(),
                     payload,
                     String.format("Event [c:%s a:%s l:%s v:%s]", category, action, label, value)
                 )
@@ -216,13 +233,13 @@ class Analytics : ThreadLoop() {
 
 
     private inner class Payload(
-        private val mCreatedTS: Long,
+        private val mCreatedWallTimeMS: Long,
         private val mPayload: String,
         private val mDebugLog: String
     ) {
         /** Must be executed in background thread.  */
-        fun send(nowTS: Long): Boolean {
-            val deltaTS = nowTS - mCreatedTS
+        fun send(wallTimeMS: Long): Boolean {
+            val deltaTS = wallTimeMS - mCreatedWallTimeMS
 
             // Queue Time:
             // https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#qt
@@ -230,7 +247,7 @@ class Analytics : ThreadLoop() {
             // https://developers.google.com/analytics/devguides/collection/protocol/ga4/reference?client_type=firebase#payload
             val payload = mPayload.replaceFirst(
                 "\\{".toRegex(),
-                String.format(Locale.US, "{'timestamp_micros':%d,", mCreatedTS * 1000 /* ms to μs */)
+                String.format(Locale.US, "{'timestamp_micros':%d,", mCreatedWallTimeMS * 1000 /* ms to μs */)
             )
 
             try {
