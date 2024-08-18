@@ -41,7 +41,7 @@ class MonitorMixin(
     companion object {
         private val TAG: String = MonitorMixin::class.java.simpleName
         private val DEBUG: Boolean = GlobalDebug.DEBUG
-        private val DEBUG_FFMPEG = false
+        private val DEBUG_FFMPEG = true
 
         const val MAX_CAMERAS = 3
 

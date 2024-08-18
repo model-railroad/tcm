@@ -211,7 +211,10 @@ class MainActivity : AppCompatActivity() {
         if (!this::logger.isInitialized) {
             logger = object : ILogger {
                 override fun log(msg: String) {
-                    if (!debugDisplay) return
+                    if (!debugDisplay) {
+                        Log.d(TAG, "Status: $msg")
+                        return
+                    }
                     statusTxt.post {
                         addStatus(msg)
                     }
@@ -219,7 +222,10 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun log(tag: String, msg: String) {
-                    if (!debugDisplay) return
+                    if (!debugDisplay) {
+                        Log.d(TAG, "Status: $msg")
+                        return
+                    }
                     statusTxt.post {
                         addStatus("$tag : $msg")
                     }

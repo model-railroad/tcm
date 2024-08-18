@@ -20,6 +20,7 @@ package com.alflabs.tcm.record
 import android.os.SystemClock
 import com.alflabs.tcm.activity.VideoViewHolder
 import com.alflabs.tcm.util.Analytics
+import com.alflabs.tcm.util.GlobalDebug
 import com.alflabs.tcm.util.ILogger
 import com.alflabs.tcm.util.ThreadLoop
 import org.bytedeco.javacv.AndroidFrameConverter
@@ -38,6 +39,8 @@ class GrabberThread(
 
     companion object {
         private val TAG: String = GrabberThread::class.java.simpleName
+        private val DEBUG: Boolean = GlobalDebug.DEBUG
+        private const val SPIN = "|/-\\"
 
         // https://ffmpeg.org/doxygen/trunk/pixfmt_8h_source.html
         const val AV_PIX_FMT_RGB24 = 75 - 73
@@ -52,6 +55,9 @@ class GrabberThread(
         const val FFMPEG_TIMEOUT_µS = (1000 * FFMPEG_TIMEOUT_MS).toString()
         const val PAUSE_BEFORE_RETRY_MS = 1000L * 5 // 5 seconds
     }
+
+    private var countStart = 0
+    private var countNull = 0
 
     override fun beforeThreadLoop() {
         logger.log(TAG, "beforeThreadLoop")
@@ -96,17 +102,29 @@ class GrabberThread(
 
             var firstImage = true
 
+            countStart++
+            var spin = 0
+
             while (!mQuit) {
                 frame = grabber.grabImage()
-                if (frame === null) break;
+                if (frame === null) {
+                    countNull++
+                    break
+                };
                 if (firstImage) {
                     renderer.setStatus("")
                     firstImage = false
+                }
+                if (DEBUG) {
+                    renderer.setStatus("S: $countStart   N: $countNull  ${SPIN.get(spin)}")
+                    spin = (spin + 1) % 4
                 }
                 // use frame
                 val bmp = converter.convert(frame)
                 renderer.render(bmp)
             }
+
+            if (DEBUG) renderer.setStatus("S: $countStart   N: $countNull") // DEBUG
 
             logger.log(TAG, "end while: quit ($mQuit) or frame ($frame)")
             analytics.sendEvent(
