@@ -137,13 +137,14 @@ dependencies {
     // For isCoreLibraryDesugaringEnabled
     coreLibraryDesugaring(libs.android.tool.desugar.jdk.libs)
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
     implementation(libs.androidx.activity)
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference)
     implementation(libs.androidx.preference.ktx)
+    // implementation(libs.kotlinx.coroutines) -- not currently used
+    implementation(libs.material)
     implementation(libs.squareup.okhttp3)
 
     testImplementation(libs.junit)

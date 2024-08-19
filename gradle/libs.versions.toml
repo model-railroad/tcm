@@ -1,6 +1,7 @@
 [versions]
 agp = "8.5.1"
 kotlin = "1.9.0"
+kotlinxCorout = "1.3.9"
 coreKtx = "1.10.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
@@ -44,19 +45,20 @@ ffmpegVersion = "6.1.1-1.5.10"  # with Android arm64, x86_64 (64-bit only)
 
 [libraries]
 android-tool-desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarVersion" }
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-javacv-platform = { group = "org.bytedeco", name = "javacv-platform", version.ref = "javacvVersion" }
-opencv-platform = { group= "org.bytedeco", name= "opencv-platform", version.ref = "opencvVersion" }
-ffmpeg-platform = { group= "org.bytedeco", name= "ffmpeg-platform", version.ref = "ffmpegVersion" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-preference = { group = "androidx.preference", name = "preference", version.ref = "preference" }
 androidx-preference-ktx = { group = "androidx.preference", name = "preference-ktx", version.ref = "preferenceKtx" }
+ffmpeg-platform = { group= "org.bytedeco", name= "ffmpeg-platform", version.ref = "ffmpegVersion" }
+javacv-platform = { group = "org.bytedeco", name = "javacv-platform", version.ref = "javacvVersion" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCorout" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+opencv-platform = { group= "org.bytedeco", name= "opencv-platform", version.ref = "opencvVersion" }
 squareup-okhttp3 = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttpVersion" }
 
 [plugins]

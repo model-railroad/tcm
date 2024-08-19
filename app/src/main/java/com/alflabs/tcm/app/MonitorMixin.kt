@@ -19,7 +19,7 @@ package com.alflabs.tcm.app
 
 import android.util.Log
 import com.alflabs.tcm.activity.MainActivity
-import com.alflabs.tcm.record.GrabberThread
+import com.alflabs.tcm.record.GrabbersManagerThread
 import com.alflabs.tcm.util.Analytics
 import com.alflabs.tcm.util.GlobalDebug
 import org.bytedeco.javacv.FFmpegLogCallback
@@ -52,7 +52,7 @@ class MonitorMixin(
     }
 
     private var camerasCount : Int = 0
-    private var grabberThreads = mutableListOf<GrabberThread>()
+    private var grabbersManager : GrabbersManagerThread? = null
 //    lateinit var wakeWifiLockHandler : WakeWifiLockHandler
 //        private set
     private var batteryMonitorThread : BatteryMonitorThread? = null
@@ -129,28 +129,40 @@ class MonitorMixin(
     }
 
     fun onStartStreaming() {
-        if (grabberThreads.isNotEmpty()) {
-            return
-        }
+        if (DEBUG) Log.d(TAG, "onStartStreaming")
+        grabbersManager?.stop()
 
         val prefs = AppPrefsValues(activity)
 
-        for (index in 1..camerasCount) {
-            try {
-                activity.videoViewHolders[index - 1].onStart()
-                val gt = GrabberThread(
-                    activity.getLogger(),
-                    analytics,
-                    index,
-                    prefs.camerasUrl(index),
-                    activity.videoViewHolders[index - 1])
-                grabberThreads.add(gt)
-            } catch (t: Throwable) {
-                activity.addStatus("ERROR with Grabber $index: $t")
+        val camUrls = buildMap<Int, String> {
+            for (index in 1..camerasCount) {
+                put(index, prefs.camerasUrl(index))
             }
         }
 
-        grabberThreads.forEach { it.start() }
+        grabbersManager = GrabbersManagerThread(
+            activity.getLogger(),
+            analytics,
+            camUrls,
+            activity.videoViewHolders)
+
+
+//        for (index in 1..camerasCount) {
+//            try {
+//                activity.videoViewHolders[index - 1].onStart()
+//                val gt = GrabberThread(
+//                    activity.getLogger(),
+//                    analytics,
+//                    index,
+//                    prefs.camerasUrl(index),
+//                    activity.videoViewHolders[index - 1])
+//                grabberThreads.add(gt)
+//            } catch (t: Throwable) {
+//                activity.addStatus("ERROR with Grabber $index: $t")
+//            }
+//        }
+
+        grabbersManager?.start()
 
 //        wakeWifiLockHandler.lockWake()
 //        wakeWifiLockHandler.lockWifi()
@@ -158,13 +170,13 @@ class MonitorMixin(
     }
 
     fun onStopStreaming() {
-        if (DEBUG) Log.d(TAG, "onStopStreaming ${grabberThreads.size} grabber threads")
+        if (DEBUG) Log.d(TAG, "onStopStreaming")
 
 //        wakeWifiLockHandler.releaseWifi()
 //        wakeWifiLockHandler.releaseWake()
 
-        grabberThreads.forEach { it.stop() }
-        grabberThreads.clear()
+        grabbersManager?.stop()
+        grabbersManager = null
 
         val prefs = AppPrefsValues(activity)
         val camerasCount = prefs.camerasCount()

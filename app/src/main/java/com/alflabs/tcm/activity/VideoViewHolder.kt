@@ -26,6 +26,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.alflabs.tcm.R
 import com.alflabs.tcm.app.AppPrefsValues
+import com.alflabs.tcm.record.IGrabberRenderer
 import com.alflabs.tcm.util.FpsMeasurer
 import com.alflabs.tcm.util.GlobalDebug
 
@@ -65,29 +66,35 @@ class VideoViewHolder(
     }
 
     fun setVisible(visible: Boolean) {
-        container.visibility = if (visible) View.VISIBLE else View.GONE
+        container.post {
+            container.visibility = if (visible) View.VISIBLE else View.GONE
+        }
     }
 
     fun onStart() {
         if (DEBUG) Log.d(TAG, "VideoViewHolder $cameraIndex -- START")
         setStatus("Starting")
-        imageView.keepScreenOn = true
-        fpsView.text = fpsView.context.getString(R.string.main__starting_cam, cameraIndex)
+        imageView.post {
+            imageView.keepScreenOn = true
+            fpsView.text = fpsView.context.getString(R.string.main__starting_cam, cameraIndex)
 
-        labelView.text = prefs.camerasLabel(cameraIndex)
+            labelView.text = prefs.camerasLabel(cameraIndex)
 
-        // Note: Any preferences should be used in onStart, which is called after PrefsActivity.
-        imageView.scaleType = ImageView.ScaleType.MATRIX
-        // Force recomputing matrix before displaying the first image
-        // (we don't know the image size here before the first rendering; we do have that info
-        // in GrabberThread but only after the stream connection started.)
-        mat = null
+            // Note: Any preferences should be used in onStart, which is called after PrefsActivity.
+            imageView.scaleType = ImageView.ScaleType.MATRIX
+            // Force recomputing matrix before displaying the first image
+            // (we don't know the image size here before the first rendering; we do have that info
+            // in GrabberThread but only after the stream connection started.)
+            mat = null
+        }
     }
 
     fun onStop() {
         if (DEBUG) Log.d(TAG, "VideoViewHolder $cameraIndex -- STOP")
-        imageView.keepScreenOn = false
-        fpsView.text = fpsView.context.getString(R.string.main__stopped_cam, cameraIndex)
+        imageView.post {
+            imageView.keepScreenOn = false
+            fpsView.text = fpsView.context.getString(R.string.main__stopped_cam, cameraIndex)
+        }
     }
 
     private fun computeImageMatrix(bmpW: Int, bmpH: Int, viewW: Int, viewH: Int): Matrix {

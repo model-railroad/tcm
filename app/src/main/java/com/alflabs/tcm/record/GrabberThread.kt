@@ -18,7 +18,6 @@
 package com.alflabs.tcm.record
 
 import android.os.SystemClock
-import com.alflabs.tcm.activity.VideoViewHolder
 import com.alflabs.tcm.util.Analytics
 import com.alflabs.tcm.util.GlobalDebug
 import com.alflabs.tcm.util.ILogger
@@ -27,18 +26,13 @@ import org.bytedeco.javacv.AndroidFrameConverter
 import org.bytedeco.javacv.FFmpegFrameGrabber
 import org.bytedeco.javacv.Frame
 import org.bytedeco.javacv.FrameGrabber
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.math.max
-import org.bytedeco.ffmpeg.avformat.*
-import org.bytedeco.ffmpeg.global.avformat.*
-import java.util.concurrent.atomic.AtomicInteger
 
 class GrabberThread(
     private val logger: ILogger,
     private val analytics: Analytics,
     private val camIndex: Int,
     private val url: String,
-    private val renderer : VideoViewHolder
+    private val renderer : IGrabberRenderer
 ): ThreadLoop() {
 
     companion object {
@@ -60,8 +54,9 @@ class GrabberThread(
         const val PAUSE_BEFORE_RETRY_MS = 1000L * 5 // 5 seconds
     }
 
-    private var countStart = 0
-    private var countNull = 0
+    fun stopRequested() {
+        mQuit = true
+    }
 
     override fun beforeThreadLoop() {
         logger.log(TAG, "beforeThreadLoop")
@@ -83,30 +78,12 @@ class GrabberThread(
             grabber.setOption("rtsp_transport", "tcp")  // "udp" or "tcp"
             grabber.setOption("rw_timeout", FFMPEG_TIMEOUT_µS) // microseconds
             grabber.setOption("stimeout"  , FFMPEG_TIMEOUT_µS) // microseconds
-            // "timeout" isn't supported in older versions of FFMPEG for RTSP
+            // "timeout" isn't supported in older versions of FFMPEG for RTSP (before 6.1.1-1.5.10)
              grabber.setOption("timeout"   , FFMPEG_TIMEOUT_µS) // microseconds
             // Match the Android Bitmap Config ARGB_8888, which speeds up the converter.
             grabber.pixelFormat = AV_PIX_FMT_ARGB
             grabber.timeout = FFMPEG_TIMEOUT_MS
             grabber.start()
-
-            // Example from https://github.com/bytedeco/javacv/blob/master/samples/FFmpegStreamingTimeout.java
-            val interruptFlag = AtomicBoolean(false)
-            val interruptCount = AtomicInteger(0)
-            val cp: AVIOInterruptCB.Callback_Pointer = object : AVIOInterruptCB.Callback_Pointer() {
-                override fun call(pointer: org.bytedeco.javacpp.Pointer?): Int {
-                    // 0 - continue, 1 - exit
-                    interruptCount.incrementAndGet()
-                    val interruptFlagInt = if (interruptFlag.get()) 1 else 0
-                    logger.log(TAG, "@@ Callback, interrupt flag == $interruptFlagInt")
-                    return interruptFlagInt
-                }
-            }
-            val oc: AVFormatContext = grabber.formatContext
-            avformat_alloc_context()
-            val cb: AVIOInterruptCB = AVIOInterruptCB()
-            cb.callback(cp)
-            oc.interrupt_callback(cb)
 
             val pixelFormat = grabber.getPixelFormat()
             val frameRate = grabber.getFrameRate()
@@ -126,59 +103,18 @@ class GrabberThread(
 
             var firstImage = true
 
-            countStart++
-            var spin = 0
-            val grabberDesiredMS = 1000L / 2 // 5 FPS target in ms
-            var grabCalls = 0
-            val statsSpanMS = 10*60*1000L
-            var statsMinuteEndMS = SystemClock.elapsedRealtime() + statsSpanMS
-            var statsMax = 0L
-            var statsTotal = 0L
-            var statsCount = 0
-            var statsAvg = 0L
-
             while (!mQuit) {
-                val grabberStartMS = SystemClock.elapsedRealtime()
-                if (grabberStartMS > statsMinuteEndMS) {
-                    statsMinuteEndMS = grabberStartMS + statsSpanMS
-                    statsTotal = 0L
-                    statsCount = 0
-                    grabCalls = 0
-                }
                 frame = grabber.grabImage()
-                grabCalls++
-                if (frame === null) {
-                    countNull++
+                if (frame === null || mQuit) {
                     break
-                } else {
-                    val grabberDeltaMS = SystemClock.elapsedRealtime() - grabberStartMS - grabberDesiredMS
-                    if (grabberDeltaMS > 0) {
-                        statsMax = max(statsMax, grabberDeltaMS)
-                        statsTotal += grabberDeltaMS
-                        statsCount++
-                        statsAvg = statsTotal / statsCount
-                    }
                 }
                 if (firstImage) {
                     renderer.setStatus("")
                     firstImage = false
                 }
-                if (DEBUG) {
-                    renderer.setStatus("S: $countStart   N: $countNull  ${SPIN[spin]}\n" +
-                            "${statsTotal/1000}s / #$statsCount = $statsAvg ms\nMax $statsMax ms\n" +
-                            "${(100 * statsCount) / grabCalls} % -- int ${interruptCount.get()}")
-                    spin = (spin + 1) % 4
-                }
                 // use frame
                 val bmp = converter.convert(frame)
                 renderer.render(bmp)
-            }
-
-            if (DEBUG) {
-                renderer.setStatus("S: $countStart   N: $countNull  ${SPIN[spin]}\n" +
-                        "${statsTotal/1000}s / #$statsCount = $statsAvg ms\n" +
-                        "Max $statsMax ms\n" +
-                        "${(100 * statsCount) / grabCalls} %")
             }
 
             logger.log(TAG, "end while: quit ($mQuit) or frame ($frame)")
@@ -196,6 +132,7 @@ class GrabberThread(
                 label = camIndex.toString(),
                 value = "1")
             renderer.setStatus("Disconnected")
+            renderer.pingAlive()
 
             try {
                 grabber?.close()
@@ -225,6 +162,7 @@ class GrabberThread(
         while (!mQuit && SystemClock.elapsedRealtime() < endMS) {
             try {
                 Thread.sleep(10L)
+                renderer.pingAlive()
             } catch (ignore: Exception) {
             }
         }
