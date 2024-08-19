@@ -38,6 +38,8 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:textStyle="bold"
                     android:textColor="@color/red"
+                    android:shadowColor="@color/white"
+                    android:shadowRadius="10"
                     tools:text="Status 1"
                 />
             <TextView
@@ -82,6 +84,8 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:textStyle="bold"
                     android:textColor="@color/red"
+                    android:shadowColor="@color/white"
+                    android:shadowRadius="10"
                     tools:text="Status 2"
                     />
             <TextView
@@ -127,6 +131,8 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:textStyle="bold"
                     android:textColor="@color/red"
+                    android:shadowColor="@color/white"
+                    android:shadowRadius="10"
                     tools:text="Status 3"
                     />
             <TextView

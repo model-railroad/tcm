@@ -27,7 +27,11 @@ import org.bytedeco.javacv.AndroidFrameConverter
 import org.bytedeco.javacv.FFmpegFrameGrabber
 import org.bytedeco.javacv.Frame
 import org.bytedeco.javacv.FrameGrabber
-
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.math.max
+import org.bytedeco.ffmpeg.avformat.*
+import org.bytedeco.ffmpeg.global.avformat.*
+import java.util.concurrent.atomic.AtomicInteger
 
 class GrabberThread(
     private val logger: ILogger,
@@ -40,7 +44,7 @@ class GrabberThread(
     companion object {
         private val TAG: String = GrabberThread::class.java.simpleName
         private val DEBUG: Boolean = GlobalDebug.DEBUG
-        private const val SPIN = "|/-\\"
+        private const val SPIN = "◥◢◣◤"
 
         // https://ffmpeg.org/doxygen/trunk/pixfmt_8h_source.html
         const val AV_PIX_FMT_RGB24 = 75 - 73
@@ -50,7 +54,7 @@ class GrabberThread(
         const val AV_PIX_FMT_ABGR = 101 - 73
         const val AV_PIX_FMT_BGRA = 102 - 73
 
-        const val FFMPEG_TIMEOUT_S  = 3             // 3 seconds
+        const val FFMPEG_TIMEOUT_S  = 2             // 2 seconds
         const val FFMPEG_TIMEOUT_MS = 1000 * FFMPEG_TIMEOUT_S
         const val FFMPEG_TIMEOUT_µS = (1000 * FFMPEG_TIMEOUT_MS).toString()
         const val PAUSE_BEFORE_RETRY_MS = 1000L * 5 // 5 seconds
@@ -79,10 +83,30 @@ class GrabberThread(
             grabber.setOption("rtsp_transport", "tcp")  // "udp" or "tcp"
             grabber.setOption("rw_timeout", FFMPEG_TIMEOUT_µS) // microseconds
             grabber.setOption("stimeout"  , FFMPEG_TIMEOUT_µS) // microseconds
+            // "timeout" isn't supported in older versions of FFMPEG for RTSP
+             grabber.setOption("timeout"   , FFMPEG_TIMEOUT_µS) // microseconds
             // Match the Android Bitmap Config ARGB_8888, which speeds up the converter.
             grabber.pixelFormat = AV_PIX_FMT_ARGB
             grabber.timeout = FFMPEG_TIMEOUT_MS
             grabber.start()
+
+            // Example from https://github.com/bytedeco/javacv/blob/master/samples/FFmpegStreamingTimeout.java
+            val interruptFlag = AtomicBoolean(false)
+            val interruptCount = AtomicInteger(0)
+            val cp: AVIOInterruptCB.Callback_Pointer = object : AVIOInterruptCB.Callback_Pointer() {
+                override fun call(pointer: org.bytedeco.javacpp.Pointer?): Int {
+                    // 0 - continue, 1 - exit
+                    interruptCount.incrementAndGet()
+                    val interruptFlagInt = if (interruptFlag.get()) 1 else 0
+                    logger.log(TAG, "@@ Callback, interrupt flag == $interruptFlagInt")
+                    return interruptFlagInt
+                }
+            }
+            val oc: AVFormatContext = grabber.formatContext
+            avformat_alloc_context()
+            val cb: AVIOInterruptCB = AVIOInterruptCB()
+            cb.callback(cp)
+            oc.interrupt_callback(cb)
 
             val pixelFormat = grabber.getPixelFormat()
             val frameRate = grabber.getFrameRate()
@@ -104,19 +128,45 @@ class GrabberThread(
 
             countStart++
             var spin = 0
+            val grabberDesiredMS = 1000L / 2 // 5 FPS target in ms
+            var grabCalls = 0
+            val statsSpanMS = 10*60*1000L
+            var statsMinuteEndMS = SystemClock.elapsedRealtime() + statsSpanMS
+            var statsMax = 0L
+            var statsTotal = 0L
+            var statsCount = 0
+            var statsAvg = 0L
 
             while (!mQuit) {
+                val grabberStartMS = SystemClock.elapsedRealtime()
+                if (grabberStartMS > statsMinuteEndMS) {
+                    statsMinuteEndMS = grabberStartMS + statsSpanMS
+                    statsTotal = 0L
+                    statsCount = 0
+                    grabCalls = 0
+                }
                 frame = grabber.grabImage()
+                grabCalls++
                 if (frame === null) {
                     countNull++
                     break
-                };
+                } else {
+                    val grabberDeltaMS = SystemClock.elapsedRealtime() - grabberStartMS - grabberDesiredMS
+                    if (grabberDeltaMS > 0) {
+                        statsMax = max(statsMax, grabberDeltaMS)
+                        statsTotal += grabberDeltaMS
+                        statsCount++
+                        statsAvg = statsTotal / statsCount
+                    }
+                }
                 if (firstImage) {
                     renderer.setStatus("")
                     firstImage = false
                 }
                 if (DEBUG) {
-                    renderer.setStatus("S: $countStart   N: $countNull  ${SPIN.get(spin)}")
+                    renderer.setStatus("S: $countStart   N: $countNull  ${SPIN[spin]}\n" +
+                            "${statsTotal/1000}s / #$statsCount = $statsAvg ms\nMax $statsMax ms\n" +
+                            "${(100 * statsCount) / grabCalls} % -- int ${interruptCount.get()}")
                     spin = (spin + 1) % 4
                 }
                 // use frame
@@ -124,7 +174,12 @@ class GrabberThread(
                 renderer.render(bmp)
             }
 
-            if (DEBUG) renderer.setStatus("S: $countStart   N: $countNull") // DEBUG
+            if (DEBUG) {
+                renderer.setStatus("S: $countStart   N: $countNull  ${SPIN[spin]}\n" +
+                        "${statsTotal/1000}s / #$statsCount = $statsAvg ms\n" +
+                        "Max $statsMax ms\n" +
+                        "${(100 * statsCount) / grabCalls} %")
+            }
 
             logger.log(TAG, "end while: quit ($mQuit) or frame ($frame)")
             analytics.sendEvent(

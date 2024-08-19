@@ -52,6 +52,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (DEBUG) Log.d(TAG, "onCreate")
         super.onCreate(savedInstanceState)
         analytics = Analytics()
         monitorMixin = MonitorMixin(this, analytics)
@@ -120,6 +121,7 @@ class MainActivity : AppCompatActivity() {
 
     // Invoked after onCreate or onRestart
     override fun onStart() {
+        if (DEBUG) Log.d(TAG, "onStart")
         super.onStart()
 
         // Note: Any UI that can be changed by editing preferences should be set/reset in
@@ -131,7 +133,6 @@ class MainActivity : AppCompatActivity() {
 
         analytics.setAnalyticsId(prefs)
         debugDisplay = prefs.systemDebugDisplay()
-        if (DEBUG) Log.d(TAG, "onStart -- debugDisplay = $debugDisplay")
 
         statusTxt.visibility = if (debugDisplay) View.VISIBLE else View.GONE
         if (!debugDisplay) statusTxt.text = ""
@@ -152,6 +153,7 @@ class MainActivity : AppCompatActivity() {
 
     // Invoked after onStart or onPause
     override fun onResume() {
+        if (DEBUG) Log.d(TAG, "onResume")
         super.onResume()
         hideNavigationBar()
         monitorMixin.onResume()
@@ -159,6 +161,7 @@ class MainActivity : AppCompatActivity() {
 
     // Next state is either onResume or onStop
     override fun onPause() {
+        if (DEBUG) Log.d(TAG, "onPause")
         super.onPause()
         analytics.sendEvent(category = "TCM", action = "Pause")
         monitorMixin.onPause()
@@ -166,6 +169,7 @@ class MainActivity : AppCompatActivity() {
 
     // Next state is either onCreate > Start, onRestart > Start, or onDestroy
     override fun onStop() {
+        if (DEBUG) Log.d(TAG, "onStop")
         super.onStop()
         monitorMixin.onStop()
         analytics.stop()
@@ -173,22 +177,24 @@ class MainActivity : AppCompatActivity() {
 
     // The end of the activity
     override fun onDestroy() {
+        if (DEBUG) Log.d(TAG, "onDestroy")
         super.onDestroy()
         monitorMixin.onDestroy()
     }
 
     private fun onPrefsButton() {
+        if (DEBUG) Log.d(TAG, "onPrefsButton")
         val i = Intent(this, PrefsActivity::class.java)
         startActivity(i)
     }
 
     private fun onStartButton() {
-        if (DEBUG) Log.d(TAG, "@@ on START button")
+        if (DEBUG) Log.d(TAG, "onStartButton")
         monitorMixin.onStartStreaming()
     }
 
     private fun onStopButton() {
-        if (DEBUG) Log.d(TAG, "@@ on STOP button")
+        if (DEBUG) Log.d(TAG, "onStopButton")
         monitorMixin.onStopStreaming()
     }
 
@@ -241,6 +247,7 @@ class MainActivity : AppCompatActivity() {
     private fun hideNavigationBar() {
         val prefs = AppPrefsValues(this)
         if (!prefs.systemHideNavBar()) return
+        if (DEBUG) Log.d(TAG, "hideNavigationBar")
 
         val root = window.decorView
         val visibility =
