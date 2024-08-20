@@ -61,7 +61,8 @@ class Analytics : ThreadLoop() {
         // Debug events are visible in GA4 > Prop Setting > Data Display > Debug View only.
         private const val VERBOSE_DEBUG = false
 
-        private const val IDLE_SLEEP_MS = 1000L / 10L
+        private const val IDLE_SLEEP_MS     = 1000L
+        private const val IDLE_SLEEP_MAX_MS = 1000L * 60
         private const val MAX_ERROR_NUM = 3
 
         private val GA4_URL = ("https://www.google-analytics.com/"
@@ -76,6 +77,7 @@ class Analytics : ThreadLoop() {
     private val mStopLoopOnceEmpty = AtomicBoolean(false)
     private val mLatchEndLoop = CountDownLatch(1)
     private val mExecutor = Executors.newSingleThreadScheduledExecutor()
+    private var mErrorSleepMs = IDLE_SLEEP_MS
 
     private var analyticsId = ""
     private var mGA4ClientId = ""
@@ -133,7 +135,9 @@ class Analytics : ThreadLoop() {
             while (!mQuit) {
                 val payload: Payload? = mPayloads.pollFirst()
                 if (payload == null) break
-                if (!payload.send(System.currentTimeMillis())) {
+                if (payload.send(System.currentTimeMillis())) {
+                    mErrorSleepMs = IDLE_SLEEP_MS
+                } else {
                     if (isNotStopping) {
                         // If it fails, append the payload at the *end* of the queue to retry later
                         // after all newer events.
@@ -152,7 +156,11 @@ class Analytics : ThreadLoop() {
 
         if (!mQuit) {
             try {
-                Thread.sleep(IDLE_SLEEP_MS)
+                Thread.sleep(mErrorSleepMs)
+                if (mErrorSleepMs < IDLE_SLEEP_MAX_MS) {
+                    mErrorSleepMs += mErrorSleepMs
+                    if (DEBUG) Log.d(TAG, "Error timeout changed to $mErrorSleepMs ms")
+                }
             } catch (e: Exception) {
                 if (DEBUG) Log.d(TAG, "Stats idle loop interrupted: $e")
             }
