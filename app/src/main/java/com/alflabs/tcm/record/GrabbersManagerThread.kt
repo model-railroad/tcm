@@ -40,12 +40,13 @@ class GrabbersManagerThread(
         private const val SPIN = "◥◢◣◤"
 
         private const val GRAB_REFRESH_MS = 1000L           // 1 second
-        private const val GRAB_TIMEOUT_MS = 1000L * 6       // 6 seconds
+        private const val GRAB_TIMEOUT_MS = 1000L * 8       // 8 seconds
         private const val STAT_REPORT_MS  = 1000L * 60 * 10 // 10 minutes in milliseconds
         private const val GRAB_CLEANUP_MS = 1000L * 60      // 1 minute in milliseconds
     }
 
     private val exGrabbers = mutableListOf<GrabberThread>()
+    private var maxExGrabbersCount = 0
 
     private inner class CamThread(
         private val index : Int,
@@ -202,11 +203,19 @@ class GrabbersManagerThread(
                 if (nowMS >= sendStatsMS) {
                     cams.forEach { it.sendStat(analytics) }
 
+                    analytics.sendEvent(
+                        category = "TCM",
+                        action = "MaxExGrabbers",
+                        value = maxExGrabbersCount.toString())
+                    maxExGrabbersCount = 0
+
                     sendStatsMS = nowMS + STAT_REPORT_MS
                 }
                 if (nowMS >= grabCleanupMS) {
                     if (exGrabbers.isNotEmpty()) {
-                        if (DEBUG) Log.d(TAG, "exGrabbers: ${exGrabbers.size}")
+                        val size = exGrabbers.size
+                        if (DEBUG) Log.d(TAG, "exGrabbers: $size")
+                        maxExGrabbersCount = max(maxExGrabbersCount, size)
                         exGrabbers.removeIf { it.isLoopFinished }
                     }
                     grabCleanupMS = SystemClock.elapsedRealtime() + GRAB_CLEANUP_MS

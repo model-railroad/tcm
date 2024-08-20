@@ -16,6 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import com.android.build.gradle.internal.tasks.factory.dependsOn
+import java.util.regex.Pattern
 
 plugins {
     alias(libs.plugins.android.application)
@@ -51,6 +52,22 @@ android {
         }
     }
 
+    flavorDimensions += "api"
+    productFlavors {
+        create("api21") {
+            dimension = "api"
+            minSdk = 21
+            versionCode = minSdk!! + 1000 * (android.defaultConfig.versionCode ?: 0)
+            versionNameSuffix = "-api${minSdk!!}"
+        }
+        create("api23") {
+            dimension = "api"
+            minSdk = 23
+            versionCode = minSdk!! + 1000 * (android.defaultConfig.versionCode ?: 0)
+            versionNameSuffix = "-api${minSdk!!}"
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -82,6 +99,31 @@ android {
     // }
 
 }
+
+// Source: https://medium.com/@banmarkovic/get-current-flavor-in-android-gradle-6d23d27259e3
+fun getCurrentFlavor(): String {
+    val taskRequestsStr = gradle.startParameter.taskRequests.toString()
+    val pattern: Pattern = if (taskRequestsStr.contains("assemble")) {
+        Pattern.compile("assemble(\\w+)(Release|Debug)")
+    } else {
+        Pattern.compile("bundle(\\w+)(Release|Debug)")
+    }
+
+    val matcher = pattern.matcher(taskRequestsStr)
+    val flavor = if (matcher.find()) {
+        matcher.group(1).lowercase()
+    } else {
+        println("@@ NO FLAVOR FOUND")
+        ""
+    }
+    println("@@ Current flavor: $flavor")
+    return flavor
+}
+
+
+fun selectPlatform(api: Int, apiChoice: Any, other: Any): Any =
+    if (getCurrentFlavor().contains(api.toString())) apiChoice else other
+
 
 // Source: https://github.com/bytedeco/sample-projects/blob/master/JavaCV-android-example/app/build.gradle
 // and manually converted from Groovy Gradle to kts.
@@ -126,13 +168,16 @@ dependencies {
     //   app/build/javacpp/lib/{armeabi-v7a,arm64-v8a,x86,x86_64}/
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     // This provides the java imports available.
-    implementation(libs.javacv.platform)
-    implementation(libs.ffmpeg.platform)
-    implementation(libs.opencv.platform)
+    "api21Implementation"(libs.javacv.platform21)
+    "api21Implementation"(libs.ffmpeg.platform21)
+    "api21Implementation"(libs.opencv.platform21)
+    "api23Implementation"(libs.javacv.platform23)
+    "api23Implementation"(libs.ffmpeg.platform23)
+    "api23Implementation"(libs.opencv.platform23)
     // This provides the JNI libs needed at runtime.
     // For some reason only one "platform" needs to be specified below.
-    // (e.g. trying to hava javacpp of javacv + ffmpeg makes it fail).
-    javacpp(libs.opencv.platform)
+    // (e.g. trying to have javacpp of opencv + javacv + ffmpeg makes it fail).
+    javacpp(selectPlatform(21, libs.opencv.platform21, libs.opencv.platform23))
 
     // For isCoreLibraryDesugaringEnabled
     coreLibraryDesugaring(libs.android.tool.desugar.jdk.libs)
