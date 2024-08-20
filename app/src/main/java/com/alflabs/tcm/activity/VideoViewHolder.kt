@@ -26,32 +26,43 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.alflabs.tcm.R
 import com.alflabs.tcm.app.AppPrefsValues
-import com.alflabs.tcm.record.IGrabberRenderer
 import com.alflabs.tcm.util.FpsMeasurer
 import com.alflabs.tcm.util.GlobalDebug
 
 class VideoViewHolder(
     private val cameraIndex: Int,
-    private val prefs: AppPrefsValues,
     private val container: ViewGroup,
     private val imageView: ImageView,
     private val labelView: TextView,
     private val statusView: TextView,
-    private val fpsView: TextView) {
+    private val fpsView: TextView,
+    private val runOnUiThread: IRunOnUiThread,
+    ) {
 
     companion object {
         private val TAG: String = VideoViewHolder::class.java.simpleName
         private val DEBUG: Boolean = GlobalDebug.DEBUG
     }
 
+    fun interface IRunOnUiThread {
+        fun run(action: () -> Unit)
+    }
+
+    private var transform: CamTransformValues? = null
+    private var label = ""
     private val fpsMeasurer = FpsMeasurer()
     private var mat: Matrix? = null
 
+    fun loadPrefs(prefs: AppPrefsValues) {
+        transform = prefs.camerasTransform(cameraIndex)
+        label = prefs.camerasLabel(cameraIndex)
+    }
+
     fun render(bmp: Bitmap) {
-        imageView.post {
+        runOnUiThread.run {
             fpsMeasurer.ping()
-            if (mat == null) {
-                mat = computeImageMatrix(bmp.width, bmp.height, imageView.width, imageView.height)
+            if (mat == null && transform != null) {
+                mat = computeImageMatrix(transform!!, bmp.width, bmp.height, imageView.width, imageView.height)
                 imageView.imageMatrix = mat
             }
             imageView.setImageBitmap(bmp)
@@ -60,13 +71,13 @@ class VideoViewHolder(
     }
 
     fun setStatus(status: String) {
-        statusView.post {
+        runOnUiThread.run {
             statusView.text = status
         }
     }
 
     fun setVisible(visible: Boolean) {
-        container.post {
+        runOnUiThread.run {
             container.visibility = if (visible) View.VISIBLE else View.GONE
         }
     }
@@ -74,11 +85,11 @@ class VideoViewHolder(
     fun onStart() {
         if (DEBUG) Log.d(TAG, "VideoViewHolder $cameraIndex -- START")
         setStatus("Starting")
-        imageView.post {
+        runOnUiThread.run {
             imageView.keepScreenOn = true
             fpsView.text = fpsView.context.getString(R.string.main__starting_cam, cameraIndex)
 
-            labelView.text = prefs.camerasLabel(cameraIndex)
+            labelView.text = label
 
             // Note: Any preferences should be used in onStart, which is called after PrefsActivity.
             imageView.scaleType = ImageView.ScaleType.MATRIX
@@ -91,14 +102,20 @@ class VideoViewHolder(
 
     fun onStop() {
         if (DEBUG) Log.d(TAG, "VideoViewHolder $cameraIndex -- STOP")
-        imageView.post {
+        runOnUiThread.run {
             imageView.keepScreenOn = false
             fpsView.text = fpsView.context.getString(R.string.main__stopped_cam, cameraIndex)
         }
     }
 
-    private fun computeImageMatrix(bmpW: Int, bmpH: Int, viewW: Int, viewH: Int): Matrix {
-        val transform = prefs.camerasTransform(cameraIndex)
+    private fun computeImageMatrix(
+        transform: CamTransformValues,
+        bmpW: Int,
+        bmpH: Int,
+        viewW: Int,
+        viewH: Int
+    ): Matrix {
+        if (DEBUG) Log.d(TAG, "VideoViewHolder $cameraIndex -- computeImageMatrix")
         val mat = Matrix()
 
         // Center image on view (0,0) to apply rotation & scale

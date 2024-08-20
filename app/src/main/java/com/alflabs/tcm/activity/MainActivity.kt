@@ -86,31 +86,28 @@ class MainActivity : AppCompatActivity() {
         videoViewHolders = listOf(
             VideoViewHolder(
                 1,
-                prefs,
                 findViewById(R.id.container_cam1),
                 findViewById(R.id.video_cam1),
                 findViewById(R.id.label_cam1),
                 findViewById(R.id.status_cam1),
-                findViewById(R.id.fps_cam1),
-                ),
+                findViewById(R.id.fps_cam1)
+                ) { action -> runOnUiThread { action.invoke() } },
             VideoViewHolder(
                 2,
-                prefs,
                 findViewById(R.id.container_cam2),
                 findViewById(R.id.video_cam2),
                 findViewById(R.id.label_cam2),
                 findViewById(R.id.status_cam2),
                 findViewById(R.id.fps_cam2),
-                ),
+                ) { action -> runOnUiThread { action.invoke() } },
             VideoViewHolder(
                 3,
-                prefs,
                 findViewById(R.id.container_cam3),
                 findViewById(R.id.video_cam3),
                 findViewById(R.id.label_cam3),
                 findViewById(R.id.status_cam3),
                 findViewById(R.id.fps_cam3),
-            ),
+            ) { action -> runOnUiThread { action.invoke() } },
         )
 
         if (DEBUG) {
@@ -133,6 +130,8 @@ class MainActivity : AppCompatActivity() {
 
         analytics.setAnalyticsId(prefs)
         debugDisplay = prefs.systemDebugDisplay()
+
+        videoViewHolders.forEach { it.loadPrefs(prefs) }
 
         statusTxt.visibility = if (debugDisplay) View.VISIBLE else View.GONE
         if (!debugDisplay) statusTxt.text = ""

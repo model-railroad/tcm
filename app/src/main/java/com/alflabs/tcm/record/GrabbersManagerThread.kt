@@ -38,6 +38,8 @@ class GrabbersManagerThread(
         private val TAG: String = GrabbersManagerThread::class.java.simpleName
         private val DEBUG: Boolean = GlobalDebug.DEBUG
         private const val SPIN = "◥◢◣◤"
+
+        private const val STAT_REPORT_MS = 1000L * 60 * 10  // 10 minutes in milliseconds
     }
 
     private inner class CamThread(
@@ -70,7 +72,7 @@ class GrabbersManagerThread(
                 camUrls[index]!!,
                 render!!,
             )
-            grabber?.start()
+            grabber?.start("Grabber-$index-$countNewRender")
         }
 
         private fun discardGrabber() {
@@ -78,6 +80,7 @@ class GrabbersManagerThread(
             render = null
             grabber?.let {
                 grabber?.stopRequested()
+                grabber = null
             }
         }
 
@@ -119,6 +122,15 @@ class GrabbersManagerThread(
                 }
             }
         }
+
+        fun sendStat(analytics: Analytics) {
+            analytics.sendEvent(
+                category = "TCM_Cam",
+                action = "MaxDelayMS",
+                label = index.toString(),
+                value = maxDelayMS.toString())
+            maxDelayMS = 0
+        }
     }
 
     private class CamRender(private val camThread: CamThread) : IGrabberRenderer {
@@ -147,7 +159,7 @@ class GrabbersManagerThread(
 
     override fun start() {
         if (DEBUG) Log.d(TAG, "start")
-        super.start()
+        super.start("GrabberManager")
     }
 
     override fun stop() {
@@ -168,8 +180,17 @@ class GrabbersManagerThread(
         try {
             cams.forEach { it.start() }
 
+            var sendStatsMS = SystemClock.elapsedRealtime() + STAT_REPORT_MS
+
             while (!mQuit) {
                 cams.forEach { it.loop() }
+
+                val nowMS = SystemClock.elapsedRealtime()
+                if (nowMS >= sendStatsMS) {
+                    cams.forEach { it.sendStat(analytics) }
+
+                    sendStatsMS = nowMS + STAT_REPORT_MS
+                }
 
                 try {
                     Thread.sleep(1000)

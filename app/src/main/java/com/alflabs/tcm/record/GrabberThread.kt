@@ -118,7 +118,7 @@ class GrabberThread(
                 category = "TCM_Cam",
                 action = if (mQuit) "Stop" else "Error",
                 label = camIndex.toString(),
-                value = "1")
+                value = "0")
             grabber.flush()
 
         } catch (e: FrameGrabber.Exception) {
@@ -126,12 +126,13 @@ class GrabberThread(
                 category = "TCM_Cam",
                 action = "Error",
                 label = camIndex.toString(),
-                value = "1")
+                value = "0")
             renderer.setStatus("Disconnected")
             renderer.pingAlive()
 
             try {
-                grabber?.close()
+                grabber?.close() // implementation calls stop + release
+                grabber = null
             } catch (ignore: FrameGrabber.Exception) {}
             logger.log(TAG, "Grabber Exception: $e")
             if (e.toString().contains("Could not open input")) {
@@ -142,7 +143,9 @@ class GrabberThread(
         } finally {
             try {
                 grabber?.close() // implementation calls stop + release
-            } catch (ignore: FrameGrabber.Exception) {}
+            } catch (e: FrameGrabber.Exception) {
+                logger.log(TAG, "Grabber Close Exception: $e")
+            }
             // AndroidFrameConverter.close() was only added in JavaCV 1.5.5
             if (converter is AutoCloseable) {
                 converter.close()

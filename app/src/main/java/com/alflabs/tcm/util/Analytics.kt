@@ -125,18 +125,20 @@ class Analytics : ThreadLoop() {
         val isStopping = mStopLoopOnceEmpty.get()
         val isNotStopping = !isStopping
 
+        var errors = 0
+
         if (mPayloads.isEmpty()) {
             if (isStopping) {
                 throw EndLoopException()
             }
         } else {
-            var errors = 0
 
             while (!mQuit) {
                 val payload: Payload? = mPayloads.pollFirst()
                 if (payload == null) break
                 if (payload.send(System.currentTimeMillis())) {
                     mErrorSleepMs = IDLE_SLEEP_MS
+                    errors = 0
                 } else {
                     if (isNotStopping) {
                         // If it fails, append the payload at the *end* of the queue to retry later
@@ -145,7 +147,7 @@ class Analytics : ThreadLoop() {
                         mPayloads.offerLast(payload)
                         errors++
 
-                        // Don't hammer the server in case of failures.
+                        // Don't hammer the server in case of continuous failures.
                         if (errors >= MAX_ERROR_NUM) {
                             break
                         }
@@ -157,7 +159,7 @@ class Analytics : ThreadLoop() {
         if (!mQuit) {
             try {
                 Thread.sleep(mErrorSleepMs)
-                if (mErrorSleepMs < IDLE_SLEEP_MAX_MS) {
+                if (errors > 0 && mErrorSleepMs < IDLE_SLEEP_MAX_MS) {
                     mErrorSleepMs += mErrorSleepMs
                     if (DEBUG) Log.d(TAG, "Error timeout changed to $mErrorSleepMs ms")
                 }
