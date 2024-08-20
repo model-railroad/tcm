@@ -19,10 +19,11 @@ package com.alflabs.tcm.app
 
 import android.util.Log
 import com.alflabs.tcm.activity.MainActivity
+import com.alflabs.tcm.app.MonitorMixin.Companion.DEBUG_FFMPEG
 import com.alflabs.tcm.record.GrabbersManagerThread
+import com.alflabs.tcm.util.AVUtils
 import com.alflabs.tcm.util.Analytics
 import com.alflabs.tcm.util.GlobalDebug
-import org.bytedeco.javacv.FFmpegLogCallback
 
 /**
  * This is the main core "Monitor" of the TCM application.
@@ -68,14 +69,8 @@ class MonitorMixin(
     // Invoked after onCreate or onRestart
     fun onStart() {
         if (DEBUG) Log.d(TAG, "onStart")
-        if (DEBUG_FFMPEG) {
-            try {
-                // FFmpegLogCallback.setLevel(AV_LOG_TRACE)    // Warning: very verbose in logcat
-                FFmpegLogCallback.set()
-            } catch (t: Throwable) {
-                activity.addStatus("ERROR: $t")
-            }
-        }
+
+        AVUtils.instance.setFFmpegLogCallback(activity.getLogger())
 
         val prefs = AppPrefsValues(activity)
         camerasCount = prefs.camerasCount()

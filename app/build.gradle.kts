@@ -146,6 +146,7 @@ dependencies {
     // implementation(libs.kotlinx.coroutines) -- not currently used
     implementation(libs.material)
     implementation(libs.squareup.okhttp3)
+    implementation(kotlin("reflect"))
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

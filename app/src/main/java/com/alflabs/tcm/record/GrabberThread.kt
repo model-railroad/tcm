@@ -18,6 +18,7 @@
 package com.alflabs.tcm.record
 
 import android.os.SystemClock
+import com.alflabs.tcm.util.AVUtils
 import com.alflabs.tcm.util.Analytics
 import com.alflabs.tcm.util.GlobalDebug
 import com.alflabs.tcm.util.ILogger
@@ -38,15 +39,6 @@ class GrabberThread(
     companion object {
         private val TAG: String = GrabberThread::class.java.simpleName
         private val DEBUG: Boolean = GlobalDebug.DEBUG
-        private const val SPIN = "◥◢◣◤"
-
-        // https://ffmpeg.org/doxygen/trunk/pixfmt_8h_source.html
-        const val AV_PIX_FMT_RGB24 = 75 - 73
-        const val AV_PIX_FMT_BGR24 = 76 - 73
-        const val AV_PIX_FMT_ARGB =  99 - 73    // Matches Android Bitmap Config ARGB_8888
-        const val AV_PIX_FMT_RGBA = 100 - 73
-        const val AV_PIX_FMT_ABGR = 101 - 73
-        const val AV_PIX_FMT_BGRA = 102 - 73
 
         const val FFMPEG_TIMEOUT_S  = 2             // 2 seconds
         const val FFMPEG_TIMEOUT_MS = 1000 * FFMPEG_TIMEOUT_S
@@ -72,16 +64,20 @@ class GrabberThread(
 
             renderer.setStatus("Connecting")
 
+            // TBD all that setup below is highly dependend on the URL using RTSP.
             grabber = FFmpegFrameGrabber(url)
             grabber.format = "rtsp"
             // http://ffmpeg.org/ffmpeg-all.html#rtsp
             grabber.setOption("rtsp_transport", "tcp")  // "udp" or "tcp"
             grabber.setOption("rw_timeout", FFMPEG_TIMEOUT_µS) // microseconds
             grabber.setOption("stimeout"  , FFMPEG_TIMEOUT_µS) // microseconds
-            // "timeout" isn't supported in older versions of FFMPEG for RTSP (before 6.1.1-1.5.10)
-             grabber.setOption("timeout"   , FFMPEG_TIMEOUT_µS) // microseconds
+            if (AVUtils.instance.isJavaCV_1_5_9) {
+                // "timeout" isn't supported in older versions of FFMPEG for RTSP (before
+                // 6.1.1-1.5.10 although I don't exactly which version.)
+                grabber.setOption("timeout", FFMPEG_TIMEOUT_µS) // microseconds
+            }
             // Match the Android Bitmap Config ARGB_8888, which speeds up the converter.
-            grabber.pixelFormat = AV_PIX_FMT_ARGB
+            grabber.pixelFormat = AVUtils.AV_PIX_FMT_ARGB
             grabber.timeout = FFMPEG_TIMEOUT_MS
             grabber.start()
 
