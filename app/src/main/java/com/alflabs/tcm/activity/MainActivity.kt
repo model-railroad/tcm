@@ -55,6 +55,7 @@ class MainActivity : AppCompatActivity() {
         if (DEBUG) Log.d(TAG, "onCreate")
         super.onCreate(savedInstanceState)
         analytics = Analytics()
+        setUncaughtExceptionHandler()
         monitorMixin = MonitorMixin(this, analytics)
         monitorMixin.onCreate()
 
@@ -113,6 +114,21 @@ class MainActivity : AppCompatActivity() {
         if (DEBUG) {
             addStatus("\n@@ API Level: ${android.os.Build.VERSION.SDK_INT}")
             addStatus("\n@@ ABIs: ${android.os.Build.SUPPORTED_ABIS.toList()}")
+        }
+    }
+
+    private fun setUncaughtExceptionHandler() {
+        Thread.setDefaultUncaughtExceptionHandler { thread, exception ->
+            // Note: this may run a thread like thread FinalizerWatchdogDaemon.
+            // The thread here has nothing to do with where the object was being used.
+            Log.e(TAG, "@@ Uncaught Exception in thread ${thread.name}", exception)
+            runOnUiThread {
+                analytics.sendEvent(
+                    category = "TCM",
+                    action = "Exception",
+                    label = "${thread.name} ${exception.javaClass.simpleName}"
+                )
+            }
         }
     }
 

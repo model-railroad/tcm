@@ -23,4 +23,7 @@ interface IStartStop {
 
     @Throws(Exception::class)
     fun stop()
+
+    @Throws(Exception::class)
+    fun stop(joinTimeoutMillis: Long)
 }

@@ -46,21 +46,31 @@ class GrabberThread(
         const val PAUSE_BEFORE_RETRY_MS = 1000L * 5 // 5 seconds
     }
 
+    var isWaitingForFirstImage = true
+        private set
+    var isLoopFinished = false
+        private set
+
     fun stopRequested() {
         mQuit = true
     }
 
     override fun beforeThreadLoop() {
-        logger.log(TAG, "beforeThreadLoop")
+        logger.log(TAG, "GrabberThread $camIndex > beforeThreadLoop")
+    }
+
+    override fun afterThreadLoop() {
+        logger.log(TAG, "GrabberThread $camIndex > afterThreadLoop")
+        isLoopFinished = true
     }
 
     override fun runInThreadLoop() {
-        logger.log(TAG, "runInThreadLoop")
+        logger.log(TAG, "GrabberThread $camIndex > runInThreadLoop")
         var grabber : FFmpegFrameGrabber? = null
         val converter = AndroidFrameConverter()
 
         try {
-            logger.log(TAG, "Grabber for URL: $url")
+            logger.log(TAG, "GrabberThread $camIndex > Grabber for URL: $url")
 
             renderer.setStatus("Connecting")
 
@@ -83,7 +93,7 @@ class GrabberThread(
 
             val pixelFormat = grabber.getPixelFormat()
             val frameRate = grabber.getFrameRate()
-            logger.log(TAG, "Grabber started with video format " + pixelFormat
+            logger.log(TAG, "GrabberThread $camIndex > Grabber started with video format " + pixelFormat
                     + ", framerate " + frameRate + " fps"
                     + ", size " + grabber.imageWidth + "x" + grabber.imageHeight
             )
@@ -97,23 +107,22 @@ class GrabberThread(
             // Note that frame is reused for each frame recording
             var frame: Frame? = null
 
-            var firstImage = true
-
             while (!mQuit) {
                 frame = grabber.grabImage()
                 if (frame === null || mQuit) {
                     break
                 }
-                if (firstImage) {
-                    renderer.setStatus("")
-                    firstImage = false
-                }
                 // use frame
                 val bmp = converter.convert(frame)
                 renderer.render(bmp)
+
+                if (isWaitingForFirstImage) {
+                    isWaitingForFirstImage = false
+                    renderer.setStatus("")
+                }
             }
 
-            logger.log(TAG, "end while: quit ($mQuit) or frame ($frame)")
+            logger.log(TAG, "GrabberThread $camIndex > end while: quit ($mQuit) or frame ($frame)")
             analytics.sendEvent(
                 category = "TCM_Cam",
                 action = if (mQuit) "Stop" else "Error",
@@ -134,23 +143,23 @@ class GrabberThread(
                 grabber?.close() // implementation calls stop + release
                 grabber = null
             } catch (ignore: FrameGrabber.Exception) {}
-            logger.log(TAG, "Grabber Exception: $e")
+            logger.log(TAG, "GrabberThread $camIndex > Grabber Exception: $e")
             if (e.toString().contains("Could not open input")) {
                 // Insert a delay before retrying unless asked to quit
-                logger.log(TAG, "Pause $PAUSE_BEFORE_RETRY_MS ms before retry")
+                logger.log(TAG, "GrabberThread $camIndex > Pause $PAUSE_BEFORE_RETRY_MS ms before retry")
                 pause(PAUSE_BEFORE_RETRY_MS)
             }
         } finally {
             try {
                 grabber?.close() // implementation calls stop + release
             } catch (e: FrameGrabber.Exception) {
-                logger.log(TAG, "Grabber Close Exception: $e")
+                logger.log(TAG, "GrabberThread $camIndex > Grabber Close Exception: $e")
             }
             // AndroidFrameConverter.close() was only added in JavaCV 1.5.5
             if (converter is AutoCloseable) {
                 converter.close()
             }
-            logger.log(TAG, "runInThreadLoop - closed")
+            logger.log(TAG, "GrabberThread $camIndex > runInThreadLoop - closed")
 
             renderer.setStatus("Disconnected")
         }
@@ -165,9 +174,5 @@ class GrabberThread(
             } catch (ignore: Exception) {
             }
         }
-    }
-
-    override fun afterThreadLoop() {
-        logger.log(TAG, "afterThreadLoop")
     }
 }

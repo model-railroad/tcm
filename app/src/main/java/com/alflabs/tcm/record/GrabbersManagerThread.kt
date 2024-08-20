@@ -39,8 +39,13 @@ class GrabbersManagerThread(
         private val DEBUG: Boolean = GlobalDebug.DEBUG
         private const val SPIN = "◥◢◣◤"
 
-        private const val STAT_REPORT_MS = 1000L * 60 * 10  // 10 minutes in milliseconds
+        private const val GRAB_REFRESH_MS = 1000L           // 1 second
+        private const val GRAB_TIMEOUT_MS = 1000L * 6       // 6 seconds
+        private const val STAT_REPORT_MS  = 1000L * 60 * 10 // 10 minutes in milliseconds
+        private const val GRAB_CLEANUP_MS = 1000L * 60      // 1 minute in milliseconds
     }
+
+    private val exGrabbers = mutableListOf<GrabberThread>()
 
     private inner class CamThread(
         private val index : Int,
@@ -79,7 +84,8 @@ class GrabbersManagerThread(
             render?.isValid = false
             render = null
             grabber?.let {
-                grabber?.stopRequested()
+                exGrabbers.add(it)
+                it.stopRequested()
                 grabber = null
             }
         }
@@ -98,7 +104,9 @@ class GrabbersManagerThread(
             pingRenderTS = SystemClock.elapsedRealtime()
 
             if (DEBUG) {
-                viewHolder.setStatus("${SPIN[spin]} $countNewRender\n$currDelayMS < $maxDelayMS ms")
+                viewHolder.setStatus(
+                    "${SPIN[spin]} $countNewRender - ex ${exGrabbers.size}\n" +
+                        "$currDelayMS < $maxDelayMS ms")
                 spin = (spin + 1) % 4
             }
         }
@@ -110,13 +118,17 @@ class GrabbersManagerThread(
         }
 
         fun loop() {
+            grabber?.let {
+                // Don't try to timeout a grabber that is trying to open its stream
+                if (it.isWaitingForFirstImage) return
+            }
             val nowTS = SystemClock.elapsedRealtime()
             val latestPingTS = max(pingActiveTS, pingRenderTS)
             if (latestPingTS > 0) {
                 val delayMS = nowTS - latestPingTS
                 currDelayMS = delayMS
                 maxDelayMS = max(maxDelayMS, nowTS - latestPingTS)
-                if (delayMS > 4000) {
+                if (delayMS > GRAB_TIMEOUT_MS) {
                     discardGrabber()
                     startNewGrabber()
                 }
@@ -164,7 +176,7 @@ class GrabbersManagerThread(
 
     override fun stop() {
         if (DEBUG) Log.d(TAG, "stop")
-        super.stop()
+        super.stop(0)
     }
 
     override fun runInThreadLoop() {
@@ -181,6 +193,7 @@ class GrabbersManagerThread(
             cams.forEach { it.start() }
 
             var sendStatsMS = SystemClock.elapsedRealtime() + STAT_REPORT_MS
+            var grabCleanupMS = SystemClock.elapsedRealtime() + GRAB_CLEANUP_MS
 
             while (!mQuit) {
                 cams.forEach { it.loop() }
@@ -191,11 +204,21 @@ class GrabbersManagerThread(
 
                     sendStatsMS = nowMS + STAT_REPORT_MS
                 }
+                if (nowMS >= grabCleanupMS) {
+                    if (exGrabbers.isNotEmpty()) {
+                        if (DEBUG) Log.d(TAG, "exGrabbers: ${exGrabbers.size}")
+                        exGrabbers.removeIf { it.isLoopFinished }
+                    }
+                    grabCleanupMS = SystemClock.elapsedRealtime() + GRAB_CLEANUP_MS
+                }
 
                 try {
-                    Thread.sleep(1000)
+                    Thread.sleep(GRAB_REFRESH_MS)
                 } catch (_ : Exception) {}
             }
+
+            exGrabbers.forEach { it.stop(joinTimeoutMillis = 1000L * 10 ) }
+
         } finally {
             cams.forEach { it.stopBlocking() }
         }

@@ -46,12 +46,17 @@ abstract class ThreadLoop : IStartStop {
 
     @Throws(Exception::class)
     override fun stop() {
+        stop(0)
+    }
+
+    @Throws(Exception::class)
+    override fun stop(joinTimeoutMillis: Long) {
         if (mThread != null) {
             val t: Thread = mThread!!
             mThread = null
             mQuit = true
             t.interrupt()
-            t.join()
+            t.join(joinTimeoutMillis)
         }
     }
 
