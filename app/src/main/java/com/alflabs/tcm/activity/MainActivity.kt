@@ -72,6 +72,7 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
+
         // The following sample code _could_ be used if we wanted to offset all views to fit
         // below the transparent system/status bar. However we want the video there so that's
         // exactly what we do not want in this app.
@@ -84,6 +85,7 @@ class MainActivity : AppCompatActivity() {
 
         statusTxt = findViewById(R.id.status_text)
 
+        val deferView = window.decorView
         videoViewHolders = listOf(
             VideoViewHolder(
                 1,
@@ -92,7 +94,7 @@ class MainActivity : AppCompatActivity() {
                 findViewById(R.id.label_cam1),
                 findViewById(R.id.status_cam1),
                 findViewById(R.id.fps_cam1)
-                ) { action -> runOnUiThread { action.invoke() } },
+                ) { action -> deferView.post(action) },
             VideoViewHolder(
                 2,
                 findViewById(R.id.container_cam2),
@@ -100,7 +102,7 @@ class MainActivity : AppCompatActivity() {
                 findViewById(R.id.label_cam2),
                 findViewById(R.id.status_cam2),
                 findViewById(R.id.fps_cam2),
-                ) { action -> runOnUiThread { action.invoke() } },
+                ) { action -> deferView.post(action) },
             VideoViewHolder(
                 3,
                 findViewById(R.id.container_cam3),
@@ -108,7 +110,7 @@ class MainActivity : AppCompatActivity() {
                 findViewById(R.id.label_cam3),
                 findViewById(R.id.status_cam3),
                 findViewById(R.id.fps_cam3),
-            ) { action -> runOnUiThread { action.invoke() } },
+            ) { action -> deferView.post(action) },
         )
 
         if (DEBUG) {

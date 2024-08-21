@@ -187,13 +187,6 @@ class Analytics : ThreadLoop() {
         }
 
         try {
-            start()
-        } catch (e: Exception) {
-            if (DEBUG) Log.d(TAG, "Event Ignored -- Failed to start Analytics thread: $e")
-            return
-        }
-
-        try {
             // Events keys:
             // https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide#event
             // GA4:
