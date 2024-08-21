@@ -30,6 +30,7 @@ import kotlin.math.max
 class GrabbersManagerThread(
     private val logger: ILogger,
     private val analytics: Analytics,
+    private val debugDisplay: Boolean,
     private val camUrls: Map<Int, String>,
     private val viewHolders: List<VideoViewHolder>,
 ): ThreadLoop() {
@@ -104,7 +105,7 @@ class GrabbersManagerThread(
         fun pingRender() {
             pingRenderTS = SystemClock.elapsedRealtime()
 
-            if (DEBUG) {
+            if (debugDisplay) {
                 viewHolder.setStatus(
                     "${SPIN[spin]} $countNewRender - ex ${exGrabbers.size}\n" +
                         "$currDelayMS < $maxDelayMS ms")

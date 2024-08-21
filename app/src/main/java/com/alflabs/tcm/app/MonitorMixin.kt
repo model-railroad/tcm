@@ -19,7 +19,6 @@ package com.alflabs.tcm.app
 
 import android.util.Log
 import com.alflabs.tcm.activity.MainActivity
-import com.alflabs.tcm.app.MonitorMixin.Companion.DEBUG_FFMPEG
 import com.alflabs.tcm.record.GrabbersManagerThread
 import com.alflabs.tcm.util.AVUtils
 import com.alflabs.tcm.util.Analytics
@@ -42,7 +41,6 @@ class MonitorMixin(
     companion object {
         private val TAG: String = MonitorMixin::class.java.simpleName
         private val DEBUG: Boolean = GlobalDebug.DEBUG
-        private val DEBUG_FFMPEG = true
 
         const val MAX_CAMERAS = 3
 
@@ -135,9 +133,13 @@ class MonitorMixin(
             }
         }
 
+
+        var debugDisplay = prefs.systemDebugDisplay2()
+
         grabbersManager = GrabbersManagerThread(
             activity.getLogger(),
             analytics,
+            debugDisplay,
             camUrls,
             activity.videoViewHolders)
 

@@ -62,7 +62,9 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
         return CamTransformValues.parse(s ?: CameraTransformPref.STRING_DEFAULT)
     }
 
-    fun systemDebugDisplay() : Boolean = prefs.getBoolean(PREF_SYSTEM__DEBUG_DISPLAY, false)
+    fun systemDebugDisplay1() : Boolean = prefs.getBoolean(PREF_SYSTEM__DEBUG_DISPLAY_1, false)
+
+    fun systemDebugDisplay2() : Boolean = prefs.getBoolean(PREF_SYSTEM__DEBUG_DISPLAY_2, false)
 
     fun systemStartOnBoot() : Boolean = prefs.getBoolean(PREF_SYSTEM__START_ON_BOOT, false)
 
@@ -101,7 +103,8 @@ class AppPrefsValues(context: Context) : BasePrefsValues(context) {
         }
 
     companion object {
-        const val PREF_SYSTEM__DEBUG_DISPLAY = "pref_system__debug_display"
+        const val PREF_SYSTEM__DEBUG_DISPLAY_1 = "pref_system__debug_display1"
+        const val PREF_SYSTEM__DEBUG_DISPLAY_2 = "pref_system__debug_display2"
         const val PREF_SYSTEM__HOME = "pref_system__home"
         const val PREF_SYSTEM__START_ON_BOOT = "pref_system__start_on_boot"
         const val PREF_SYSTEM__HIDE_NAV_BAR = "pref_system__hide_nav_bar"

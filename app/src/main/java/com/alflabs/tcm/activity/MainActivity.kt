@@ -147,7 +147,7 @@ class MainActivity : AppCompatActivity() {
         // prefs.setString("pref_system__ga4_id", // 'ga id | client id | app secret'
 
         analytics.setAnalyticsId(prefs)
-        debugDisplay = prefs.systemDebugDisplay()
+        debugDisplay = prefs.systemDebugDisplay1()
 
         videoViewHolders.forEach { it.loadPrefs(prefs) }
 

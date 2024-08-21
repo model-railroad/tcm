@@ -47,10 +47,16 @@
                 app:useSimpleSummaryProvider="true" />
 
         <SwitchPreferenceCompat
-                app:key="pref_system__debug_display"
-                app:summaryOff="@string/prefs__debug_display_off"
-                app:summaryOn="@string/prefs__debug_display_on"
-                app:title="@string/prefs__debug_display_title" />
+                app:key="pref_system__debug_display1"
+                app:summaryOff="@string/prefs__debug_display1_off"
+                app:summaryOn="@string/prefs__debug_display1_on"
+                app:title="@string/prefs__debug_display1_title" />
+
+        <SwitchPreferenceCompat
+                app:key="pref_system__debug_display2"
+                app:summaryOff="@string/prefs__debug_display2_off"
+                app:summaryOn="@string/prefs__debug_display2_on"
+                app:title="@string/prefs__debug_display2_title" />
 
     </PreferenceCategory>
 
