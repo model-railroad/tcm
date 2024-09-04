@@ -20,9 +20,13 @@ package com.alflabs.tcm.app
 import android.content.Context
 import com.alflabs.tcm.activity.CamTransformValues
 import com.alflabs.tcm.activity.CameraTransformPref
+import com.alflabs.tcm.dagger.AppQualifier
 import com.alflabs.tcm.util.BasePrefsValues
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class AppPrefsValues(context: Context) : BasePrefsValues(context) {
+@Singleton
+class AppPrefsValues @Inject constructor(@AppQualifier context: Context) : BasePrefsValues(context) {
 
     /** Retrieve string for key or null.  */
     private fun getString(key: String): String? {

@@ -1,20 +1,21 @@
 [versions]
-agp = "8.5.1"
+agp = "8.5.2"
 kotlin = "1.9.0"
 kotlinxCorout = "1.3.9"
-coreKtx = "1.10.1"
+coreKtx = "1.13.1"
 junit = "4.13.2"
-junitVersion = "1.1.5"
-espressoCore = "3.5.1"
-appcompat = "1.6.1"
-material = "1.10.0"
-activity = "1.8.0"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+appcompat = "1.7.0"
+material = "1.12.0"
+activity = "1.9.1"
 constraintlayout = "2.1.4"
 preference = "1.2.1"
 preferenceKtx = "1.2.1"  # Automatic update resolution works right here.
 okhttpVersion = "3.10.0"
 javacvPluginVersion = "1.5.10"      # Use latest JavaCV plugin, independent of JNI libs below.
-desugarVersion = "2.0.4"
+desugarVersion = "2.1.1"
+daggerVersion = "2.49"
 
 # JavaCV Versions
 # ---------------
@@ -56,6 +57,8 @@ androidx-preference-ktx = { group = "androidx.preference", name = "preference-kt
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 squareup-okhttp3 = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttpVersion" }
+dagger-dagger = { group = "com.google.dagger", name = "dagger", version.ref = "daggerVersion" }
+dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "daggerVersion" }
 
 ffmpeg-platform21 = { group= "org.bytedeco", name= "ffmpeg-platform", version.ref = "ffmpegVersion21" }
 javacv-platform21 = { group = "org.bytedeco", name = "javacv-platform", version.ref = "javacvVersion21" }
@@ -67,5 +70,6 @@ opencv-platform23 = { group= "org.bytedeco", name= "opencv-platform", version.re
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+jetbrains-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 javacpp-platform = { id = "org.bytedeco.gradle-javacpp-platform", version.ref = "javacvPluginVersion" }
 

@@ -21,6 +21,7 @@ import java.util.regex.Pattern
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.jetbrains.kotlin.kapt)
     alias(libs.plugins.javacpp.platform)
 }
 
@@ -182,16 +183,19 @@ dependencies {
     // For isCoreLibraryDesugaringEnabled
     coreLibraryDesugaring(libs.android.tool.desugar.jdk.libs)
 
+    implementation(libs.dagger.dagger)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference)
     implementation(libs.androidx.preference.ktx)
-    // implementation(libs.kotlinx.coroutines) -- not currently used
     implementation(libs.material)
     implementation(libs.squareup.okhttp3)
+    // implementation(libs.kotlinx.coroutines) -- not currently used
     implementation(kotlin("reflect"))
+
+    kapt(libs.dagger.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
