@@ -29,19 +29,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
-        <activity
-                android:name=".activity.PrefsActivity"
-                android:launchMode="singleTop"
-                android:exported="false"
-                android:label="@string/prefs__activity_title" />
-
-        <receiver android:name=".app.BootReceiver"
-                android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>
