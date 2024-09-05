@@ -109,7 +109,7 @@ Instead, all the behavior logic is tied to the `MainActivity`:
 
 
 
-### Wake/Wifi Lock and Power Saving Behavior
+### Wake Lock and Power Saving Behavior
 
 The goal is to have the tablet (almost) always turned on. The layout at the Randall Museum
 Model Railroad is turned on by the museum staff at 9am and turned off at 5pm. The tablet is
@@ -137,9 +137,9 @@ The behavior should be:
   - Stop video streaming.
   - Release the View.screen_on wake lock, to ensure the screen can dim and enter sleep mode.
 
-Starting with Android 10 (API 29), it is no longer possible to use the WiFiManager
-feature to force enable the wifi and automatically select an SSID to connect to, and thus this
-feature is no longer offered.
+Starting with Android 10 (API 29), it is no longer possible to use the WiFiManager feature to
+force enable the wifi and automatically select an SSID to connect to, and thus this feature is
+no longer offered.
 
 
 
@@ -200,10 +200,11 @@ Phase 1 (fixes after initial prototype deployment):
 
 Phase 2 (optional):
 
+- ✅ Rewrite image transform to be a custom pref dialog with (rot,zoom,pan).
+- ✅ Remove unused features: BootReceiver, WifiLock (not available on API 29+).
 - ☐ Consider using a foreground service rather than a thread for main processing?
 - ☐ Replace settings icon by 3-dot menu: settings|start|stop. Dynamic visibility on tap.
 - ☐ Force activity display orientation (via prefs).
-- ✅ Rewrite image transform to be a custom pref dialog with (rot,zoom,pan).
 - ☐ Reintroduce preference to fill/fit in image view.
 - ☐ Gamma correction on input images (via OpenCV LUT f.ex.)
 - ☐ Use OpenCV to detect motion.

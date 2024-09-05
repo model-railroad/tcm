@@ -215,15 +215,6 @@ class MainActivity : AppCompatActivity() {
         monitorMixin.onStopStreaming()
     }
 
-//    override fun onRequestPermissionsResult(
-//        requestCode: Int,
-//        permissions: Array<out String>,
-//        grantResults: IntArray
-//    ) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        monitorMixin.wakeWifiLockHandler.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//    }
-
     fun addStatus(s : String) {
         Log.d(TAG, "Status: $s")
         if (!debugDisplay) return

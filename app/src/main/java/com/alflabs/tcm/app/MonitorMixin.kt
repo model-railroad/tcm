@@ -52,16 +52,10 @@ class MonitorMixin(
 
     private var camerasCount : Int = 0
     private var grabbersManager : GrabbersManagerThread? = null
-//    lateinit var wakeWifiLockHandler : WakeWifiLockHandler
-//        private set
     private var batteryMonitorThread : BatteryMonitorThread? = null
 
     fun onCreate() {
         if (DEBUG) Log.d(TAG, "onCreate")
-
-//        wakeWifiLockHandler = WakeWifiLockHandler(activity)
-//        wakeWifiLockHandler.onCreate()
-
     }
 
     // Invoked after onCreate or onRestart
@@ -143,34 +137,11 @@ class MonitorMixin(
             camUrls,
             activity.videoViewHolders)
 
-
-//        for (index in 1..camerasCount) {
-//            try {
-//                activity.videoViewHolders[index - 1].onStart()
-//                val gt = GrabberThread(
-//                    activity.getLogger(),
-//                    analytics,
-//                    index,
-//                    prefs.camerasUrl(index),
-//                    activity.videoViewHolders[index - 1])
-//                grabberThreads.add(gt)
-//            } catch (t: Throwable) {
-//                activity.addStatus("ERROR with Grabber $index: $t")
-//            }
-//        }
-
         grabbersManager?.start()
-
-//        wakeWifiLockHandler.lockWake()
-//        wakeWifiLockHandler.lockWifi()
-//        wakeWifiLockHandler.enableSelectedWifiNetwork()
     }
 
     fun onStopStreaming() {
         if (DEBUG) Log.d(TAG, "onStopStreaming")
-
-//        wakeWifiLockHandler.releaseWifi()
-//        wakeWifiLockHandler.releaseWake()
 
         grabbersManager?.stop()
         grabbersManager = null
