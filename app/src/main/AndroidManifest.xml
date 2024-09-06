@@ -21,6 +21,7 @@
                 android:name=".activity.MainActivity"
                 android:launchMode="singleTop"
                 android:theme="@style/Theme.MainActivity"
+                android:screenOrientation="sensorLandscape"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,12 +37,6 @@
                 android:exported="false"
                 android:label="@string/prefs__activity_title" />
 
-        <receiver android:name=".app.BootReceiver"
-                android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>

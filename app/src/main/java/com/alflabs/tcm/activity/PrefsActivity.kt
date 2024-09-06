@@ -109,6 +109,7 @@ class PrefsActivity : AppCompatActivity() {
             }
         }
 
+        @Suppress("DEPRECATION")
         override fun onDisplayPreferenceDialog(preference: Preference) {
             try {
                 // That's a weird API that doesn't return a usable error/boolean directly.

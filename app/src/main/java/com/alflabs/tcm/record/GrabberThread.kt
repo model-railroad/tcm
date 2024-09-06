@@ -156,6 +156,7 @@ class GrabberThread(
                 logger.log(TAG, "GrabberThread $camIndex > Grabber Close Exception: $e")
             }
             // AndroidFrameConverter.close() was only added in JavaCV 1.5.5
+            @Suppress("USELESS_IS_CHECK")
             if (converter is AutoCloseable) {
                 converter.close()
             }
