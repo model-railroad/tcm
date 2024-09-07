@@ -32,7 +32,7 @@ class CameraTransformPref : DialogPreference {
         defStyleAttr: Int,
         defStyleRes: Int
     ) : super(context, attrs, defStyleAttr, defStyleRes) {
-        init(context)
+        init()
     }
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
@@ -40,18 +40,18 @@ class CameraTransformPref : DialogPreference {
         attrs,
         defStyleAttr
     ) {
-        init(context)
+        init()
     }
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        init(context)
+        init()
     }
 
     constructor(context: Context) : super(context) {
-        init(context)
+        init()
     }
 
-    private fun init(context: Context) {
+    private fun init() {
         if (DEBUG) Log.d(TAG, "PREF init")
         dialogLayoutResource = R.layout.cam_transform_dialog_pref
         summaryProvider = CameraTransformSummaryProvider.instance
@@ -132,9 +132,8 @@ class CameraTransformPref : DialogPreference {
             return
         }
 
-        val myState = state as CamTransformSavedState
-        super.onRestoreInstanceState(myState.getSuperState())
-        setText(myState.mText)
+        super.onRestoreInstanceState(state.superState)
+        setText(state.mText)
     }
 }
 

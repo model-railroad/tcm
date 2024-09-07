@@ -30,14 +30,6 @@
                 app:title="@string/prefs__only_on_ac_power_title" />
 
         <EditTextPreference
-                app:key="pref_system__wifi_ssid"
-                app:title="@string/prefs__wifi_ssid_title"
-                android:inputType="text"
-                android:singleLine="true"
-                android:maxLines="1"
-                app:useSimpleSummaryProvider="true" />
-
-        <EditTextPreference
                 app:key="pref_system__ga4_id"
                 app:title="@string/prefs__ga4_id_title"
                 android:inputType="text"

@@ -17,6 +17,7 @@
  */
 package com.alflabs.tcm.activity
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -215,15 +216,6 @@ class MainActivity : AppCompatActivity() {
         monitorMixin.onStopStreaming()
     }
 
-//    override fun onRequestPermissionsResult(
-//        requestCode: Int,
-//        permissions: Array<out String>,
-//        grantResults: IntArray
-//    ) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        monitorMixin.wakeWifiLockHandler.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//    }
-
     fun addStatus(s : String) {
         Log.d(TAG, "Status: $s")
         if (!debugDisplay) return
@@ -261,6 +253,7 @@ class MainActivity : AppCompatActivity() {
 
     //----
     /** Enable immersion mode to hide the navigation bar  */
+    @Suppress("DEPRECATION")
     private fun hideNavigationBar() {
         val prefs = AppPrefsValues(this)
         if (!prefs.systemHideNavBar()) return

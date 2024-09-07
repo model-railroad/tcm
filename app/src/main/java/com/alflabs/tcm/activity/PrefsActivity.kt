@@ -23,17 +23,14 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.alflabs.tcm.R
 import com.alflabs.tcm.app.AppPrefsValues
-import com.alflabs.tcm.app.BootReceiver
 import com.alflabs.tcm.app.LauncherRole
 import com.alflabs.tcm.app.MonitorMixin
-import com.alflabs.tcm.app.WakeWifiLockHandler
 import com.alflabs.tcm.util.GlobalDebug
 
 class PrefsActivity : AppCompatActivity() {
@@ -69,11 +66,12 @@ class PrefsActivity : AppCompatActivity() {
 
             val bootPref = findPreference<SwitchPreferenceCompat>(AppPrefsValues.PREF_SYSTEM__START_ON_BOOT)
             bootPref?.apply {
-                isEnabled = Build.VERSION.SDK_INT <= BootReceiver.MAX_USAGE_API
+                // TBD: re-enable once Accessibility API is used for this feature.
+                isEnabled = false
                 if (!isEnabled) {
                     isChecked = false
                     summaryProvider = null
-                    summary = "Feature No Longer Supported"
+                    summary = "Feature Not Supported Yet"
                 }
             }
 
@@ -109,18 +107,9 @@ class PrefsActivity : AppCompatActivity() {
                 countPref.setDefaultValue(MonitorMixin.MAX_CAMERAS)
                 if (countPref.value == null) countPref.value = MonitorMixin.MAX_CAMERAS.toString()
             }
-
-            val ssidPref = findPreference<EditTextPreference>(AppPrefsValues.PREF_SYSTEM__WIFI_SSID)
-            ssidPref?.apply {
-                isEnabled = Build.VERSION.SDK_INT <= WakeWifiLockHandler.MAX_API_WIFI_SSID
-                if (!isEnabled) {
-                    text = ""
-                    summaryProvider = null
-                    summary = "Feature No Longer Supported"
-                }
-            }
         }
 
+        @Suppress("DEPRECATION")
         override fun onDisplayPreferenceDialog(preference: Preference) {
             try {
                 // That's a weird API that doesn't return a usable error/boolean directly.
