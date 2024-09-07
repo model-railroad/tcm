@@ -52,21 +52,15 @@ android {
         }
     }
 
-    flavorDimensions += "api"
-    productFlavors {
-        create("api21") {
-            dimension = "api"
-            minSdk = 21
-            versionCode = minSdk!! + 1000 * (android.defaultConfig.versionCode ?: 0)
-            versionNameSuffix = "-api${minSdk!!}"
-        }
-        create("api23") {
-            dimension = "api"
-            minSdk = 23
-            versionCode = minSdk!! + 1000 * (android.defaultConfig.versionCode ?: 0)
-            versionNameSuffix = "-api${minSdk!!}"
-        }
-    }
+//    flavorDimensions += "api"
+//    productFlavors {
+//        create("api21") {
+//            dimension = "api"
+//            minSdk = 21
+//            versionCode = minSdk!! + 1000 * (android.defaultConfig.versionCode ?: 0)
+//            versionNameSuffix = "-api${minSdk!!}"
+//        }
+//    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -168,16 +162,13 @@ dependencies {
     //   app/build/javacpp/lib/{armeabi-v7a,arm64-v8a,x86,x86_64}/
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     // This provides the java imports available.
-    "api21Implementation"(libs.javacv.platform21)
-    "api21Implementation"(libs.ffmpeg.platform21)
-    "api21Implementation"(libs.opencv.platform21)
-    "api23Implementation"(libs.javacv.platform23)
-    "api23Implementation"(libs.ffmpeg.platform23)
-    "api23Implementation"(libs.opencv.platform23)
+    implementation(libs.javacv.platform)
+    implementation(libs.ffmpeg.platform)
+    implementation(libs.opencv.platform)
     // This provides the JNI libs needed at runtime.
     // For some reason only one "platform" needs to be specified below.
     // (e.g. trying to have javacpp of opencv + javacv + ffmpeg makes it fail).
-    javacpp(selectPlatform(21, libs.opencv.platform21, libs.opencv.platform23))
+    javacpp(libs.opencv.platform)
 
     // For isCoreLibraryDesugaringEnabled
     coreLibraryDesugaring(libs.android.tool.desugar.jdk.libs)
