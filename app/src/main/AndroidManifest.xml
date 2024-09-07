@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- For camera streaming and GA access. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -13,7 +14,11 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/Theme.TrackCamMonitorApp"
+            android:extractNativeLibs="true"
             tools:targetApi="31">
+
+        <!-- application extractNativeLibs=true is needed to prevent INSTALL_FAILED_INVALID_APK
+             when installing JNI libs on API 23+. -->
 
         <profileable android:shell="true"/>
 
