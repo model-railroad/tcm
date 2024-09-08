@@ -16,7 +16,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import com.android.build.gradle.internal.tasks.factory.dependsOn
-import java.util.regex.Pattern
 
 plugins {
     alias(libs.plugins.android.application)
@@ -53,16 +52,6 @@ android {
         }
     }
 
-//    flavorDimensions += "api"
-//    productFlavors {
-//        create("api21") {
-//            dimension = "api"
-//            minSdk = 21
-//            versionCode = minSdk!! + 1000 * (android.defaultConfig.versionCode ?: 0)
-//            versionNameSuffix = "-api${minSdk!!}"
-//        }
-//    }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -77,48 +66,21 @@ android {
         jvmTarget = "1.8"
     }
 
-    // This line prevents some JavaCV native-image/* files from being included which create errors.
     packaging {
-        jniLibs  .excludes.add("META-INF/native-image/**/*.json")
-        resources.excludes.add("META-INF/native-image/**/*.json")
+        jniLibs {
+            // Sets AndroidManifest <application extractNativeLibs=true> to allow JNI libs to be
+            // compressed and not zip-aligned.
+            useLegacyPackaging = true
+        }
+        resources {
+            // Remove all the JavaCV lib/ which are being considered "resources" and being packaged
+            // in the final APK. Instead JniLibs are packaged via the "javacpp" configuration below.
+            excludes.add("**/lib/**")
+            // This line prevents some JavaCV native-image/* files from being included which create errors.
+            excludes.add("META-INF/native-image/**/*.json")
+        }
     }
-
-    // This generates per-abi APKs if both android-arm and android-x86 libs are provided.
-    // splits {
-    //     abi {
-    //         isEnable = true
-    //         reset()
-    //         include("x86", "armeabi")
-    //         isUniversalApk = false
-    //     }
-    // }
-
 }
-
-// Source: https://medium.com/@banmarkovic/get-current-flavor-in-android-gradle-6d23d27259e3
-fun getCurrentFlavor(): String {
-    val taskRequestsStr = gradle.startParameter.taskRequests.toString()
-    val pattern: Pattern = if (taskRequestsStr.contains("assemble")) {
-        Pattern.compile("assemble(\\w+)(Release|Debug)")
-    } else {
-        Pattern.compile("bundle(\\w+)(Release|Debug)")
-    }
-
-    val matcher = pattern.matcher(taskRequestsStr)
-    val flavor = if (matcher.find()) {
-        matcher.group(1).lowercase()
-    } else {
-        println("@@ NO FLAVOR FOUND")
-        ""
-    }
-    println("@@ Current flavor: $flavor")
-    return flavor
-}
-
-
-fun selectPlatform(api: Int, apiChoice: Any, other: Any): Any =
-    if (getCurrentFlavor().contains(api.toString())) apiChoice else other
-
 
 // Source: https://github.com/bytedeco/sample-projects/blob/master/JavaCV-android-example/app/build.gradle
 // and manually converted from Groovy Gradle to kts.
@@ -128,51 +90,75 @@ tasks.register<Copy>("javacppExtract") {
     dependsOn(configurations["javacpp"])
 
     doFirst {
-        println("@@ javacppExtract: input ${inputs.files.files.size} files")
-        // DEBUG -- this prints the files parsed by this rule when looking for lib/** below
-        // println("@@ javacppExtract:\n -${inputs.files.files.joinToString("\n- ") { f -> f.path.toString() }}")
+        val names = configurations["javacpp"]
+            .map { it.name.replace("^([^-]+).*$".toRegex(), "$1") }
+            .distinct()
+            .sorted()
+        val abis  = configurations["javacpp"]
+            .asSequence()
+            .map { it.name }
+            .filter { it.contains("android") }
+            .map { it.replace("^.*(android[^.]+).*$".toRegex(), "$1") }
+            .distinct()
+            .sorted()
+            .toList()
+        println("@@ javacppExtract: ${names.size} input files $names x $abis")
     }
 
     from(configurations["javacpp"].map { zipTree(it) })
-    include("lib/**")
+    include("lib/**/*.so")
     into("${layout.buildDirectory.get()}/javacpp/")
 
     doLast {
-         val f = configurations["javacpp"].map { it.path.toString() }
-         println("@@ javacppExtract: output ${f.size} files")
+        var numFiles = 0
+        fileTree("${layout.buildDirectory.get()}/javacpp/lib/").visit(object : FileVisitor {
+            override fun visitDir(dirDetails: FileVisitDetails) { }
+            override fun visitFile(fileDetails: FileVisitDetails) {
+                numFiles++
+            }
+        })
+        println("@@ javacppExtract: $numFiles output files in ${layout.buildDirectory.get()}/javacpp/lib/")
     }
 }
 
 android {
     sourceSets["main"].jniLibs.srcDir("${layout.buildDirectory.get()}/javacpp/lib/")
     project.tasks.preBuild.dependsOn("javacppExtract")
+
+    println("@@ TYPE = ${sourceSets["main"].jniLibs::class.simpleName}")
+    println("@@ JniLibs Dirs = ${sourceSets["main"].jniLibs.srcDirs}")
 }
 
-
 dependencies {
-    // JavaCV - OpenCV stuff
+
+    // --- JavaCV + FFMPEG + OpenCV dependencies
     // Note: JavaCV-platform does NOT provide any NDK JNI for Android directly.
     // IIRC, they are in the JARs, with "-platform" filtered using the "javacppPlatform" (set
     // in the main build.gradle.kts) and used by the JavaCPP Gradle Plugin, then extracted using
-    // that javacppExtract rule above and then imported using the fileTree(libs) rule.
+    // that javacppExtract rule above and then imported by the javacpp configuration below.
     // Something like that. It's quite convoluted.
     // Bottom line:
     // 1- See comments in gradle/libs.versions.toml
-    // 2- To find what JNI jar/so gets added, build, and then look into
+    // 2- To find what JNI lib/*.so gets added: first build, and then look into
     //   app/build/tmp/.cache/expanded/
     //   app/build/javacpp/lib/{armeabi-v7a,arm64-v8a,x86,x86_64}/
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+
     // This provides the java imports available.
+    // Note: the JAR /lib gets packaged in the APK /lib folder as resources, and to avoid that
+    // we filter them out above via packaging.jniLibs.resources.excludes. That's because these
+    // JAR /lib contains way more than the required .so, they also contain source code and execs.
     implementation(libs.javacv.platform)
     implementation(libs.ffmpeg.platform)
-    implementation(libs.opencv.platform)
-    // This provides the JNI libs needed at runtime.
-    // For some reason only one "platform" needs to be specified below.
-    // (e.g. trying to have javacpp of opencv + javacv + ffmpeg makes it fail).
-    javacpp(libs.opencv.platform)
 
-    // For isCoreLibraryDesugaringEnabled
-    coreLibraryDesugaring(libs.android.tool.desugar.jdk.libs)
+    // This filters the JAR artifacts to unzip the lib/*.so and provide them as JNI libs.
+    javacpp(libs.javacv.platform)
+    javacpp(libs.ffmpeg.platform)
+
+    // TBD add OpenCV in both rules above once we actually use it.
+
+    // --- All other dependencies
+
+    coreLibraryDesugaring(libs.android.tool.desugar.jdk.libs) // For isCoreLibraryDesugaringEnabled
 
     implementation(libs.dagger.dagger)
     implementation(libs.androidx.activity)
@@ -188,7 +174,8 @@ dependencies {
 
     kapt(libs.dagger.compiler)
 
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    // "Where we're going, we don't need tests" (at least for now)
+    // testImplementation(libs.junit)
+    // androidTestImplementation(libs.androidx.junit)
+    // androidTestImplementation(libs.androidx.espresso.core)
 }
