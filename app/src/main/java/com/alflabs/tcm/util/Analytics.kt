@@ -28,11 +28,11 @@ import java.io.IOException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import java.util.concurrent.ConcurrentLinkedDeque
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
+import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * An implementation using GA4 Measurement Protocol (POST HTTPS) _without_ Firebase.
@@ -51,7 +51,8 @@ import java.util.concurrent.atomic.AtomicBoolean
  * - add dimension "Event Label" with Event Scope for user param "event_label."
  *
  */
-class Analytics : ThreadLoop() {
+@Singleton
+class Analytics @Inject constructor() : ThreadLoop() {
 
     companion object {
         private val TAG: String = Analytics::class.java.simpleName
@@ -61,9 +62,9 @@ class Analytics : ThreadLoop() {
         // Debug events are visible in GA4 > Prop Setting > Data Display > Debug View only.
         private const val VERBOSE_DEBUG = false
 
-        private const val IDLE_SLEEP_MS     = 1000L
-        private const val IDLE_SLEEP_MAX_MS = 1000L * 60
-        private const val MAX_ERROR_NUM = 3
+        private const val IDLE_SLEEP_MS     = 1000L          // 1 second regular pool time
+        private const val IDLE_SLEEP_MAX_MS = 1000L * 60 * 5 // 5 minutes max error retry
+        private const val MAX_ERROR_NUM = 2
 
         private val GA4_URL = ("https://www.google-analytics.com/"
                 + (if (VERBOSE_DEBUG) "debug/" else "")
@@ -73,9 +74,7 @@ class Analytics : ThreadLoop() {
     }
 
     private val mOkHttpClient = OkHttpClient()      // Uses android.permission.INTERNET in Manifest
-    private val mPayloads = ConcurrentLinkedDeque<Payload>()
-    private val mStopLoopOnceEmpty = AtomicBoolean(false)
-    private val mLatchEndLoop = CountDownLatch(1)
+    private val mPayloads = LinkedBlockingDeque<Payload>()
     private val mExecutor = Executors.newSingleThreadScheduledExecutor()
     private var mErrorSleepMs = IDLE_SLEEP_MS
 
@@ -84,6 +83,10 @@ class Analytics : ThreadLoop() {
     private var mGA4AppSecret = ""
 
 
+    /**
+     * Sets or reset the Analytics ID.
+     */
+    @Synchronized
     fun setAnalyticsId(prefs: AppPrefsValues) {
         // GA4 uses the format "GA4ID|ClientID|AppSecret".
         var idOrFile = prefs.systemGA4ID()
@@ -110,51 +113,43 @@ class Analytics : ThreadLoop() {
      * Side effect: The executor is now a dagger singleton.
      */
     @Throws(Exception::class)
-    override fun stop() {
+    override fun stopSync() {
         if (DEBUG) Log.d(TAG, "Stop")
-        mStopLoopOnceEmpty.set(true)
-        mLatchEndLoop.await(10, TimeUnit.SECONDS)
-        super.stop()
+        stopSync(10 * 1000)
+    }
+
+    override fun stopSync(joinTimeoutMillis: Long) {
+        super.stopSync(joinTimeoutMillis)
         mExecutor.shutdown()
-        mExecutor.awaitTermination(10, TimeUnit.SECONDS)
+        mExecutor.awaitTermination(joinTimeoutMillis, TimeUnit.MILLISECONDS)
         if (DEBUG) Log.d(TAG, "Stopped")
     }
 
     @Throws(EndLoopException::class)
     override fun runInThreadLoop() {
-        val isStopping = mStopLoopOnceEmpty.get()
-        val isNotStopping = !isStopping
-
         var errors = 0
 
-        if (mPayloads.isEmpty()) {
-            if (isStopping) {
-                throw EndLoopException()
-            }
-        } else {
-
-            while (!mQuit) {
-                val payload: Payload? = mPayloads.pollFirst()
-                if (payload == null) break
+        while (!mQuit) {
+            try {
+                val payload = mPayloads.takeFirst() // blocking or interrupted
                 if (payload.send(System.currentTimeMillis())) {
                     mErrorSleepMs = IDLE_SLEEP_MS
                     errors = 0
-                } else {
-                    if (isNotStopping) {
-                        // If it fails, append the payload at the *end* of the queue to retry later
-                        // after all newer events.
-                        // Except if we fail when stopping, in that case we just drop the events.
-                        mPayloads.offerLast(payload)
-                        errors++
+                } else  if (!mQuit) {
+                    // If it fails, append the payload at the *end* of the queue to retry later
+                    // after all newer events.
+                    // Except if we fail when stopping, in that case we just drop the events.
+                    mPayloads.offerLast(payload)
+                    errors++
 
-                        // Don't hammer the server in case of continuous failures.
-                        if (errors >= MAX_ERROR_NUM) {
-                            break
-                        }
+                    // Don't hammer the server in case of continuous failures.
+                    if (errors >= MAX_ERROR_NUM) {
+                        break
                     }
                 }
-            }
+            } catch (_: InterruptedException) { }
         }
+
 
         if (!mQuit) {
             try {
@@ -171,9 +166,9 @@ class Analytics : ThreadLoop() {
 
     override fun afterThreadLoop() {
         if (DEBUG) Log.d(TAG, "End Loop")
-        mLatchEndLoop.countDown()
     }
 
+    @Synchronized
     fun sendEvent(
         category: String,
         action: String,

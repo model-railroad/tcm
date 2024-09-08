@@ -18,12 +18,19 @@
 package com.alflabs.tcm.util
 
 interface IStartStop {
+    /// Starts the thread loop
     @Throws(Exception::class)
     fun start()
 
+    /// Requests the thread loop to stop but does not wait for it.
     @Throws(Exception::class)
-    fun stop()
+    fun requestStopAsync()
 
+    /// Requests the thread loop to stop and waits for it indefinitely.
     @Throws(Exception::class)
-    fun stop(joinTimeoutMillis: Long)
+    fun stopSync()
+
+    /// Requests the thread loop to stop and waits for it for the specified time.
+    @Throws(Exception::class)
+    fun stopSync(joinTimeoutMillis: Long)
 }

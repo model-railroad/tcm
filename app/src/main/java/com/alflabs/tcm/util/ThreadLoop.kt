@@ -40,22 +40,30 @@ abstract class ThreadLoop : IStartStop {
                 Thread({ this.runInThread() }, name)
             }
             mQuit = false
-            mThread!!.start()
+            mThread?.start()
         }
     }
 
     @Throws(Exception::class)
-    override fun stop() {
-        stop(0)
-    }
-
-    @Throws(Exception::class)
-    override fun stop(joinTimeoutMillis: Long) {
+    override fun requestStopAsync() {
         if (mThread != null) {
             val t: Thread = mThread!!
             mThread = null
             mQuit = true
             t.interrupt()
+        }
+    }
+
+    @Throws(Exception::class)
+    override fun stopSync() {
+        stopSync(0)
+    }
+
+    @Throws(Exception::class)
+    override fun stopSync(joinTimeoutMillis: Long) {
+        if (mThread != null) {
+            val t: Thread = mThread!!
+            requestStopAsync()
             t.join(joinTimeoutMillis)
         }
     }

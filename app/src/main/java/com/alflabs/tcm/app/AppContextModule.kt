@@ -17,12 +17,8 @@
  */
 package com.alflabs.tcm.app
 
-import android.app.AlarmManager
-import android.app.NotificationManager
 import android.content.Context
-import android.net.wifi.WifiManager
-import android.os.PowerManager
-import com.alflabs.tcm.dagger.AppQualifier
+import com.alflabs.tcm.dagger.AppContext
 import com.alflabs.tcm.util.ILogger
 import dagger.Module
 import dagger.Provides
@@ -35,7 +31,7 @@ class AppContextModule(private val mContext: Context) {
      * Users request it by using the @AppQualifier to distinguish it from the one provided by the activity.
      */
     @Provides
-    @AppQualifier
+    @AppContext
     fun providesContext(): Context {
         return mContext
     }
@@ -52,27 +48,27 @@ class AppContextModule(private val mContext: Context) {
         return AppLogger()
     }
 
-    @Provides
-    @Singleton
-    fun providesAlarmManager(): AlarmManager {
-        return mContext.applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    }
-
-    @Provides
-    @Singleton
-    fun providesWifiManager(): WifiManager {
-        return mContext.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-    }
-
-    @Provides
-    @Singleton
-    fun providesPowerManager(): PowerManager {
-        return mContext.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
-    }
-
-    @Provides
-    @Singleton
-    fun providesNotificationManager(): NotificationManager {
-        return mContext.applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    }
+//    @Provides
+//    @Singleton
+//    fun providesAlarmManager(): AlarmManager {
+//        return mContext.applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+//    }
+//
+//    @Provides
+//    @Singleton
+//    fun providesWifiManager(): WifiManager {
+//        return mContext.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+//    }
+//
+//    @Provides
+//    @Singleton
+//    fun providesPowerManager(): PowerManager {
+//        return mContext.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+//    }
+//
+//    @Provides
+//    @Singleton
+//    fun providesNotificationManager(): NotificationManager {
+//        return mContext.applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//    }
 }

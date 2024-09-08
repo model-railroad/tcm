@@ -30,9 +30,9 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.alflabs.tcm.R
+import com.alflabs.tcm.app.AppMonitor
 import com.alflabs.tcm.app.AppPrefsValues
 import com.alflabs.tcm.app.MainApp
-import com.alflabs.tcm.app.MonitorMixin
 import com.alflabs.tcm.dagger.ActivityScope
 import com.alflabs.tcm.util.Analytics
 import com.alflabs.tcm.util.GlobalDebug
@@ -45,13 +45,13 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mComponent: IMainActivityComponent
-    @Inject internal lateinit var appPrefsValues: AppPrefsValues
     @Inject internal lateinit var logger: ILogger
+    @Inject internal lateinit var analytics: Analytics
+    @Inject internal lateinit var appMonitor: AppMonitor
+    @Inject internal lateinit var appPrefsValues: AppPrefsValues
 
     private var debugDisplay = false
     private lateinit var statusTxt: TextView
-    private lateinit var monitorMixin: MonitorMixin
-    private lateinit var analytics: Analytics
     lateinit var videoViewHolders: List<VideoViewHolder>
         private set
 
@@ -94,10 +94,7 @@ class MainActivity : AppCompatActivity() {
         // Do not access dagger objects before this call
         getComponent().inject(this)
 
-        analytics = Analytics()
         setUncaughtExceptionHandler()
-        monitorMixin = MonitorMixin(this, analytics)
-        monitorMixin.onCreate()
 
         // ComponentActivity.enableEdgeToEdge makes the top system/status bar transparent.
         // Note: an alternative is to set it via style theme resources as such:
@@ -184,7 +181,6 @@ class MainActivity : AppCompatActivity() {
         // For debugging
         // prefs.setString("pref_system__ga4_id", // 'ga id | client id | app secret'
 
-        analytics.setAnalyticsId(appPrefsValues)
         debugDisplay = appPrefsValues.systemDebugDisplay1()
 
         videoViewHolders.forEach { it.loadPrefs(appPrefsValues) }
@@ -201,9 +197,7 @@ class MainActivity : AppCompatActivity() {
         stopBtn .setOnClickListener { onStopButton() }
         prefsBtn.setOnClickListener { onPrefsButton() }
 
-        analytics.start()
         analytics.sendEvent(category = "TCM", action = "Start")
-        monitorMixin.onStart()
     }
 
     // Invoked after onStart or onPause
@@ -212,7 +206,7 @@ class MainActivity : AppCompatActivity() {
         attachLogger()
         super.onResume()
         hideNavigationBar()
-        monitorMixin.onResume()
+        appMonitor.onActivityResume(this)
     }
 
     // Next state is either onResume or onStop
@@ -220,7 +214,7 @@ class MainActivity : AppCompatActivity() {
         if (DEBUG) Log.d(TAG, "onPause")
         super.onPause()
         analytics.sendEvent(category = "TCM", action = "Pause")
-        monitorMixin.onPause()
+        appMonitor.onActivityPause()
         logger.removeDelegate()
     }
 
@@ -228,31 +222,34 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         if (DEBUG) Log.d(TAG, "onStop")
         super.onStop()
-        monitorMixin.onStop()
-        analytics.stop()
+        analytics.stopSync()
     }
 
     // The end of the activity
     override fun onDestroy() {
         if (DEBUG) Log.d(TAG, "onDestroy")
         super.onDestroy()
-        monitorMixin.onDestroy()
     }
 
     private fun onPrefsButton() {
         if (DEBUG) Log.d(TAG, "onPrefsButton")
         val i = Intent(this, PrefsActivity::class.java)
+        appMonitor.onActivityPause()
         startActivity(i)
     }
 
     private fun onStartButton() {
         if (DEBUG) Log.d(TAG, "onStartButton")
-        monitorMixin.onStartStreaming()
+        // Useful for DEBUG purposes only
+        if (!appMonitor.activityResumed) {
+            appMonitor.onActivityResume(this)
+        }
     }
 
     private fun onStopButton() {
         if (DEBUG) Log.d(TAG, "onStopButton")
-        monitorMixin.onStopStreaming()
+        // Useful for DEBUG purposes only
+        appMonitor.onActivityPause()
     }
 
     fun addStatus(s : String) {
@@ -261,6 +258,7 @@ class MainActivity : AppCompatActivity() {
         statusTxt.text = "$s\n${statusTxt.text}"
     }
 
+    @Deprecated("Use App Logger instead", ReplaceWith("@Inject ILogger"))
     fun getLogger() : ILogger {
         // TBD remove once daggerized
         return logger

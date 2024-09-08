@@ -83,7 +83,7 @@ class CamThread(
     fun stopBlocking() {
         if (DEBUG) Log.d(TAG, "CamThread $index > stopBlocking")
         grabber?.let {
-            grabber?.stop()
+            grabber?.stopSync()
         }
         grabber = null
         discardGrabber()

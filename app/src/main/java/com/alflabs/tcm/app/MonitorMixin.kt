@@ -101,7 +101,7 @@ class MonitorMixin(
     // Next state is either onResume or onStop
     fun onPause() {
         if (DEBUG) Log.d(TAG, "onPause")
-        batteryMonitorThread?.stop()
+        batteryMonitorThread?.stopSync()
         onStopStreaming()
     }
 
@@ -117,7 +117,7 @@ class MonitorMixin(
 
     fun onStartStreaming() {
         if (DEBUG) Log.d(TAG, "onStartStreaming")
-        grabbersManager?.stop()
+        grabbersManager?.stopSync()
 
         val prefs = AppPrefsValues(activity)
 
@@ -143,7 +143,7 @@ class MonitorMixin(
     fun onStopStreaming() {
         if (DEBUG) Log.d(TAG, "onStopStreaming")
 
-        grabbersManager?.stop()
+        grabbersManager?.stopSync()
         grabbersManager = null
 
         val prefs = AppPrefsValues(activity)

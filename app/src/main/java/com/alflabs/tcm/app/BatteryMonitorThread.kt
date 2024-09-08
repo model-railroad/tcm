@@ -74,12 +74,15 @@ class BatteryMonitorThread(
     }
 
     private fun sendOnStateChange(newState: Boolean) {
-        analytics.sendEvent(
-            category = "TCM_Plugged",
-            action = if (newState) "On" else "Off",
-            value = "1")
+        if (!mQuit) {
+            analytics.sendEvent(
+                category = "TCM_Plugged",
+                action = if (newState) "On" else "Off",
+                value = "1"
+            )
 
-        onStateChange(newState)
+            onStateChange(newState)
+        }
     }
 
     private fun isPlugged() : Boolean {

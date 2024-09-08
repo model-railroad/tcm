@@ -52,9 +52,9 @@ class GrabbersManagerThread(
         super.start("GrabberManager")
     }
 
-    override fun stop() {
+    override fun stopSync() {
         if (DEBUG) Log.d(TAG, "stop")
-        super.stop(0)
+        super.stopSync(0)
     }
 
     override fun runInThreadLoop() {
@@ -109,7 +109,7 @@ class GrabbersManagerThread(
                 } catch (_ : Exception) {}
             }
 
-            exGrabbers.forEach { it.stop(joinTimeoutMillis = 1000L * 10 ) }
+            exGrabbers.forEach { it.stopSync(joinTimeoutMillis = 1000L * 10 ) }
 
         } finally {
             cams.forEach { it.stopBlocking() }

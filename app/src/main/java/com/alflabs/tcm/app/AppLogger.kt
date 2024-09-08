@@ -21,6 +21,12 @@ import android.util.Log
 import com.alflabs.tcm.util.ILogger
 import com.alflabs.tcm.util.LoggerDelegate
 
+/**
+ * The app specific implementation of ILogger.
+ * It can defer to an activity delegate.
+ *
+ * Note: don't use this directly. Instead @Inject ILogger from the App component.
+ */
 class AppLogger : ILogger {
 
     private var delegate: LoggerDelegate? = null

@@ -33,15 +33,16 @@ class MainApp : Application() {
     lateinit var appComponent: IAppComponent
         private set
 
-    @Inject
-    lateinit var mLogger: ILogger
+    @Inject internal lateinit var logger: ILogger
+    @Inject internal lateinit var appMonitor: AppMonitor
 
     override fun onCreate() {
         super.onCreate()
 
         appComponent = createDaggerAppComponent()
         appComponent.inject(this)
-        mLogger.log("App", "onCreate")
+        appMonitor.onAppCreate()
+        logger.log("App", "onCreate")
     }
 
     private fun createDaggerAppComponent(): IAppComponent {
