@@ -121,7 +121,7 @@ class AppMonitor @Inject constructor(
         stopStreamingRunnable = Runnable {
             if (DEBUG) Log.d(TAG, "onStopStreaming")
 
-            grabbersManager?.stopSync()
+            grabbersManager?.requestStopAsync()
             grabbersManager = null
 
             for (index in 1..camerasCount) {

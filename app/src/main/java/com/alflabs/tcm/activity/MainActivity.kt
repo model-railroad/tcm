@@ -213,16 +213,15 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         if (DEBUG) Log.d(TAG, "onPause")
         super.onPause()
+        logger.removeDelegate()
         analytics.sendEvent(category = "TCM", action = "Pause")
         appMonitor.onActivityPause()
-        logger.removeDelegate()
     }
 
     // Next state is either onCreate > Start, onRestart > Start, or onDestroy
     override fun onStop() {
         if (DEBUG) Log.d(TAG, "onStop")
         super.onStop()
-        analytics.stopSync()
     }
 
     // The end of the activity
@@ -234,7 +233,6 @@ class MainActivity : AppCompatActivity() {
     private fun onPrefsButton() {
         if (DEBUG) Log.d(TAG, "onPrefsButton")
         val i = Intent(this, PrefsActivity::class.java)
-        appMonitor.onActivityPause()
         startActivity(i)
     }
 

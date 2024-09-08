@@ -25,6 +25,7 @@ import com.alflabs.tcm.util.GlobalDebug
 import com.alflabs.tcm.util.ILogger
 import kotlin.math.max
 
+/// Manages a single GrabberThread
 class CamThread(
     private val logger: ILogger,
     private val analytics: Analytics,
@@ -70,21 +71,19 @@ class CamThread(
         grabber?.start("Grabber-$index-$countNewRender")
     }
 
-    private fun discardGrabber() {
+    internal fun discardGrabber() {
         render?.isValid = false
         render = null
         grabber?.let {
-            exGrabbers.add(it)
             it.stopRequested()
+            exGrabbers.add(it)
             grabber = null
         }
     }
 
     fun stopBlocking() {
         if (DEBUG) Log.d(TAG, "CamThread $index > stopBlocking")
-        grabber?.let {
-            grabber?.stopSync()
-        }
+        grabber?.stopSync()
         grabber = null
         discardGrabber()
         viewHolder.onStop()

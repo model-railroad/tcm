@@ -52,9 +52,14 @@ class GrabbersManagerThread(
         super.start("GrabberManager")
     }
 
-    override fun stopSync() {
-        if (DEBUG) Log.d(TAG, "stop")
-        super.stopSync(0)
+    override fun requestStopAsync() {
+        if (DEBUG) Log.d(TAG, "requestStopAsync")
+        super.requestStopAsync()
+    }
+
+    override fun stopSync(joinTimeoutMillis: Long) {
+        if (DEBUG) Log.d(TAG, "stopSync")
+        super.stopSync(joinTimeoutMillis)
     }
 
     override fun runInThreadLoop() {
@@ -105,9 +110,15 @@ class GrabbersManagerThread(
                 }
 
                 try {
-                    Thread.sleep(GRAB_REFRESH_MS)
-                } catch (_ : Exception) {}
+                    if (!mQuit) {
+                        Thread.sleep(GRAB_REFRESH_MS)
+                    }
+                } catch (e : Exception) {
+                    if (DEBUG) Log.d(TAG, "ThreadLoop: $e")
+                }
             }
+
+            cams.forEach { it.discardGrabber() }
 
             exGrabbers.forEach { it.stopSync(joinTimeoutMillis = 1000L * 10 ) }
 
