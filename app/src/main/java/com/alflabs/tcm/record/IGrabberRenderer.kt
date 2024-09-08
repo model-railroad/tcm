@@ -19,6 +19,7 @@ package com.alflabs.tcm.record
 
 import android.graphics.Bitmap
 
+/** Interface used to render the output of a [GrabberThread]. */
 interface IGrabberRenderer {
     fun render(bmp: Bitmap)
     fun setStatus(status: String)

@@ -28,6 +28,7 @@ import org.bytedeco.javacv.FFmpegFrameGrabber
 import org.bytedeco.javacv.Frame
 import org.bytedeco.javacv.FrameGrabber
 
+/** Stream and lifecycle handling of an [FFmpegFrameGrabber]. */
 class GrabberThread(
     private val logger: ILogger,
     private val analytics: Analytics,

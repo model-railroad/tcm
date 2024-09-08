@@ -33,6 +33,7 @@ import com.alflabs.tcm.R
 import com.alflabs.tcm.app.AppMonitor
 import com.alflabs.tcm.app.AppPrefsValues
 import com.alflabs.tcm.app.MainApp
+import com.alflabs.tcm.dagger.ActivityQualifier
 import com.alflabs.tcm.dagger.ActivityScope
 import com.alflabs.tcm.util.Analytics
 import com.alflabs.tcm.util.GlobalDebug
@@ -60,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         private val DEBUG: Boolean = GlobalDebug.DEBUG
 
 
-        fun getMainActivityComponent(context: Context): IMainActivityComponent {
+        fun getMainActivityComponent(@ActivityQualifier context: Context): IMainActivityComponent {
             context as MainActivity
             return context.getComponent()
         }

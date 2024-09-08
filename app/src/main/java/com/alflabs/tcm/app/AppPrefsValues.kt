@@ -20,14 +20,14 @@ package com.alflabs.tcm.app
 import android.content.Context
 import com.alflabs.tcm.activity.CamTransformValues
 import com.alflabs.tcm.activity.CameraTransformPref
-import com.alflabs.tcm.dagger.AppContext
+import com.alflabs.tcm.dagger.AppQualifier
 import com.alflabs.tcm.util.BasePrefsValues
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AppPrefsValues @Inject constructor(
-    @AppContext internal var context: Context
+    @AppQualifier internal var context: Context
 ) : BasePrefsValues(context) {
 
     /** Retrieve string for key or null.  */
@@ -80,7 +80,7 @@ class AppPrefsValues @Inject constructor(
 
     fun systemGA4ID() : String = prefs.getString(PREF_SYSTEM__GA4_ID, "") ?: ""
 
-    fun camerasCount() = getInt(PREF_CAMERAS__COUNT, MonitorMixin.MAX_CAMERAS)
+    fun camerasCount() = getInt(PREF_CAMERAS__COUNT, AppMonitor.MAX_CAMERAS)
 
     fun camerasUrl(index: Int) : String =
         when (index) {

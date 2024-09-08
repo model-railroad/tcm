@@ -26,6 +26,7 @@ import com.alflabs.tcm.util.ILogger
 import com.alflabs.tcm.util.ThreadLoop
 import kotlin.math.max
 
+/** Live management of a [GrabberThread] pool. */
 class GrabbersManagerThread(
     private val logger: ILogger,
     private val analytics: Analytics,
@@ -66,7 +67,7 @@ class GrabbersManagerThread(
         if (DEBUG) Log.d(TAG, "runInThreadLoop")
 
         val cams = camUrls.map { entry ->
-            CamThread(
+            GrabberHolder(
                 logger = logger,
                 analytics = analytics,
                 debugDisplay = debugDisplay,

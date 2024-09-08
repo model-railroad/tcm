@@ -18,7 +18,7 @@
 package com.alflabs.tcm.app
 
 import android.content.Context
-import com.alflabs.tcm.dagger.AppContext
+import com.alflabs.tcm.dagger.AppQualifier
 import com.alflabs.tcm.util.ILogger
 import dagger.Module
 import dagger.Provides
@@ -31,7 +31,7 @@ class AppContextModule(private val mContext: Context) {
      * Users request it by using the @AppQualifier to distinguish it from the one provided by the activity.
      */
     @Provides
-    @AppContext
+    @AppQualifier
     fun providesContext(): Context {
         return mContext
     }

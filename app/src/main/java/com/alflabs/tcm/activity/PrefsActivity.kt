@@ -28,9 +28,9 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.alflabs.tcm.R
+import com.alflabs.tcm.app.AppMonitor
 import com.alflabs.tcm.app.AppPrefsValues
 import com.alflabs.tcm.app.LauncherRole
-import com.alflabs.tcm.app.MonitorMixin
 import com.alflabs.tcm.util.GlobalDebug
 
 class PrefsActivity : AppCompatActivity() {
@@ -101,11 +101,11 @@ class PrefsActivity : AppCompatActivity() {
 
             val countPref = findPreference<ListPreference>(AppPrefsValues.PREF_CAMERAS__COUNT)
             countPref?.apply {
-                val numbers: List<String> = 1.rangeTo(MonitorMixin.MAX_CAMERAS).map { it.toString() }
+                val numbers: List<String> = 1.rangeTo(AppMonitor.MAX_CAMERAS).map { it.toString() }
                 countPref.entries = numbers.toTypedArray()
                 countPref.entryValues = countPref.entries
-                countPref.setDefaultValue(MonitorMixin.MAX_CAMERAS)
-                if (countPref.value == null) countPref.value = MonitorMixin.MAX_CAMERAS.toString()
+                countPref.setDefaultValue(AppMonitor.MAX_CAMERAS)
+                if (countPref.value == null) countPref.value = AppMonitor.MAX_CAMERAS.toString()
             }
         }
 

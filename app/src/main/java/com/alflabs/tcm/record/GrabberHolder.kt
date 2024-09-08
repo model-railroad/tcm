@@ -25,8 +25,8 @@ import com.alflabs.tcm.util.GlobalDebug
 import com.alflabs.tcm.util.ILogger
 import kotlin.math.max
 
-/// Manages a single GrabberThread
-class CamThread(
+/** Manages a single [GrabberThread] and holds all state needed to manage the thread. */
+class GrabberHolder(
     private val logger: ILogger,
     private val analytics: Analytics,
     private val debugDisplay: Boolean,
@@ -37,19 +37,19 @@ class CamThread(
 ) {
 
     companion object {
-        private val TAG: String = CamThread::class.java.simpleName
+        private val TAG: String = GrabberHolder::class.java.simpleName
         private val DEBUG: Boolean = GlobalDebug.DEBUG
         private const val SPIN = "◥◢◣◤"
     }
 
-    var grabber : GrabberThread? = null
-    var render : CamRender? = null
-    var pingRenderTS = 0L
-    var pingActiveTS = 0L
-    var maxDelayMS = 0L
-    var currDelayMS = 0L
-    var spin = 0
-    var countNewRender = 0
+    private var grabber : GrabberThread? = null
+    private var render : GrabberRender? = null
+    private var pingRenderTS = 0L
+    private var pingActiveTS = 0L
+    private var maxDelayMS = 0L
+    private var currDelayMS = 0L
+    private var spin = 0
+    private var countNewRender = 0
 
     fun start() {
         if (DEBUG) Log.d(TAG, "CamThread $index > start")
@@ -60,7 +60,7 @@ class CamThread(
     private fun startNewGrabber() {
         if (DEBUG) Log.d(TAG, "CamThread $index > newGrabber")
         countNewRender++
-        render = CamRender(this)
+        render = GrabberRender(this)
         grabber = GrabberThread(
             logger,
             analytics,
@@ -72,7 +72,7 @@ class CamThread(
     }
 
     internal fun discardGrabber() {
-        render?.isValid = false
+        render?.setValid(false)
         render = null
         grabber?.let {
             it.stopRequested()

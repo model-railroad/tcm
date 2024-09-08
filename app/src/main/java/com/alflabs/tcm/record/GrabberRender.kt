@@ -19,26 +19,31 @@ package com.alflabs.tcm.record
 
 import android.graphics.Bitmap
 
-class CamRender(private val camThread: CamThread) : IGrabberRenderer {
+/** Renders the output of a [GrabberThread] into a [MainActivity]. */
+class GrabberRender(private val grabberHolder: GrabberHolder) : IGrabberRenderer {
     @Volatile
-    var isValid = true
+    private var isValid = true
+
+    fun setValid(valid: Boolean) {
+        isValid = valid
+    }
 
     override fun render(bmp: Bitmap) {
         if (isValid) {
-            camThread.pingRender()
-            camThread.viewHolder.render(bmp)
+            grabberHolder.pingRender()
+            grabberHolder.viewHolder.render(bmp)
         }
     }
 
     override fun setStatus(status: String) {
         if (isValid) {
-            camThread.viewHolder.setStatus(status)
+            grabberHolder.viewHolder.setStatus(status)
         }
     }
 
     override fun pingAlive() {
         if (isValid) {
-            camThread.pingAlive()
+            grabberHolder.pingAlive()
         }
     }
 }

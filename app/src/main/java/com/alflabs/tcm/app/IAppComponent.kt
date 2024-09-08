@@ -22,12 +22,10 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [ AppContextModule::class /*, AppDataModule::class, ServiceModule::class */])
+@Component(modules = [ AppContextModule::class])
 interface IAppComponent {
     val appPrefsValues: AppPrefsValues
     val mainActivityComponentFactory: IMainActivityComponent.Factory
 
     fun inject(mainApp: MainApp)
-//    fun inject(bootReceiver: BootReceiver?)
-//    fun inject(rtacService: RtacService?)
 }

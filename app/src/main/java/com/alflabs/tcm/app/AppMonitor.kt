@@ -20,8 +20,7 @@ package com.alflabs.tcm.app
 import android.content.Context
 import android.util.Log
 import com.alflabs.tcm.activity.MainActivity
-import com.alflabs.tcm.app.MonitorMixin.Companion.MAX_CAMERAS
-import com.alflabs.tcm.dagger.AppContext
+import com.alflabs.tcm.dagger.AppQualifier
 import com.alflabs.tcm.record.GrabbersManagerThread
 import com.alflabs.tcm.util.AVUtils
 import com.alflabs.tcm.util.Analytics
@@ -35,11 +34,16 @@ class AppMonitor @Inject constructor(
     private var logger: ILogger,
     private var analytics: Analytics,
     private var appPrefsValues: AppPrefsValues,
-    @AppContext internal var appContext: Context
+    @AppQualifier internal var appContext: Context
 ) {
     companion object {
         private val TAG: String = AppMonitor::class.java.simpleName
         private val DEBUG: Boolean = GlobalDebug.DEBUG
+
+        const val MAX_CAMERAS = 3
+
+        const val START_AUTOMATICALLY = true        // for debugging purposes
+
     }
 
 
