@@ -1,5 +1,5 @@
 /*
- * Project: Train-Motion
+ * Project: Train-Motion, modified for TCM
  * Copyright (C) 2021 alf.labs gmail com,
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -19,4 +19,9 @@ package com.alflabs.tcm.util
 
 interface ILogger {
     fun log(tag: String, msg: String)
+
+    fun attachDelegate(delegate: LoggerDelegate)
+    fun removeDelegate()
 }
+
+typealias LoggerDelegate = (tag: String, msg: String) -> Unit

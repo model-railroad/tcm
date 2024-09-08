@@ -37,6 +37,7 @@ import com.alflabs.tcm.dagger.ActivityScope
 import com.alflabs.tcm.util.Analytics
 import com.alflabs.tcm.util.GlobalDebug
 import com.alflabs.tcm.util.ILogger
+import com.alflabs.tcm.util.LoggerDelegate
 import javax.inject.Inject
 
 
@@ -45,9 +46,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mComponent: IMainActivityComponent
     @Inject internal lateinit var appPrefsValues: AppPrefsValues
+    @Inject internal lateinit var logger: ILogger
 
     private var debugDisplay = false
-    private lateinit var logger: ILogger
     private lateinit var statusTxt: TextView
     private lateinit var monitorMixin: MonitorMixin
     private lateinit var analytics: Analytics
@@ -208,6 +209,7 @@ class MainActivity : AppCompatActivity() {
     // Invoked after onStart or onPause
     override fun onResume() {
         if (DEBUG) Log.d(TAG, "onResume")
+        attachLogger()
         super.onResume()
         hideNavigationBar()
         monitorMixin.onResume()
@@ -219,6 +221,7 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
         analytics.sendEvent(category = "TCM", action = "Pause")
         monitorMixin.onPause()
+        logger.removeDelegate()
     }
 
     // Next state is either onCreate > Start, onRestart > Start, or onDestroy
@@ -259,21 +262,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun getLogger() : ILogger {
-        if (!this::logger.isInitialized) {
-            logger = object : ILogger {
-                override fun log(tag: String, msg: String) {
-                    if (!debugDisplay) {
-                        Log.d(TAG, "Status: $msg")
-                        return
-                    }
+        // TBD remove once daggerized
+        return logger
+    }
+
+    private fun attachLogger() {
+        logger.attachDelegate(object : LoggerDelegate {
+            override fun invoke(tag: String, msg: String) {
+                if (debugDisplay) {
                     statusTxt.post {
                         addStatus("$tag : $msg")
                     }
                 }
             }
-        }
-
-        return logger
+        })
     }
 
     //----
