@@ -47,7 +47,7 @@ class MainApp : Application() {
     private fun createDaggerAppComponent(): IAppComponent {
         return DaggerIAppComponent
             .builder()
-//            .appContextModule(AppContextModule(applicationContext))
+            .appContextModule(AppContextModule(applicationContext))
 //            .appDataModule(AppDataModule())
             .build()
     }

@@ -1,6 +1,6 @@
 /*
- * Project: RTAC
- * Copyright (C) 2017 alf.labs gmail com,
+ * Project: Lib Utils
+ * Copyright (C) 2020 alf.labs gmail com,
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -15,19 +15,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.alflabs.tcm.app
+package com.alflabs.tcm.dagger
 
-import com.alflabs.tcm.activity.IMainActivityComponent
-import dagger.Component
-import javax.inject.Singleton
+import javax.inject.Qualifier
 
-@Singleton
-@Component(modules = [ AppContextModule::class /*, AppDataModule::class, ServiceModule::class */])
-interface IAppComponent {
-    val appPrefsValues: AppPrefsValues
-    val mainActivityComponentFactory: IMainActivityComponent.Factory
-
-    fun inject(mainApp: MainApp)
-//    fun inject(bootReceiver: BootReceiver?)
-//    fun inject(rtacService: RtacService?)
-}
+/** Indicates that a Context is the ApplicationContext.  */
+@Qualifier
+@MustBeDocumented
+@Retention(AnnotationRetention.RUNTIME)
+annotation class AppContext

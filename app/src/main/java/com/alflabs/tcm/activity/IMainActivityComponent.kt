@@ -15,19 +15,18 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.alflabs.tcm.app
+package com.alflabs.tcm.activity
 
-import com.alflabs.tcm.activity.IMainActivityComponent
-import dagger.Component
-import javax.inject.Singleton
+import com.alflabs.tcm.dagger.ActivityScope
+import dagger.Subcomponent
 
-@Singleton
-@Component(modules = [ AppContextModule::class /*, AppDataModule::class, ServiceModule::class */])
-interface IAppComponent {
-    val appPrefsValues: AppPrefsValues
-    val mainActivityComponentFactory: IMainActivityComponent.Factory
+@ActivityScope
+@Subcomponent(modules = [ActivityContextModule::class])
+interface IMainActivityComponent {
+    @Subcomponent.Factory
+    interface Factory {
+        fun create(activityContextModule: ActivityContextModule): IMainActivityComponent
+    }
 
-    fun inject(mainApp: MainApp)
-//    fun inject(bootReceiver: BootReceiver?)
-//    fun inject(rtacService: RtacService?)
+    fun inject(mainActivity: MainActivity)
 }

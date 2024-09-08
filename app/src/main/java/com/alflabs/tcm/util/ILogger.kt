@@ -18,7 +18,5 @@
 package com.alflabs.tcm.util
 
 interface ILogger {
-    fun log(msg: String)
-
     fun log(tag: String, msg: String)
 }

@@ -60,7 +60,7 @@ class AVUtils {
                 // call FFmpegLogCallback.set()
                 FFmpegLogCallback::class.declaredFunctions.firstOrNull { it.name == "set" }?.call()
             } catch (t: Throwable) {
-                logger.log("ERROR: $t")
+                logger.log(TAG, "ERROR: $t")
                 throw t
             }
         }

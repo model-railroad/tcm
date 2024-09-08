@@ -31,13 +31,20 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.alflabs.tcm.R
 import com.alflabs.tcm.app.AppPrefsValues
+import com.alflabs.tcm.app.MainApp
 import com.alflabs.tcm.app.MonitorMixin
+import com.alflabs.tcm.dagger.ActivityScope
 import com.alflabs.tcm.util.Analytics
 import com.alflabs.tcm.util.GlobalDebug
 import com.alflabs.tcm.util.ILogger
+import javax.inject.Inject
 
 
+@ActivityScope
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var mComponent: IMainActivityComponent
+    @Inject internal lateinit var appPrefsValues: AppPrefsValues
 
     private var debugDisplay = false
     private lateinit var logger: ILogger
@@ -50,11 +57,42 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private val TAG: String = MainActivity::class.java.simpleName
         private val DEBUG: Boolean = GlobalDebug.DEBUG
+
+
+        fun getMainActivityComponent(context: Context): IMainActivityComponent {
+            context as MainActivity
+            return context.getComponent()
+        }
+
     }
+
+    // ---
+
+    protected fun createComponent(): IMainActivityComponent {
+        if (DEBUG) Log.d(TAG, "createComponent")
+        return MainApp
+            .getAppComponent(this)
+            .mainActivityComponentFactory
+            .create(ActivityContextModule(this))
+    }
+
+    fun getComponent(): IMainActivityComponent {
+        if (DEBUG) Log.d(TAG, "getComponent")
+        if (!this::mComponent.isInitialized) {
+            mComponent = createComponent()
+        }
+        return mComponent
+    }
+
+    // ---
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (DEBUG) Log.d(TAG, "onCreate")
         super.onCreate(savedInstanceState)
+
+        // Do not access dagger objects before this call
+        getComponent().inject(this)
+
         analytics = Analytics()
         setUncaughtExceptionHandler()
         monitorMixin = MonitorMixin(this, analytics)
@@ -64,8 +102,7 @@ class MainActivity : AppCompatActivity() {
         // Note: an alternative is to set it via style theme resources as such:
         // <item name="android:statusBarColor">@android:color/transparent</item>
         // However by doing it programmatically we can respect the app preferences.
-        val prefs = AppPrefsValues(this)
-        if (prefs.systemHideNavBar()) {
+        if (appPrefsValues.systemHideNavBar()) {
             enableEdgeToEdge(
                 statusBarStyle = SystemBarStyle.dark(Color.argb(0x40, 0x20, 0x20, 0x20))
             )
@@ -142,15 +179,14 @@ class MainActivity : AppCompatActivity() {
 
         // Note: Any UI that can be changed by editing preferences should be set/reset in
         // onStart rather than onCreate. onStart is called when coming back from PrefsActivity.
-        val prefs = AppPrefsValues(this)
 
         // For debugging
         // prefs.setString("pref_system__ga4_id", // 'ga id | client id | app secret'
 
-        analytics.setAnalyticsId(prefs)
-        debugDisplay = prefs.systemDebugDisplay1()
+        analytics.setAnalyticsId(appPrefsValues)
+        debugDisplay = appPrefsValues.systemDebugDisplay1()
 
-        videoViewHolders.forEach { it.loadPrefs(prefs) }
+        videoViewHolders.forEach { it.loadPrefs(appPrefsValues) }
 
         statusTxt.visibility = if (debugDisplay) View.VISIBLE else View.GONE
         if (!debugDisplay) statusTxt.text = ""
@@ -225,17 +261,6 @@ class MainActivity : AppCompatActivity() {
     fun getLogger() : ILogger {
         if (!this::logger.isInitialized) {
             logger = object : ILogger {
-                override fun log(msg: String) {
-                    if (!debugDisplay) {
-                        Log.d(TAG, "Status: $msg")
-                        return
-                    }
-                    statusTxt.post {
-                        addStatus(msg)
-                    }
-
-                }
-
                 override fun log(tag: String, msg: String) {
                     if (!debugDisplay) {
                         Log.d(TAG, "Status: $msg")
@@ -255,8 +280,7 @@ class MainActivity : AppCompatActivity() {
     /** Enable immersion mode to hide the navigation bar  */
     @Suppress("DEPRECATION")
     private fun hideNavigationBar() {
-        val prefs = AppPrefsValues(this)
-        if (!prefs.systemHideNavBar()) return
+        if (!appPrefsValues.systemHideNavBar()) return
         if (DEBUG) Log.d(TAG, "hideNavigationBar")
 
         val root = window.decorView
