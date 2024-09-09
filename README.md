@@ -194,17 +194,19 @@ MVP:
 Phase 1 (fixes after initial prototype deployment):
 
 - ❌ Update min API level to 29 / Q / Android 10.
-- ☐ Add GA support (with pref for GA ID).
-- ☐ Add 3-dot menu instead of single pref button.
+- ✅ Add GA support (with pref for GA ID).
+- ✅ Add 3-dot menu instead of single pref button.
 - ✅ Support 3 cameras.
 
 Phase 2 (optional):
 
-- ✅ Rewrite image transform to be a custom pref dialog with (rot,zoom,pan).
-- ✅ Remove unused features: BootReceiver, WifiLock (not available on API 29+).
-- ☐ Consider using a foreground service rather than a thread for main processing?
-- ☐ Replace settings icon by 3-dot menu: settings|start|stop. Dynamic visibility on tap.
-- ☐ Force activity display orientation (via prefs).
+- ✅ App: Rewrite image transform to be a custom pref dialog with (rot,zoom,pan).
+- ✅ App: Consider using a app monitor rather than activity monitor for main processing
+- ✅ App: Replace settings icon by 3-dot menu: settings|start|stop. Dynamic visibility on tap.
+- ❌ App: Force activity display orientation (via prefs).
+- ✅ App: Import/Export Cameras Configuration (via simple text data sharing).
+- ✅ Admin: Remove unused features: BootReceiver, WifiLock (not available on API 29+).
+- ✅ Admin: Fix Gradle to only pack required JavaCV JNI Libs.
 - ☐ Reintroduce preference to fill/fit in image view.
 - ☐ Gamma correction on input images (via OpenCV LUT f.ex.)
 - ☐ Use OpenCV to detect motion.
