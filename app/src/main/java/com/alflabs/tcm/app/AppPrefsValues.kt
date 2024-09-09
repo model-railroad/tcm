@@ -42,6 +42,13 @@ class AppPrefsValues @Inject constructor(
         }
     }
 
+    /** Sets a key integer.  */
+    fun setInt(key: String, value: Int) {
+        synchronized(editLock()) {
+            endEdit(startEdit().putInt(key, value))
+        }
+    }
+
     /** Retrieve int for key or default.  */
     private fun getInt(key: String, defaultValue: Int): Int {
         try {
@@ -83,27 +90,24 @@ class AppPrefsValues @Inject constructor(
     fun camerasCount() = getInt(PREF_CAMERAS__COUNT, AppMonitor.MAX_CAMERAS)
 
     fun camerasUrl(index: Int) : String =
-        when (index) {
-            1 -> prefs.getString(PREF_CAMERAS__URL_1, "") ?: ""
-            2 -> prefs.getString(PREF_CAMERAS__URL_2, "") ?: ""
-            3 -> prefs.getString(PREF_CAMERAS__URL_3, "") ?: ""
-            else -> throw IndexOutOfBoundsException("Camera URL Index $index out of bounds")
+        if (PREF_CAMERAS__URL.containsKey(index)) {
+            prefs.getString(PREF_CAMERAS__URL[index], "") ?: ""
+        } else {
+            throw IndexOutOfBoundsException("Camera URL Index $index out of bounds")
         }
 
     fun camerasLabel(index: Int) : String =
-        when (index) {
-            1 -> prefs.getString(PREF_CAMERAS__LABEL_1, "") ?: ""
-            2 -> prefs.getString(PREF_CAMERAS__LABEL_2, "") ?: ""
-            3 -> prefs.getString(PREF_CAMERAS__LABEL_3, "") ?: ""
-            else -> throw IndexOutOfBoundsException("Camera LABEL Index $index out of bounds")
+        if (PREF_CAMERAS__LABEL.containsKey(index)) {
+            prefs.getString(PREF_CAMERAS__LABEL[index], "") ?: ""
+        } else {
+            throw IndexOutOfBoundsException("Camera LABEL Index $index out of bounds")
         }
 
     fun camerasTransform(index: Int) : CamTransformValues =
-        when (index) {
-            1 -> getTransform(PREF_CAMERAS__TRANSFORM_1)
-            2 -> getTransform(PREF_CAMERAS__TRANSFORM_2)
-            3 -> getTransform(PREF_CAMERAS__TRANSFORM_3)
-            else -> throw IndexOutOfBoundsException("Camera TRANSFORM Index $index out of bounds")
+        if (PREF_CAMERAS__TRANSFORM.containsKey(index)) {
+            getTransform(PREF_CAMERAS__TRANSFORM[index]!!)
+        } else {
+            throw IndexOutOfBoundsException("Camera TRANSFORM Index $index out of bounds")
         }
 
     companion object {
@@ -115,14 +119,20 @@ class AppPrefsValues @Inject constructor(
         const val PREF_SYSTEM__ONLY_ON_AC_POWER = "pref_system__only_on_ac_power"
         const val PREF_SYSTEM__GA4_ID = "pref_system__ga4_id"
         const val PREF_CAMERAS__COUNT = "pref_cameras__count"
-        const val PREF_CAMERAS__URL_1 = "pref_cameras__url_1"
-        const val PREF_CAMERAS__URL_2 = "pref_cameras__url_2"
-        const val PREF_CAMERAS__URL_3 = "pref_cameras__url_3"
-        const val PREF_CAMERAS__LABEL_1 = "pref_cameras__label_1"
-        const val PREF_CAMERAS__LABEL_2 = "pref_cameras__label_2"
-        const val PREF_CAMERAS__LABEL_3 = "pref_cameras__label_3"
-        const val PREF_CAMERAS__TRANSFORM_1 = "pref_cameras__transform_1"
-        const val PREF_CAMERAS__TRANSFORM_2 = "pref_cameras__transform_2"
-        const val PREF_CAMERAS__TRANSFORM_3 = "pref_cameras__transform_3"
+        val PREF_CAMERAS__URL = mapOf(
+            1 to "pref_cameras__url_1",
+            2 to "pref_cameras__url_2",
+            3 to "pref_cameras__url_3",
+        )
+        val PREF_CAMERAS__LABEL = mapOf(
+            1 to "pref_cameras__label_1",
+            2 to "pref_cameras__label_2",
+            3 to "pref_cameras__label_3",
+        )
+        val PREF_CAMERAS__TRANSFORM = mapOf(
+            1 to "pref_cameras__transform_1",
+            2 to "pref_cameras__transform_2",
+            3 to "pref_cameras__transform_3",
+        )
     }
 }

@@ -54,7 +54,11 @@
     <string name="prefs__cameras_transform_3">Camera 3 - Transform</string>
 
     <string name="export__activity_title">Load/Share Camera Settings</string>
-    <string name="export__load_title">Load</string>
+    <string name="export__load_title">Reload</string>
     <string name="export__share_title">Share</string>
     <string name="export__edit_hint">Text representation of camera settings</string>
+    <string name="export__load_dlg_title">Reload Camera Settings</string>
+    <string name="export__load_dlg_msg">This will erase all current camera settings and reload them using the values listed here. This operation cannot be undone.</string>
+    <string name="export__load_dlg_cancel">Cancel</string>
+    <string name="export__load_dlg_ok">Reload</string>
 </resources>

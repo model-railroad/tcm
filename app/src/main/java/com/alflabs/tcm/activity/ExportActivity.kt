@@ -17,6 +17,7 @@
  */
 package com.alflabs.tcm.activity
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -24,6 +25,7 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import com.alflabs.tcm.R
+import com.alflabs.tcm.app.AppMonitor
 import com.alflabs.tcm.app.AppPrefsValues
 import com.alflabs.tcm.app.MainApp
 import com.alflabs.tcm.dagger.ActivityScope
@@ -58,7 +60,7 @@ class ExportActivity : AppCompatActivity() {
         editText.text.clear()
         editText.text.append(prefsToText())
 
-        findViewById<Button>(R.id.btn_load).setOnClickListener { doLoad() }
+        findViewById<Button>(R.id.btn_load).setOnClickListener { confirmLoad() }
         findViewById<Button>(R.id.btn_share).setOnClickListener { doShare() }
     }
 
@@ -91,9 +93,83 @@ class ExportActivity : AppCompatActivity() {
         return sb.toString()
     }
 
+    private fun confirmLoad() {
+        val builder = AlertDialog.Builder(this)
+        builder
+            .setTitle(R.string.export__load_dlg_title)
+            .setMessage(R.string.export__load_dlg_msg)
+            .setNegativeButton(R.string.export__load_dlg_cancel) {_, _ -> /* no-op */ }
+            .setPositiveButton(R.string.export__load_dlg_ok) { _, _ -> doLoad() }
+        builder.show()
+    }
+
     private fun doLoad() {
         // Parse key-values from text field and update preferences.
-        // TBD
+        // Note that order of keys matters:
+        // V=1
+        // N=num cameras (only valid if V=1)
+        // L|U|T + camera index = value (only valid if N=... was read before).
+
+        val source = editText.text.toString()
+
+        var numCam = 0
+        val linePattern = "^([A-Z])[ \t]*=(.*)$".toRegex()
+        val keyPattern = "^([LUT])([0-9]+)$".toRegex()
+        var versionAccepted = false
+        source.lines().forEach { line ->
+            linePattern.matchEntire(line)?.let { lineMatch ->
+                var key = lineMatch.groupValues[1]
+                var index = 0
+                val value = lineMatch.groupValues[2].trim()
+
+                if (key.isNotEmpty()) {
+                    keyPattern.matchEntire(key)?.let { keyIndexMatch ->
+                        key = keyIndexMatch.groupValues[1]
+                        index = keyIndexMatch.groupValues[2].toIntOrNull() ?: 0
+                    }
+                }
+
+                when(key) {
+                    "V" -> {
+                        versionAccepted = value == "1"
+                    }
+                    "N" -> if (versionAccepted) {
+                        val n = value.toIntOrNull() ?: 0
+                        if (n >= 1 && n <= AppMonitor.MAX_CAMERAS) {
+                            numCam = n
+                            // WARNING: PREF_CAMERAS__COUNT is a *string* preference for legacy reasons.
+                            appPrefsValues.setString(AppPrefsValues.PREF_CAMERAS__COUNT, n.toString())
+                        }
+                    }
+                    "L" -> if (versionAccepted && index >= 1 && index <= numCam) {
+                        appPrefsValues.setString(
+                            AppPrefsValues.PREF_CAMERAS__LABEL[index]!!,
+                            value)
+                    }
+                    "U" -> if (versionAccepted && index >= 1 && index <= numCam) {
+                        appPrefsValues.setString(
+                            AppPrefsValues.PREF_CAMERAS__URL[index]!!,
+                            value)
+                    }
+                    "T" -> if (versionAccepted && index >= 1 && index <= numCam) {
+                        appPrefsValues.setString(
+                            AppPrefsValues.PREF_CAMERAS__TRANSFORM[index]!!,
+                            value.replace('|', '\n'))
+                    }
+                }
+            }
+        }
+
+        // TBD: Warn if the input was not matched.
+
+        // Now navigate to the PrefsActivity to look at the result
+        navToPrefs()
+    }
+
+    private fun navToPrefs() {
+        val i = Intent(this, PrefsActivity::class.java)
+        startActivity(i)
+        finish()
     }
 
     private fun doShare() {
