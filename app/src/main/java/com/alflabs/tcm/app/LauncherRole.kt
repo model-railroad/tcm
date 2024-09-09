@@ -23,15 +23,20 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import androidx.annotation.RequiresApi
-import com.alflabs.tcm.BuildConfig
+import com.alflabs.tcm.dagger.AppQualifier
 import com.alflabs.tcm.util.GlobalDebug
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Implements a RoleManager HOME.
  *
  * This is only available starting with API 29 (Android 10 / Q).
  */
-class LauncherRole(private val context: Context) {
+@Singleton
+class LauncherRole @Inject constructor(
+    @AppQualifier private val context: Context
+) {
 
     companion object {
         private val TAG: String = LauncherRole::class.java.simpleName
@@ -42,6 +47,8 @@ class LauncherRole(private val context: Context) {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     fun isRoleAvailable() : Boolean {
+        if (Build.VERSION.SDK_INT < MIN_USAGE_API) return false
+
         val manager = context.getSystemService(Context.ROLE_SERVICE) as RoleManager?
         if (manager == null) return false
 
@@ -50,6 +57,8 @@ class LauncherRole(private val context: Context) {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     fun isRoleHeld() : Boolean {
+        if (Build.VERSION.SDK_INT < MIN_USAGE_API) return false
+
         val manager = context.getSystemService(Context.ROLE_SERVICE) as RoleManager?
         if (manager == null) return false
 
@@ -58,6 +67,8 @@ class LauncherRole(private val context: Context) {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     fun onRolePrefChanged(enabled: Boolean) : Intent? {
+        if (Build.VERSION.SDK_INT < MIN_USAGE_API) return null
+
         if (!enabled) {
             // Intent to display the Android Settings > Default Apps screen.
             // Only available starting with API 24 (N).

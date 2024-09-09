@@ -31,8 +31,12 @@ import com.alflabs.tcm.R
 import com.alflabs.tcm.app.AppMonitor
 import com.alflabs.tcm.app.AppPrefsValues
 import com.alflabs.tcm.app.LauncherRole
+import com.alflabs.tcm.app.MainApp
+import com.alflabs.tcm.dagger.ActivityScope
 import com.alflabs.tcm.util.GlobalDebug
+import javax.inject.Inject
 
+@ActivityScope
 class PrefsActivity : AppCompatActivity() {
 
     companion object {
@@ -43,19 +47,31 @@ class PrefsActivity : AppCompatActivity() {
         private const val DIALOG_FRAGMENT_TAG = "androidx.preference.PreferenceFragment.DIALOG"
     }
 
+    @Inject internal lateinit var launcherRole: LauncherRole
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Do not access dagger objects before this call
+        MainApp
+            .getAppComponent(this)
+            .prefsActivityComponentFactory
+            .create()
+            .inject(this)
+
         setContentView(R.layout.prefs_activity)
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.settings, SettingsFragment())
+                .replace(R.id.settings, SettingsFragment(launcherRole))
                 .commit()
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    class SettingsFragment : PreferenceFragmentCompat() {
+    class SettingsFragment(
+        private val launcherRole: LauncherRole
+    ) : PreferenceFragmentCompat() {
 
         private val startForResult = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -78,8 +94,6 @@ class PrefsActivity : AppCompatActivity() {
             val homePref = findPreference<SwitchPreferenceCompat>(AppPrefsValues.PREF_SYSTEM__HOME)
             homePref?.apply {
                 if (Build.VERSION.SDK_INT >= LauncherRole.MIN_USAGE_API) {
-                    val launcherRole = LauncherRole(context)
-                    isEnabled = launcherRole.isRoleAvailable()
                     isChecked = isEnabled && launcherRole.isRoleHeld()
 
                     setOnPreferenceChangeListener { _, newValue ->

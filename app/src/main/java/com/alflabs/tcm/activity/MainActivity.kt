@@ -23,7 +23,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.TextView
@@ -46,7 +45,7 @@ import javax.inject.Inject
 @ActivityScope
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var mComponent: IMainActivityComponent
+    private lateinit var component: IMainActivityComponent
     @Inject internal lateinit var logger: ILogger
     @Inject internal lateinit var analytics: Analytics
     @Inject internal lateinit var appMonitor: AppMonitor
@@ -81,10 +80,10 @@ class MainActivity : AppCompatActivity() {
 
     fun getComponent(): IMainActivityComponent {
         if (DEBUG) Log.d(TAG, "getComponent")
-        if (!this::mComponent.isInitialized) {
-            mComponent = createComponent()
+        if (!this::component.isInitialized) {
+            component = createComponent()
         }
-        return mComponent
+        return component
     }
 
     // ---

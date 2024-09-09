@@ -18,6 +18,7 @@
 package com.alflabs.tcm.app
 
 import com.alflabs.tcm.activity.IMainActivityComponent
+import com.alflabs.tcm.activity.IPrefsActivityComponent
 import dagger.Component
 import javax.inject.Singleton
 
@@ -26,6 +27,7 @@ import javax.inject.Singleton
 interface IAppComponent {
     val appPrefsValues: AppPrefsValues
     val mainActivityComponentFactory: IMainActivityComponent.Factory
+    val prefsActivityComponentFactory: IPrefsActivityComponent.Factory
 
     fun inject(mainApp: MainApp)
 }

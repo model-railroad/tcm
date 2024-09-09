@@ -21,12 +21,12 @@ import com.alflabs.tcm.dagger.ActivityScope
 import dagger.Subcomponent
 
 @ActivityScope
-@Subcomponent(modules = [ActivityContextModule::class])
-interface IMainActivityComponent {
+@Subcomponent
+interface IPrefsActivityComponent {
     @Subcomponent.Factory
     interface Factory {
-        fun create(activityContextModule: ActivityContextModule): IMainActivityComponent
+        fun create(): IPrefsActivityComponent
     }
 
-    fun inject(mainActivity: MainActivity)
+    fun inject(prefsActivity: PrefsActivity)
 }

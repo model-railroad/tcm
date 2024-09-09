@@ -17,6 +17,7 @@
  */
 package com.alflabs.tcm.app
 
+import android.app.role.RoleManager
 import android.content.Context
 import com.alflabs.tcm.dagger.AppQualifier
 import com.alflabs.tcm.util.ILogger
