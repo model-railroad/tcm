@@ -25,6 +25,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
@@ -189,14 +190,8 @@ class MainActivity : AppCompatActivity() {
         statusTxt.visibility = if (debugDisplay) View.VISIBLE else View.GONE
         if (!debugDisplay) statusTxt.text = ""
 
-        val startBtn = findViewById<Button>(R.id.start_btn)
-        val stopBtn = findViewById<Button>(R.id.stop_btn)
-        val prefsBtn = findViewById<ImageButton>(R.id.prefs_btn)
-        startBtn.visibility = if (debugDisplay) View.VISIBLE else View.GONE
-        stopBtn .visibility = if (debugDisplay) View.VISIBLE else View.GONE
-        startBtn.setOnClickListener { onStartButton() }
-        stopBtn .setOnClickListener { onStopButton() }
-        prefsBtn.setOnClickListener { onPrefsButton() }
+        val menuBtn = findViewById<ImageButton>(R.id.menu_btn)
+        menuBtn.setOnClickListener { onMenuButton(it) }
 
         analytics.sendEvent(category = "TCM", action = "Start")
     }
@@ -231,10 +226,39 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    private fun onPrefsButton() {
-        if (DEBUG) Log.d(TAG, "onPrefsButton")
-        val i = Intent(this, PrefsActivity::class.java)
-        startActivity(i)
+    private fun onMenuButton(button: View) {
+        if (DEBUG) Log.d(TAG, "onMenuButton")
+
+        val popupMenu = PopupMenu(this, button)
+        popupMenu.inflate(R.menu.main_menu)
+
+        if (!debugDisplay) {
+            popupMenu.menu.findItem(R.id.main_menu__start).setEnabled(false)
+            popupMenu.menu.findItem(R.id.main_menu__start).setVisible(false)
+            popupMenu.menu.findItem(R.id.main_menu__stop).setEnabled(false)
+            popupMenu.menu.findItem(R.id.main_menu__stop).setVisible(false)
+        }
+
+        popupMenu.setOnMenuItemClickListener { item ->
+            if (DEBUG) Log.d(TAG, "onMenu $item")
+            when(item.itemId) {
+                R.id.main_menu__prefs -> {
+                    val i = Intent(this, PrefsActivity::class.java)
+                    startActivity(i)
+                }
+                R.id.main_menu__export -> {
+                    // TBD
+                }
+                R.id.main_menu__start -> {
+                    onStartButton()
+                }
+                R.id.main_menu__stop -> {
+                    onStopButton()
+                }
+            }
+            return@setOnMenuItemClickListener true
+        }
+        popupMenu.show()
     }
 
     private fun onStartButton() {

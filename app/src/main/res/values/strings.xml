@@ -11,7 +11,12 @@
 
 
     <!-- Preferences -->
-    <string name="prefs__button_title">Preferences</string>
+    <string name="menu__button_desc">Preferences</string>
+    <string name="main_menu__prefs_title">Preferences</string>
+    <string name="main_menu__start_title">Start</string>
+    <string name="main_menu__stop_title">Stop</string>
+    <string name="main_menu__export_title">Export</string>
+
     <string name="prefs__activity_title">Preferences</string>
 
     <string name="prefs__system_header">System</string>

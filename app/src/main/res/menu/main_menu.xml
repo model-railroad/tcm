@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item   android:id="@+id/main_menu__prefs"
+            android:title="@string/main_menu__prefs_title"
+        />
+    <item   android:id="@+id/main_menu__export"
+            android:title="@string/main_menu__export_title"
+            />
+
+    <item   android:id="@+id/main_menu__start"
+            android:title="@string/main_menu__start_title"
+            />
+    <item   android:id="@+id/main_menu__stop"
+            android:title="@string/main_menu__stop_title"
+            />
+
+</menu>
