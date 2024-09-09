@@ -15,7 +15,7 @@
     <string name="main_menu__prefs_title">Preferences</string>
     <string name="main_menu__start_title">Start</string>
     <string name="main_menu__stop_title">Stop</string>
-    <string name="main_menu__export_title">Export</string>
+    <string name="main_menu__export_title">Import/Export</string>
 
     <string name="prefs__activity_title">Preferences</string>
 
@@ -52,4 +52,9 @@
     <string name="prefs__cameras_transform_1">Camera 1 - Transform</string>
     <string name="prefs__cameras_transform_2">Camera 2 - Transform</string>
     <string name="prefs__cameras_transform_3">Camera 3 - Transform</string>
+
+    <string name="export__activity_title">Import/Export</string>
+    <string name="export__import_title">Import</string>
+    <string name="export__export_title">Export</string>
+    <string name="export__edit_hint">Text representation of preferences</string>
 </resources>

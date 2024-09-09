@@ -246,7 +246,8 @@ class MainActivity : AppCompatActivity() {
                     startActivity(i)
                 }
                 R.id.main_menu__export -> {
-                    // TBD
+                    val i = Intent(this, ExportActivity::class.java)
+                    startActivity(i)
                 }
                 R.id.main_menu__start -> {
                     onStartButton()
