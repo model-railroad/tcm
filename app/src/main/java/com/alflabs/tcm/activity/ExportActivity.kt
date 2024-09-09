@@ -57,8 +57,13 @@ class ExportActivity : AppCompatActivity() {
         setContentView(R.layout.export_activity)
 
         editText = findViewById(R.id.edit_text)
-        editText.text.clear()
-        editText.text.append(prefsToText())
+        editText.setText(prefsToText())
+
+        if (intent?.action == Intent.ACTION_SEND) {
+            if (intent.type == "text/plain") {
+                editText.setText(intent.getStringExtra(Intent.EXTRA_TEXT) ?: "")
+            }
+        }
 
         findViewById<Button>(R.id.btn_load).setOnClickListener { confirmLoad() }
         findViewById<Button>(R.id.btn_share).setOnClickListener { doShare() }
