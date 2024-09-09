@@ -118,21 +118,13 @@ class ExportActivity : AppCompatActivity() {
         val source = editText.text.toString()
 
         var numCam = 0
-        val linePattern = "^([A-Z])[ \t]*=(.*)$".toRegex()
-        val keyPattern = "^([LUT])([0-9]+)$".toRegex()
+        val linePattern = "^([A-Z])([0-9]+)?[ \t]]*=(.*)$".toRegex()
         var versionAccepted = false
         source.lines().forEach { line ->
             linePattern.matchEntire(line)?.let { lineMatch ->
-                var key = lineMatch.groupValues[1]
-                var index = 0
-                val value = lineMatch.groupValues[2].trim()
-
-                if (key.isNotEmpty()) {
-                    keyPattern.matchEntire(key)?.let { keyIndexMatch ->
-                        key = keyIndexMatch.groupValues[1]
-                        index = keyIndexMatch.groupValues[2].toIntOrNull() ?: 0
-                    }
-                }
+                val key = lineMatch.groupValues[1]
+                val index = lineMatch.groupValues[2].toIntOrNull() ?: 0
+                val value = lineMatch.groupValues[3].trim()
 
                 when(key) {
                     "V" -> {
