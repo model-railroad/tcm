@@ -3,21 +3,21 @@
         android:layout_height="match_parent">
 
     <Button
-            android:id="@+id/btn_import"
+            android:id="@+id/btn_load"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginStart="16dp"
-            android:text="@string/export__import_title"
+            android:text="@string/export__load_title"
         />
 
     <Button
-            android:id="@+id/btn_export"
+            android:id="@+id/btn_share"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/btn_import"
+            android:layout_alignBaseline="@id/btn_load"
             android:layout_alignEnd="@+id/edit_text"
-            android:text="@string/export__export_title"
+            android:text="@string/export__share_title"
             />
 
     <EditText
@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="16dp"
-            android:layout_below="@id/btn_import"
+            android:layout_below="@id/btn_load"
             android:hint="@string/export__edit_hint"
             android:inputType="textMultiLine"
             android:autofillHints=""

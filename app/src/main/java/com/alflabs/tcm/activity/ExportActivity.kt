@@ -58,8 +58,8 @@ class ExportActivity : AppCompatActivity() {
         editText.text.clear()
         editText.text.append(prefsToText())
 
-        findViewById<Button>(R.id.btn_import).setOnClickListener { doImport() }
-        findViewById<Button>(R.id.btn_export).setOnClickListener { doExport() }
+        findViewById<Button>(R.id.btn_load).setOnClickListener { doLoad() }
+        findViewById<Button>(R.id.btn_share).setOnClickListener { doShare() }
     }
 
     private fun prefsToText(): String {
@@ -91,12 +91,12 @@ class ExportActivity : AppCompatActivity() {
         return sb.toString()
     }
 
-    private fun doImport() {
+    private fun doLoad() {
         // Parse key-values from text field and update preferences.
         // TBD
     }
 
-    private fun doExport() {
+    private fun doShare() {
         // Using doc from: https://developer.android.com/training/sharing/send
 
         val sendIntent: Intent = Intent().apply {

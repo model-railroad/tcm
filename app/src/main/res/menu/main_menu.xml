@@ -5,7 +5,7 @@
             android:title="@string/main_menu__prefs_title"
         />
     <item   android:id="@+id/main_menu__export"
-            android:title="@string/main_menu__export_title"
+            android:title="@string/main_menu__load_share_title"
             />
 
     <item   android:id="@+id/main_menu__start"
