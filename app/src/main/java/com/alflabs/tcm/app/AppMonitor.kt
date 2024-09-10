@@ -18,6 +18,8 @@
 package com.alflabs.tcm.app
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.alflabs.tcm.activity.MainActivity
 import com.alflabs.tcm.dagger.AppQualifier
@@ -31,9 +33,10 @@ import javax.inject.Singleton
 
 @Singleton
 class AppMonitor @Inject constructor(
-    private var logger: ILogger,
-    private var analytics: Analytics,
-    private var appPrefsValues: AppPrefsValues,
+    private val logger: ILogger,
+    private val analytics: Analytics,
+    private val appPrefsValues: AppPrefsValues,
+    private val batteryMonitorThread : BatteryMonitorThread,
     @AppQualifier internal var appContext: Context
 ) {
     companion object {
@@ -46,11 +49,11 @@ class AppMonitor @Inject constructor(
 
     }
 
-
+    private lateinit var appHandler : Handler
     private var grabbersManager : GrabbersManagerThread? = null
-    private var batteryMonitorThread : BatteryMonitorThread? = null
     private var startStreamingRunnable : Runnable? = null
     private var stopStreamingRunnable : Runnable? = null
+    private var actOnBatteryStateChanged = false
     var activityResumed = false
         private set
 
@@ -66,6 +69,19 @@ class AppMonitor @Inject constructor(
 
         analytics.setAnalyticsId(appPrefsValues)
         analytics.start()
+
+        appHandler = Handler(Looper.getMainLooper()) { msg -> true }
+
+        batteryMonitorThread.setOnBatteryStateChange { isPlugged ->
+            // This executes on the BatteryMonitorThread
+            if (actOnBatteryStateChanged) {
+                when (isPlugged) {
+                    true -> startStreamingRunnable?.let { appHandler.post(it) }
+                    false -> stopStreamingRunnable?.let { appHandler.post(it) }
+                }
+            }
+        }
+        batteryMonitorThread.start()
     }
 
     /**
@@ -76,22 +92,7 @@ class AppMonitor @Inject constructor(
 
         // The Analytics ID could have changed (e.g. if the Pref activity has been used in between).
         analytics.setAnalyticsId(appPrefsValues)
-
-        if (appPrefsValues.systemDisconnectOnBattery() && batteryMonitorThread == null) {
-            batteryMonitorThread = BatteryMonitorThread(
-                logger,
-                analytics,
-                appContext) {
-                    isPlugged -> activity.runOnUiThread {
-                        when(isPlugged) {
-                            true -> startStreamingRunnable?.run()
-                            false -> stopStreamingRunnable?.run()
-                        }
-                    }
-                }
-
-            batteryMonitorThread?.start()
-        }
+        actOnBatteryStateChanged = appPrefsValues.systemDisconnectOnBattery()
 
         val camerasCount = appPrefsValues.camerasCount()
         for (index in 1..MAX_CAMERAS) {
@@ -99,7 +100,8 @@ class AppMonitor @Inject constructor(
         }
 
         startStreamingRunnable = Runnable {
-            if (DEBUG) Log.d(TAG, "onStartStreaming")
+            // This executes in the appHandler on the main app UI thread.
+            logger.log(TAG, "onStartStreaming")
             grabbersManager?.stopSync()
 
             val camUrls = buildMap<Int, String> {
@@ -123,7 +125,8 @@ class AppMonitor @Inject constructor(
         }
 
         stopStreamingRunnable = Runnable {
-            if (DEBUG) Log.d(TAG, "onStopStreaming")
+            // This executes in the appHandler on the main app UI thread.
+            logger.log(TAG, "onStopStreaming")
 
             grabbersManager?.requestStopAsync()
             grabbersManager = null
@@ -131,15 +134,12 @@ class AppMonitor @Inject constructor(
             for (index in 1..camerasCount) {
                 activity.videoViewHolders[index - 1].onStop()
             }
-
-            // This is a one-shot operation.
-            stopStreamingRunnable = null
         }
 
         // Start when battery is connected or immediately if not monitoring.
-        if (batteryMonitorThread != null) {
-            batteryMonitorThread?.requestInitialState()
-        } else {
+        if (actOnBatteryStateChanged) {
+            batteryMonitorThread.requestInitialState()
+        } else if (START_AUTOMATICALLY) {
             startStreamingRunnable?.run()
         }
     }
@@ -155,10 +155,9 @@ class AppMonitor @Inject constructor(
         // One pause, we tear down existing process threads. However we only request them
         // to stop and then clear references (to reduce memory leaks) but we do not *wait*
         // for them.
-        batteryMonitorThread?.requestStopAsync()
-        batteryMonitorThread = null
-
-        stopStreamingRunnable?.run()
+        stopStreamingRunnable?.let { appHandler.post(it) }
+        startStreamingRunnable = null
+        stopStreamingRunnable = null
         activityResumed = false
     }
 

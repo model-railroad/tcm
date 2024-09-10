@@ -104,6 +104,7 @@ class VideoViewHolder(
         if (DEBUG) Log.d(TAG, "VideoViewHolder $cameraIndex -- STOP")
         runOnUiThread.run {
             imageView.keepScreenOn = false
+            setStatus("Stopped")
             fpsView.text = fpsView.context.getString(R.string.main__stopped_cam, cameraIndex)
         }
     }

@@ -21,16 +21,20 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import com.alflabs.tcm.dagger.AppQualifier
 import com.alflabs.tcm.util.Analytics
 import com.alflabs.tcm.util.ILogger
 import com.alflabs.tcm.util.ThreadLoop
+import java.util.concurrent.atomic.AtomicReference
+import javax.inject.Inject
+import javax.inject.Singleton
 
 
-class BatteryMonitorThread(
+@Singleton
+class BatteryMonitorThread @Inject constructor(
     private val logger: ILogger,
     private val analytics: Analytics,
-    private val context: Context,
-    private val onStateChange: (Boolean)->Unit,
+    @AppQualifier private val context: Context
 ): ThreadLoop() {
 
     companion object {
@@ -40,7 +44,7 @@ class BatteryMonitorThread(
         const val ON_BATTERY_PAUSE_MS = 1000L * 30  // 30 seconds -- TBD change to 1 min in prod
     }
 
-    @Volatile
+    private val onStateChange = AtomicReference<OnBatteryStateChange>()
     private var isPlugged = false
 
     override fun beforeThreadLoop() {
@@ -73,6 +77,10 @@ class BatteryMonitorThread(
         sendOnStateChange(isPlugged)
     }
 
+    fun setOnBatteryStateChange(callback: OnBatteryStateChange) {
+        onStateChange.set(callback)
+    }
+
     private fun sendOnStateChange(newState: Boolean) {
         if (!mQuit) {
             analytics.sendEvent(
@@ -81,7 +89,8 @@ class BatteryMonitorThread(
                 value = "1"
             )
 
-            onStateChange(newState)
+            val callback = onStateChange.get()
+            callback?.invoke(newState)
         }
     }
 
@@ -96,3 +105,5 @@ class BatteryMonitorThread(
         return plugged != 0
     }
 }
+
+typealias OnBatteryStateChange = (plugged: Boolean) -> Unit

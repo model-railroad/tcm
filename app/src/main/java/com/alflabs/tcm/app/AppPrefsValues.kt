@@ -27,7 +27,7 @@ import javax.inject.Singleton
 
 @Singleton
 class AppPrefsValues @Inject constructor(
-    @AppQualifier internal var context: Context
+    @AppQualifier private val context: Context
 ) : BasePrefsValues(context) {
 
     /** Retrieve string for key or null.  */

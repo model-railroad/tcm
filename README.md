@@ -207,6 +207,9 @@ Phase 2 (optional):
 - ✅ App: Import/Export Cameras Configuration (via simple text data sharing).
 - ✅ Admin: Remove unused features: BootReceiver, WifiLock (not available on API 29+).
 - ✅ Admin: Fix Gradle to only pack required JavaCV JNI Libs.
+- ☐ App: Start at boot using Accessibility API.
+- ☐ App: GA hourly report of battery level.
+- ☐ Reintroduce preference to fill/fit in image view.
 - ☐ Reintroduce preference to fill/fit in image view.
 - ☐ Gamma correction on input images (via OpenCV LUT f.ex.)
 - ☐ Use OpenCV to detect motion.
