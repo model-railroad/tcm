@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import android.os.SystemClock
 import com.alflabs.tcm.dagger.AppQualifier
 import com.alflabs.tcm.util.Analytics
 import com.alflabs.tcm.util.ILogger
@@ -40,12 +41,17 @@ class BatteryMonitorThread @Inject constructor(
     companion object {
         private val TAG: String = BatteryMonitorThread::class.java.simpleName
 
-        const val ON_POWER_PAUSE_MS   = 1000L * 5  // 5 seconds
-        const val ON_BATTERY_PAUSE_MS = 1000L * 30  // 30 seconds -- TBD change to 1 min in prod
+        const val ON_POWER_PAUSE_MS   = 1000L * 5       // 5 seconds
+        const val ON_BATTERY_PAUSE_MS = 1000L * 30      // 60 seconds
+
+        const val HOURLY_REPORT_MS = 1000L * 60 * 60    // 1 hour
     }
 
     private val onStateChange = AtomicReference<OnBatteryStateChange>()
     private var isPlugged = false
+    private var lastLevel = -1
+    private var lastScale = -1
+    private var nextHourlyReportTS = 0L
 
     override fun beforeThreadLoop() {
         isPlugged = isPlugged()
@@ -58,6 +64,21 @@ class BatteryMonitorThread @Inject constructor(
             logger.log(TAG, "runInThreadLoop - isPlugged state changed $isPlugged --> $newState")
             isPlugged = newState
             sendOnStateChange(newState)
+        }
+
+        val nowMS = SystemClock.elapsedRealtime()
+        if (nextHourlyReportTS < nowMS) {
+            nextHourlyReportTS = nowMS + HOURLY_REPORT_MS
+
+            if (lastScale > 0 && lastLevel >= 0) {
+                val battPercent = (lastLevel.toFloat() * 100f / lastScale.toFloat()).toInt()
+                logger.log(TAG, "Battery Percent: $battPercent%")
+                analytics.sendEvent(
+                    category = "TCM_BattPct",
+                    action = if (isPlugged) "On" else "Off",
+                    value = battPercent.toString()
+                )
+            }
         }
 
         try {
@@ -101,6 +122,11 @@ class BatteryMonitorThread @Inject constructor(
         // 0 for battery or a bitmask for {AC, Dock, USB}. We don't care how the device is
         // charging as long as it is powered by something.
         val plugged = battStatus?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) ?: 0
+        battStatus?.let {
+            lastLevel = battStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+            lastScale = battStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+        }
+
         // logger.log(TAG, "@@ check isPlugged  = $plugged")  // DEBUG
         return plugged != 0
     }
