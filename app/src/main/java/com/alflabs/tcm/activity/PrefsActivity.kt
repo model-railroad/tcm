@@ -30,6 +30,7 @@ import androidx.preference.SwitchPreferenceCompat
 import com.alflabs.tcm.R
 import com.alflabs.tcm.app.AppMonitor
 import com.alflabs.tcm.app.AppPrefsValues
+import com.alflabs.tcm.app.BootReceiver
 import com.alflabs.tcm.app.LauncherRole
 import com.alflabs.tcm.app.MainApp
 import com.alflabs.tcm.dagger.ActivityScope
@@ -89,8 +90,7 @@ class PrefsActivity : AppCompatActivity() {
 
             val bootPref = findPreference<SwitchPreferenceCompat>(AppPrefsValues.PREF_SYSTEM__START_ON_BOOT)
             bootPref?.apply {
-                // TBD: re-enable once Accessibility API is used for this feature.
-                isEnabled = false
+                isEnabled = Build.VERSION.SDK_INT <= BootReceiver.MAX_USAGE_API
                 if (!isEnabled) {
                     isChecked = false
                     summaryProvider = null

@@ -55,13 +55,13 @@ class BatteryMonitorThread @Inject constructor(
 
     override fun beforeThreadLoop() {
         isPlugged = isPlugged()
-        logger.log(TAG, "beforeThreadLoop -- isPlugged $isPlugged")
+        logger.log(TAG, "BatteryMonitor - before -- isPlugged $isPlugged")
     }
 
     override fun runInThreadLoop() {
         val newState = isPlugged()
         if (newState != isPlugged) {
-            logger.log(TAG, "runInThreadLoop - isPlugged state changed $isPlugged --> $newState")
+            logger.log(TAG, "BatteryMonitor - LOOP - isPlugged state changed $isPlugged --> $newState")
             isPlugged = newState
             sendOnStateChange(newState)
         }
@@ -84,13 +84,13 @@ class BatteryMonitorThread @Inject constructor(
         try {
             Thread.sleep(if (isPlugged) ON_POWER_PAUSE_MS else ON_BATTERY_PAUSE_MS)
         } catch (ignore: Exception) {
-            logger.log(TAG, "runInThreadLoop - interrupted")
+            logger.log(TAG, "BatteryMonitor - LOOP - interrupted")
             // This will be interrupted when thread wants to quit
         }
     }
 
     override fun afterThreadLoop() {
-        logger.log(TAG, "afterThreadLoop")
+        logger.log(TAG, "BatteryMonitor - after")
     }
 
     fun requestInitialState() {

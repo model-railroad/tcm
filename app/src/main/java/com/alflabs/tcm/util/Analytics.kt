@@ -69,13 +69,17 @@ class Analytics @Inject constructor() : ThreadLoop() {
         private const val IDLE_SLEEP_MAX_MS = 1000L * 60 * 5 // 5 minutes max error retry
         private const val MAX_ERROR_NUM = 2
 
-        private val GA4_V2_URL = ("https://www.google-analytics.com/"
-                + (if (VERBOSE_DEBUG) "debug/" else "") // Note: there is no DEBUG, this will 404
-                + "g/collect")
-
+        // The GA4 Measurement Protocol is clearly documented and works properly:
+        // https://developers.google.com/analytics/devguides/collection/protocol/ga4
         private val GA4_MP_URL = ("https://www.google-analytics.com/"
                 + (if (VERBOSE_DEBUG) "debug/" else "")
                 + "mp/collect")
+
+        // This is an _attempt_ at using the GA4 gtag.js page view mechanism.
+        // This does not seem to properly work yet: page view events are not showing in GA.
+        private val GA4_V2_URL = ("https://www.google-analytics.com/"
+                + (if (VERBOSE_DEBUG) "debug/" else "") // Note: there is no DEBUG, this will 404
+                + "g/collect")
 
         private val MEDIA_TYPE = MediaType.parse("text/plain")
     }

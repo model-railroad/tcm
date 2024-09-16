@@ -1,6 +1,6 @@
 /*
  * Project: TCM
- * Copyright (C) 2017 alf.labs gmail com,
+ * Copyright (C) 2024 alf.labs gmail com,
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,20 +17,16 @@
  */
 package com.alflabs.tcm.app
 
-import com.alflabs.tcm.activity.IExportActivityComponent
-import com.alflabs.tcm.activity.IMainActivityComponent
-import com.alflabs.tcm.activity.IPrefsActivityComponent
-import dagger.Component
-import javax.inject.Singleton
+import com.alflabs.tcm.dagger.ActivityScope
+import dagger.Subcomponent
 
-@Singleton
-@Component(modules = [ AppContextModule::class])
-interface IAppComponent {
-    val appPrefsValues: AppPrefsValues
-    val mainActivityComponentFactory: IMainActivityComponent.Factory
-    val prefsActivityComponentFactory: IPrefsActivityComponent.Factory
-    val exportActivityComponentFactory: IExportActivityComponent.Factory
-    val bootReceiverComponentFactory: IBootReceiverComponent.Factory
+@ActivityScope
+@Subcomponent
+interface IBootReceiverComponent {
+    @Subcomponent.Factory
+    interface Factory {
+        fun create(): IBootReceiverComponent
+    }
 
-    fun inject(mainApp: MainApp)
+    fun inject(bootReceiver: BootReceiver)
 }
