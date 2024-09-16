@@ -42,7 +42,7 @@ class BatteryMonitorThread @Inject constructor(
         private val TAG: String = BatteryMonitorThread::class.java.simpleName
 
         const val ON_POWER_PAUSE_MS   = 1000L * 5       // 5 seconds
-        const val ON_BATTERY_PAUSE_MS = 1000L * 30      // 60 seconds
+        const val ON_BATTERY_PAUSE_MS = 1000L * 60      // 60 seconds
 
         const val HOURLY_REPORT_MS = 1000L * 60 * 60    // 1 hour
     }

@@ -33,6 +33,7 @@ import com.alflabs.tcm.app.AppPrefsValues
 import com.alflabs.tcm.app.LauncherRole
 import com.alflabs.tcm.app.MainApp
 import com.alflabs.tcm.dagger.ActivityScope
+import com.alflabs.tcm.util.Analytics
 import com.alflabs.tcm.util.GlobalDebug
 import javax.inject.Inject
 
@@ -47,6 +48,7 @@ class PrefsActivity : AppCompatActivity() {
         private const val DIALOG_FRAGMENT_TAG = "androidx.preference.PreferenceFragment.DIALOG"
     }
 
+    @Inject internal lateinit var analytics: Analytics
     @Inject internal lateinit var launcherRole: LauncherRole
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,6 +69,11 @@ class PrefsActivity : AppCompatActivity() {
                 .commit()
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        analytics.sendPageView("Prefs Activity", "/prefs")
     }
 
     class SettingsFragment(

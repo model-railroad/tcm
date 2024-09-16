@@ -17,6 +17,8 @@
  */
 package com.alflabs.tcm.util
 
+import android.net.Uri
+import android.os.SystemClock
 import android.util.Log
 import com.alflabs.tcm.app.AppPrefsValues
 import okhttp3.MediaType
@@ -25,6 +27,7 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
 import java.io.IOException
+import java.net.URLEncoder
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -66,7 +69,11 @@ class Analytics @Inject constructor() : ThreadLoop() {
         private const val IDLE_SLEEP_MAX_MS = 1000L * 60 * 5 // 5 minutes max error retry
         private const val MAX_ERROR_NUM = 2
 
-        private val GA4_URL = ("https://www.google-analytics.com/"
+        private val GA4_V2_URL = ("https://www.google-analytics.com/"
+                + (if (VERBOSE_DEBUG) "debug/" else "") // Note: there is no DEBUG, this will 404
+                + "g/collect")
+
+        private val GA4_MP_URL = ("https://www.google-analytics.com/"
                 + (if (VERBOSE_DEBUG) "debug/" else "")
                 + "mp/collect")
 
@@ -77,6 +84,11 @@ class Analytics @Inject constructor() : ThreadLoop() {
     private val mPayloads = LinkedBlockingDeque<Payload>()
     private val mExecutor = Executors.newSingleThreadScheduledExecutor()
     private var mErrorSleepMs = IDLE_SLEEP_MS
+
+    private var v2ClientId = ""    // filled when first page_view is sent
+    private var v2SessionId = ""    // filled when first page_view is sent
+    private var v2SessionCount = 0
+    private var v2SequenceNum = 0
 
     private var analyticsId = ""
     private var mGA4ClientId = ""
@@ -98,6 +110,11 @@ class Analytics @Inject constructor() : ThreadLoop() {
 
         if (DEBUG) Log.d(TAG, "Tracking ID: $analyticsId")
         if (DEBUG) Log.d(TAG, "GA4 Client : $mGA4ClientId")
+
+        // This is currently called each time the activity starts, which is a good
+        // indicator that a "new session" is starting
+        v2SessionId = ""
+        v2SessionCount++
     }
 
     @Throws(Exception::class)
@@ -193,6 +210,11 @@ class Analytics @Inject constructor() : ThreadLoop() {
             val timeWithSeconds = LocalDateTime.now().format(formatter)
             val timeWithMinutes = timeWithSeconds.substring(0, timeWithSeconds.length - 2)
 
+            val url = String.format(
+                "%s?api_secret=%s&measurement_id=%s",
+                GA4_MP_URL, mGA4AppSecret, analyticsId
+            )
+
             var payload: String = String.format(
                 "{" +
                         "'client_id':'%s'" +  // GA4 client id
@@ -220,6 +242,7 @@ class Analytics @Inject constructor() : ThreadLoop() {
             mPayloads.offerFirst(
                 Payload(
                     System.currentTimeMillis(),
+                    url,
                     payload,
                     String.format("Event [c:%s a:%s l:%s v:%s]", category, action, label, value)
                 )
@@ -230,33 +253,87 @@ class Analytics @Inject constructor() : ThreadLoop() {
     }
 
 
+    @Synchronized
+    fun sendPageView(
+        pageTitle: String,
+        pageLocation: String
+    ) {
+        val analyticsId = analyticsId
+        if (analyticsId.isEmpty()) {
+            if (DEBUG) Log.d(TAG, "Event Ignored -- No Tracking ID")
+            return
+        }
+
+        try {
+            val _et = SystemClock.currentThreadTimeMillis().toString()
+
+            val _p = System.currentTimeMillis().toString()
+
+            if (v2SessionId.isEmpty()) {
+                v2SessionId = _p
+            }
+            if (v2ClientId.isEmpty()) {
+                v2ClientId = "$mGA4ClientId-$mGA4AppSecret".hashCode().toString()
+                v2ClientId = "$v2ClientId.$v2ClientId"
+            }
+
+            v2SequenceNum++
+
+            val url = GA4_V2_URL +
+                    "?v=2" +
+                    "&tid=$analyticsId" +
+                    "&en=page_view" +
+                    "&_p=$_p" +
+                    "&cid=$v2ClientId" +
+                    "&_s=$v2SequenceNum" +
+                    "&sid=$v2SessionId" +
+                    "&sct=$v2SessionCount" +
+                    "&dt=${Uri.encode(pageTitle)}" +
+                    "&dl=${Uri.encode(pageLocation)}" +
+                    "&_et=${_et}"
+
+            val payload = ""
+
+            mPayloads.offerFirst(
+                Payload(
+                    System.currentTimeMillis(),
+                    url,
+                    payload,
+                    "PageView [$pageTitle]"
+                )
+            )
+        } catch (e: Exception) {
+            if (DEBUG) Log.d(TAG, "PageView Encoding ERROR: $e")
+        }
+    }
     private inner class Payload(
-        private val mCreatedWallTimeMS: Long,
-        private val mPayload: String,
-        private val mDebugLog: String
+        private val createdWallTimeMS: Long,
+        private val url: String,
+        private val jsonPayload: String,
+        private val debugLog: String
     ) {
         /** Must be executed in background thread.  */
         fun send(wallTimeMS: Long): Boolean {
-            val deltaTS = wallTimeMS - mCreatedWallTimeMS
+            val deltaTS = wallTimeMS - createdWallTimeMS
 
             // Queue Time:
             // https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#qt
             // GA4 has timestamp_micros at the outer level:
             // https://developers.google.com/analytics/devguides/collection/protocol/ga4/reference?client_type=firebase#payload
-            val payload = mPayload.replaceFirst(
+            val payload = jsonPayload.replaceFirst(
                 "\\{".toRegex(),
-                String.format(Locale.US, "{'timestamp_micros':%d,", mCreatedWallTimeMS * 1000 /* ms to μs */)
+                String.format(Locale.US, "{'timestamp_micros':%d,", createdWallTimeMS * 1000 /* ms to μs */)
             )
 
             try {
-                val response = sendPayloadGA4(payload)
+                val response = sendPayloadGA4(url, payload)
 
                 val code = response.code()
                 if (DEBUG) Log.d(
                     TAG, String.format(
                         Locale.US,
                         "%s delta: %d ms, code: %d",
-                        mDebugLog, deltaTS, code
+                        debugLog, deltaTS, code
                     )
                 )
 
@@ -275,15 +352,11 @@ class Analytics @Inject constructor() : ThreadLoop() {
 
         /** Must be executed in background thread. Caller must call Response.close().  */
         @Throws(IOException::class)
-        private fun sendPayloadGA4(payload: String): Response {
+        private fun sendPayloadGA4(url: String, payload: String): Response {
             if (VERBOSE_DEBUG) {
-                Log.d(TAG, "GA4 Event Payload: $payload")
+                Log.d(TAG, "GA4 URL: $url")
+                Log.d(TAG, "GA4 Payload: $payload")
             }
-
-            val url = String.format(
-                "%s?api_secret=%s&measurement_id=%s",
-                GA4_URL, mGA4AppSecret, analyticsId
-            )
 
             val builder = Request.Builder().url(url)
 

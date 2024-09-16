@@ -29,6 +29,7 @@ import com.alflabs.tcm.app.AppMonitor
 import com.alflabs.tcm.app.AppPrefsValues
 import com.alflabs.tcm.app.MainApp
 import com.alflabs.tcm.dagger.ActivityScope
+import com.alflabs.tcm.util.Analytics
 import com.alflabs.tcm.util.GlobalDebug
 import javax.inject.Inject
 
@@ -40,6 +41,7 @@ class ExportActivity : AppCompatActivity() {
         private val DEBUG: Boolean = GlobalDebug.DEBUG
     }
 
+    @Inject internal lateinit var analytics: Analytics
     @Inject internal lateinit var appPrefsValues: AppPrefsValues
     private lateinit var editText: EditText
 
@@ -67,6 +69,11 @@ class ExportActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btn_load).setOnClickListener { confirmLoad() }
         findViewById<Button>(R.id.btn_share).setOnClickListener { doShare() }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        analytics.sendPageView("Export Activity", "/export")
     }
 
     private fun prefsToText(): String {
