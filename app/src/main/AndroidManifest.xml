@@ -4,8 +4,10 @@
 
     <!-- For camera streaming and GA access. -->
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <!-- For ACTION_BOOT_COMPLETED on API 28 and below. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- For App Wake Lock. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
             android:name=".app.MainApp"

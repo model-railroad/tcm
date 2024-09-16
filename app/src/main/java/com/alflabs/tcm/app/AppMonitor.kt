@@ -35,9 +35,9 @@ import javax.inject.Singleton
 class AppMonitor @Inject constructor(
     private val logger: ILogger,
     private val analytics: Analytics,
+    private val appWakeLock: AppWakeLock,
     private val appPrefsValues: AppPrefsValues,
     private val batteryMonitorThread : BatteryMonitorThread,
-    @AppQualifier internal var appContext: Context
 ) {
     companion object {
         private val TAG: String = AppMonitor::class.java.simpleName
@@ -110,7 +110,6 @@ class AppMonitor @Inject constructor(
                 }
             }
 
-
             val debugDisplay = appPrefsValues.systemDebugDisplay2()
 
             grabbersManager = GrabbersManagerThread(
@@ -121,13 +120,14 @@ class AppMonitor @Inject constructor(
                 activity.videoViewHolders)
 
             grabbersManager?.start()
-
+            appWakeLock.acquire()
         }
 
         stopStreamingRunnable = Runnable {
             // This executes in the appHandler on the main app UI thread.
             logger.log(TAG, "onStopStreaming")
 
+            appWakeLock.release()
             grabbersManager?.requestStopAsync()
             grabbersManager = null
 

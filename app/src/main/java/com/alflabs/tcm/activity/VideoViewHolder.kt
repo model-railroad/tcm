@@ -26,6 +26,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.alflabs.tcm.R
 import com.alflabs.tcm.app.AppPrefsValues
+import com.alflabs.tcm.app.AppWakeLock
 import com.alflabs.tcm.util.FpsMeasurer
 import com.alflabs.tcm.util.GlobalDebug
 
@@ -86,7 +87,9 @@ class VideoViewHolder(
         if (DEBUG) Log.d(TAG, "VideoViewHolder $cameraIndex -- START")
         setStatus("Starting")
         runOnUiThread.run {
-            imageView.keepScreenOn = true
+            if (AppWakeLock.USE_KEEP_SCREEN_ON) {
+                imageView.keepScreenOn = true
+            }
             fpsView.text = fpsView.context.getString(R.string.main__starting_cam, cameraIndex)
 
             labelView.text = label

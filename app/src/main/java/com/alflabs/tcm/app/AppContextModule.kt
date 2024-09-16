@@ -17,8 +17,8 @@
  */
 package com.alflabs.tcm.app
 
-import android.app.role.RoleManager
 import android.content.Context
+import android.os.PowerManager
 import com.alflabs.tcm.dagger.AppQualifier
 import com.alflabs.tcm.util.ILogger
 import dagger.Module
@@ -26,7 +26,7 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-class AppContextModule(private val mContext: Context) {
+class AppContextModule(private val context: Context) {
     /**
      * Provides an Android context, specifically this one from the app component.
      * Users request it by using the @AppQualifier to distinguish it from the one provided by the activity.
@@ -34,7 +34,7 @@ class AppContextModule(private val mContext: Context) {
     @Provides
     @AppQualifier
     fun providesContext(): Context {
-        return mContext
+        return context
     }
 
     /**
@@ -49,6 +49,12 @@ class AppContextModule(private val mContext: Context) {
         return AppLogger()
     }
 
+    @Provides
+    @Singleton
+    fun providesPowerManager(): PowerManager {
+        return context.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+    }
+
 //    @Provides
 //    @Singleton
 //    fun providesAlarmManager(): AlarmManager {
@@ -59,12 +65,6 @@ class AppContextModule(private val mContext: Context) {
 //    @Singleton
 //    fun providesWifiManager(): WifiManager {
 //        return mContext.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-//    }
-//
-//    @Provides
-//    @Singleton
-//    fun providesPowerManager(): PowerManager {
-//        return mContext.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
 //    }
 //
 //    @Provides
