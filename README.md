@@ -30,13 +30,19 @@ The following features are unique to TCM:
   boots.
 - The application disconnects from the video cameras automatically when the tablet power is off.
   In our case, the museum's layout is only powered from 9am to 5pm. When the layout's power is off,
-  the tablet automatically stops processing video and enters a sleep mode (to preserve battery)
-  and the video connection automatically restarts when power is turned back on the next day.
+  the tablet automatically stops processing video and enters a sleep mode to preserve battery.
+  The video connection automatically restarts when power is turned back on the next day.
   This is designed so that layout operations and museum staff have no need to bother turning on
   the tablet during normal business days.
 - The video feeds can be rotated, zoomed, and panned. These are recorded in settings.
 - The application can detect motion on specific parts of the video, in order to highlight it
   to the operators and call their attention when specific part of the track shows train movement.
+
+TL;DR, the most important feature is to have a "hands free" kiosk-like behavior:
+
+- The goal is that the tablet is powered by the model train layout.
+  The tablet stays on all the time and goes into sleep mode when the layout is turned off.
+  Videos start streaming automatically when the model train layout is powered on.
 
 
 ## Implementation Notes
@@ -45,13 +51,18 @@ The app is designed to run on a 10-inch tablet in landscape mode.
 It should work on other devices, however no effort is being made (so far) in optimizing
 the screen layout for different form factors.
 
+The minimum supported API level is 23, a.k.a. "Android 6", a.k.a. `M`.
+
 To achieve the desired "unattended" behavior, the tablet is typically configured as
 follows in the Android system settings:
 
-- Display > Screen Timeout : 30 seconds
-- Display > Screen Saver : None
-- Security > Screen Lock : None
-- Developer Options > Keep Screen On When Charging : Off
+- Display > Screen Timeout : 30 seconds or 1 minute.
+- Display > Screen Saver : None.
+- Security > Screen Lock : None.
+- Developer Options > Keep Screen On When Charging : Off.
+
+Ideally the tablet would be powered via a USB brick to the same power source that powers
+the cameras monitoring the model train layout.
 
 The tablet is to be treated as an "appliances" -- it should only contain this application,
 and should be considered unsecured. This can be achieved two ways:
@@ -62,14 +73,15 @@ and should be considered unsecured. This can be achieved two ways:
   make sure that the Google Play account has a PIN to install paid apps (GP does not support
   a PIN to install free apps, unfortunately).
 
-Note that this is not a locked Kiosk mode: Anyone with access to the tablet can change anything.
+Note that this is not a locked kiosk mode: Anyone with access to the tablet can change anything.
 Publicly visible devices at the Randall Museum Model Railroad are consequently placed behind a
 locked glass.
 
 
+
 ### Start at Boot / Home Launcher
 
-On Android API 21 up to 28 (Android 5/L TO 9/P), the implementation of the "Start at Boot" feature
+On Android API 23 up to 28 (Android 6/M to 9/P), the implementation of the "Start at Boot" feature
 uses the typical Android pattern:
 
 - A "Boot Receiver" is declared in the app's AndroidManifest to respond to `BOOT_COMPLETED`.
@@ -78,34 +90,30 @@ uses the typical Android pattern:
   at boot is activated, the MainActivity is started using an intent.
 
 This mechanism however is no longer possible starting with API 29 (Android 10/Q).
+
 Instead, on these devices, the application can be set as the default home launcher via the
 preferences. This is done using the `RoleManager` which only allows the application to set
 itself as the home launcher app by presenting a chooser dialog to the user.
+
 There is no way to use the same `RoleManager` to "reset" the home launcher to the default
 tablet app. Instead, when the preference is unchecked in TCM, the Android Settings "Default App"
 screen is shown, which allows the user to change the launcher app.
 
 As indicated in the previous section, even when the app is set as a home launcher, the user
 can still "escape" the app by accessing the settings from the drop-down notification bar.
-This is not a locked Kiosk mode: Anyone with access to the tablet can change anything.
+This is not a locked kiosk mode: Anyone with access to the tablet can change anything.
 
 
 ### Foreground/Background Behavior
 
-The [Randall Train Automation Controller](https://www.alfray.com/trains/randall/rtac.html)
-software is a similar Android application that displays the state of the automation to
-museum visitors and train operators. One thing this application's implementation does is
-use a background service to maintain a constant connection with the main train automation computer.
-
-We are not using this here. All behavior happens only when the main activity is in foreground.
-
-Instead, all the behavior logic is tied to the `MainActivity`:
+This app does not use a background service.
+All behavior happens only when the main activity is in foreground.
 
 - When the activity starts, the power state is checked, and the video streaming and processing
   can start if and when the tablet is properly powered.
 - When the activity is active and the tablet is on battery power, video streaming and processing
-  pauses, and allow the tablet to sleep to save on battery.
-- When the activity is paused, all processing is also stopped, including power state monitoring.
+  pauses, in order to allow the tablet to sleep and save on battery.
+- When the activity is paused, all processing is also stopped.
 
 
 
@@ -121,25 +129,16 @@ To monitor the charging state, Android provides the `ACTION_BATTERY_CHANGED` int
 the `BatteryManager.isCharging()` function (only API 23 and above).
 We do not need any AndroidManifest broadcast to monitor the charging state outside of the
 application's lifecycle.
+
 This is periodically checked using a thread in the main activity.
 
-
-The behavior should be:
-
-- When the main activity starts, start a thread to check the power state.
-    - The thread runs the check in a loop with a fairly long pause, which timeout
-      depends on whether the app is streaming or idle.
-- When the main activity is paused, stop the thread.
-- When power is on:
-  - Acquire a wake lock via the View.screen_on attribute, to prevent the display from sleeping.
-  - Start video streaming.
-- When power is off, or the main activity is paused:
-  - Stop video streaming.
-  - Release the View.screen_on wake lock, to ensure the screen can dim and enter sleep mode.
-
-Starting with Android 10 (API 29), it is no longer possible to use the WiFiManager feature to
-force enable the wifi and automatically select an SSID to connect to, and thus this feature is
-no longer offered.
+When the main activity and the tablet actually powered, video streaming automatically starts.
+At that point, the app also acquires a _wake lock_ to ensure that the tablet does not into sleep
+mode. An early implementation used the View `keepScreenOn` attribute for that purpose however that
+has turned out to be oddly unreliable when the app is set as the main Home app. Instead, the
+implementation has been switched to use the
+(`Wake Lock` API)[https://developer.android.com/develop/background-work/background-tasks/awake/wakelock],
+which requires the associated `android.permission.WAKE_LOCK` permission.
 
 
 
@@ -198,7 +197,7 @@ Phase 1 (fixes after initial prototype deployment):
 - ✅ Add 3-dot menu instead of single pref button.
 - ✅ Support 3 cameras.
 
-Phase 2 (optional):
+Phase 2:
 
 - ✅ App: Rewrite image transform to be a custom pref dialog with (rot,zoom,pan).
 - ✅ App: Consider using a app monitor rather than activity monitor for main processing
@@ -207,10 +206,15 @@ Phase 2 (optional):
 - ✅ App: Import/Export Cameras Configuration (via simple text data sharing).
 - ✅ Admin: Remove unused features: BootReceiver, WifiLock (not available on API 29+).
 - ✅ Admin: Fix Gradle to only pack required JavaCV JNI Libs.
-- ☐ App: Start at boot using Accessibility API.
-- ☐ App: GA hourly report of battery level.
+- ❌ App: Start at boot using Accessibility API (⇒ cannot be used to start the activity).
+- ✅ App: GA hourly report of battery level.
+- ✅ App: Reintroduce Boot Receiver (for API 28 and lower).
+- ✅ App: Switch from View KeepScreenOn to app-wide Wake Lock (seems more stable as a Home app).
 - ☐ Reintroduce preference to fill/fit in image view.
 - ☐ Reintroduce preference to fill/fit in image view.
+
+Phase 3:
+
 - ☐ Gamma correction on input images (via OpenCV LUT f.ex.)
 - ☐ Use OpenCV to detect motion.
 - ☐ Highlight videos w/ detected motion.

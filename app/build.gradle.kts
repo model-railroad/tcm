@@ -30,8 +30,8 @@ android {
 
     defaultConfig {
         applicationId = "com.alflabs.tcm"
-        minSdk = 23
-        targetSdk = 34
+        minSdk = 23                 // Android 6, aka M.
+        targetSdk = 34              // Android 14, aka U.
         versionCode = 1023
         versionName = "0.0.2"
 
