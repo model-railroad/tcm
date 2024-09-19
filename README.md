@@ -137,7 +137,7 @@ At that point, the app also acquires a _wake lock_ to ensure that the tablet doe
 mode. An early implementation used the View `keepScreenOn` attribute for that purpose however that
 has turned out to be oddly unreliable when the app is set as the main Home app. Instead, the
 implementation has been switched to use the
-(`Wake Lock` API)[https://developer.android.com/develop/background-work/background-tasks/awake/wakelock],
+[`Wake Lock` API](https://developer.android.com/develop/background-work/background-tasks/awake/wakelock),
 which requires the associated `android.permission.WAKE_LOCK` permission.
 
 
@@ -210,7 +210,6 @@ Phase 2:
 - ✅ App: GA hourly report of battery level.
 - ✅ App: Reintroduce Boot Receiver (for API 28 and lower).
 - ✅ App: Switch from View KeepScreenOn to app-wide Wake Lock (seems more stable as a Home app).
-- ☐ Reintroduce preference to fill/fit in image view.
 - ☐ Reintroduce preference to fill/fit in image view.
 
 Phase 3:

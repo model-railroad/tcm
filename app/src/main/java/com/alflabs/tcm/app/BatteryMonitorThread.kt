@@ -74,8 +74,9 @@ class BatteryMonitorThread @Inject constructor(
                 val battPercent = (lastLevel.toFloat() * 100f / lastScale.toFloat()).toInt()
                 logger.log(TAG, "Battery Percent: $battPercent%")
                 analytics.sendEvent(
-                    category = "TCM_BattPct",
-                    action = if (isPlugged) "On" else "Off",
+                    category = "TCM Hourly",
+                    name = "BattPct",
+                    label = if (isPlugged) "On" else "Off",
                     value = battPercent.toString()
                 )
             }
@@ -105,9 +106,9 @@ class BatteryMonitorThread @Inject constructor(
     private fun sendOnStateChange(newState: Boolean) {
         if (!mQuit) {
             analytics.sendEvent(
-                category = "TCM_Plugged",
-                action = if (newState) "On" else "Off",
-                value = "1"
+                category = "TCM App",
+                name = if (newState) "On Power" else "On Battery",
+                value = if (newState) "1" else "0",
             )
 
             val callback = onStateChange.get()

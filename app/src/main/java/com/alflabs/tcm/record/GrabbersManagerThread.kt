@@ -93,8 +93,8 @@ class GrabbersManagerThread(
                     cams.forEach { it.sendStat(analytics) }
 
                     analytics.sendEvent(
-                        category = "TCM",
-                        action = "MaxExGrabbers",
+                        category = "TCM Hourly",
+                        name = "MaxExGrabbers",
                         value = maxExGrabbersCount.toString())
                     maxExGrabbersCount = 0
 

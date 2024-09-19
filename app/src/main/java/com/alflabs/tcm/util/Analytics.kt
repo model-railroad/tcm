@@ -27,7 +27,6 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
 import java.io.IOException
-import java.net.URLEncoder
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -192,7 +191,7 @@ class Analytics @Inject constructor() : ThreadLoop() {
     @Synchronized
     fun sendEvent(
         category: String,
-        action: String,
+        name: String,
         label: String = "",
         value: String = "",
     ) {
@@ -229,7 +228,7 @@ class Analytics @Inject constructor() : ThreadLoop() {
                         ",'date_sec':'%s'" +  // date with seconds
                         ",'date_min':'%s'",  // date with minutes
                 mGA4ClientId,
-                action,
+                name,
                 category,
                 label,
                 timeWithSeconds,
@@ -248,7 +247,7 @@ class Analytics @Inject constructor() : ThreadLoop() {
                     System.currentTimeMillis(),
                     url,
                     payload,
-                    String.format("Event [c:%s a:%s l:%s v:%s]", category, action, label, value)
+                    String.format("Event [c:%s a:%s l:%s v:%s]", category, name, label, value)
                 )
             )
         } catch (e: Exception) {
