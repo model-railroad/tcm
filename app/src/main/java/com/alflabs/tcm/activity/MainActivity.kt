@@ -163,7 +163,7 @@ class MainActivity : AppCompatActivity() {
             Log.e(TAG, "@@ Uncaught Exception in thread ${thread.name}", exception)
             runOnUiThread {
                 analytics.sendEvent(
-                    category = "TCM App",
+                    category = "TCM_App",
                     name = "Exception",
                     label = "${thread.name} ${exception.javaClass.simpleName}"
                 )
@@ -192,7 +192,7 @@ class MainActivity : AppCompatActivity() {
         val menuBtn = findViewById<ImageButton>(R.id.menu_btn)
         menuBtn.setOnClickListener { onMenuButton(it) }
 
-        analytics.sendEvent(category = "TCM App", name = "Start", value = "1")
+        analytics.sendEvent(category = "TCM_App", name = "Start", value = 1)
     }
 
     // Invoked after onStart or onPause
@@ -211,7 +211,7 @@ class MainActivity : AppCompatActivity() {
         if (DEBUG) Log.d(TAG, "onPause")
         super.onPause()
         logger.removeDelegate()
-        analytics.sendEvent(category = "TCM App", name = "Pause", value = "0")
+        analytics.sendEvent(category = "TCM_App", name = "Pause", value = 0)
         appMonitor.onActivityPause()
     }
 

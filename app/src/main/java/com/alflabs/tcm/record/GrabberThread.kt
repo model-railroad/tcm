@@ -100,10 +100,10 @@ class GrabberThread(
             )
 
             analytics.sendEvent(
-                category = "TCM Stream",
+                category = "TCM_Stream",
                 name = "Start",
                 label = camIndex.toString(),
-                value = "1")
+                value = 1)
 
             // Note that frame is reused for each frame recording
             var frame: Frame? = null
@@ -125,18 +125,18 @@ class GrabberThread(
 
             logger.log(TAG, "GrabberThread $camIndex > end while: quit ($mQuit) or frame ($frame)")
             analytics.sendEvent(
-                category = "TCM Stream",
+                category = "TCM_Stream",
                 name = if (mQuit) "Stop" else "Error",
                 label = camIndex.toString(),
-                value = "0")
+                value = 0)
             grabber.flush()
 
         } catch (e: FrameGrabber.Exception) {
             analytics.sendEvent(
-                category = "TCM Stream",
-                name = "Error",
+                category = "TCM_Stream",
+                name = "Disconnected",
                 label = camIndex.toString(),
-                value = "0")
+                value = 0)
             renderer.setStatus("Disconnected")
             renderer.pingAlive()
 

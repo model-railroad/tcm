@@ -76,9 +76,7 @@ class Analytics @Inject constructor() : ThreadLoop() {
 
         // This is an _attempt_ at using the GA4 gtag.js page view mechanism.
         // This does not seem to properly work yet: page view events are not showing in GA.
-        private val GA4_V2_URL = ("https://www.google-analytics.com/"
-                + (if (VERBOSE_DEBUG) "debug/" else "") // Note: there is no DEBUG, this will 404
-                + "g/collect")
+        private val GA4_V2_URL = "https://www.google-analytics.com/g/collect"
 
         private val MEDIA_TYPE = MediaType.parse("text/plain")
     }
@@ -188,12 +186,24 @@ class Analytics @Inject constructor() : ThreadLoop() {
         if (DEBUG) Log.d(TAG, "End Loop")
     }
 
+    /**
+     * Logs a GA4 custom event.
+     *
+     * GA4's main event attributes are event name and it's optional value.
+     * These have contraints:
+     * - The name must NOT have spaces. Keep it [AZa-z-] for best effect.
+     * - The value is provided as a USD value and thus can be an integer.
+     *
+     * GA4 does not natively support "event_category" nor "event_label". These are provided as
+     * custom fields for GA2 backward compatibility. To be used in GA4, they need to be added to
+     * the custom event lists on the stream definition.
+     */
     @Synchronized
     fun sendEvent(
         category: String,
         name: String,
         label: String = "",
-        value: String = "",
+        value: Int? = null,
     ) {
         val analyticsId = analyticsId
         if (analyticsId.isEmpty()) {
@@ -234,11 +244,9 @@ class Analytics @Inject constructor() : ThreadLoop() {
                 timeWithSeconds,
                 timeWithMinutes
             )
-            try {
-                val value_ = value.toInt()
-                payload += String.format(Locale.US, ",'value':%d,'currency':'USD'", value_)
-            } catch (_: Exception) {
-                // no-op
+
+            value?.let {
+                payload += String.format(Locale.US, ",'value':%d,'currency':'USD'", it)
             }
             payload += "}}]}"
 
@@ -256,6 +264,10 @@ class Analytics @Inject constructor() : ThreadLoop() {
     }
 
 
+    /**
+     * Logs a pageview. This is experimental, and actually currently doesn't seem to work
+     * with the GA4 page view analytics. These events can be found via Looker Studio.
+     */
     @Synchronized
     fun sendPageView(
         pageTitle: String,
