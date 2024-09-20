@@ -164,7 +164,7 @@ class MainActivity : AppCompatActivity() {
             runOnUiThread {
                 analytics.sendEvent(
                     category = "TCM_App",
-                    name = "Exception",
+                    name = "App_Exception",
                     label = "${thread.name} ${exception.javaClass.simpleName}"
                 )
             }
@@ -192,7 +192,7 @@ class MainActivity : AppCompatActivity() {
         val menuBtn = findViewById<ImageButton>(R.id.menu_btn)
         menuBtn.setOnClickListener { onMenuButton(it) }
 
-        analytics.sendEvent(category = "TCM_App", name = "Start", value = 1)
+        analytics.sendEvent(category = "TCM_App", name = "App_Start", value = 1)
     }
 
     // Invoked after onStart or onPause
@@ -211,7 +211,7 @@ class MainActivity : AppCompatActivity() {
         if (DEBUG) Log.d(TAG, "onPause")
         super.onPause()
         logger.removeDelegate()
-        analytics.sendEvent(category = "TCM_App", name = "Pause", value = 0)
+        analytics.sendEvent(category = "TCM_App", name = "App_Pause", value = 0)
         appMonitor.onActivityPause()
     }
 

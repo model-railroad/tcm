@@ -75,7 +75,7 @@ class BatteryMonitorThread @Inject constructor(
                 logger.log(TAG, "Battery Percent: $battPercent%")
                 analytics.sendEvent(
                     category = "TCM_Hourly",
-                    name = "Batt_Pct",
+                    name = "Hourly_Batt_Pct",
                     label = if (isPlugged) "On" else "Off",
                     value = battPercent
                 )
@@ -107,7 +107,7 @@ class BatteryMonitorThread @Inject constructor(
         if (!mQuit) {
             analytics.sendEvent(
                 category = "TCM_App",
-                name = if (newState) "On_Power" else "On_Battery",
+                name = if (newState) "App_Power" else "App_Battery",
                 value = if (newState) 1 else 0,
             )
 

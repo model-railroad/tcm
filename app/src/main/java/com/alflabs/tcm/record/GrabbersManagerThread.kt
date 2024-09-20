@@ -94,7 +94,7 @@ class GrabbersManagerThread(
 
                     analytics.sendEvent(
                         category = "TCM_Hourly",
-                        name = "MaxExGrabbers",
+                        name = "Hourly_MaxExGrabbers",
                         value = maxExGrabbersCount)
                     maxExGrabbersCount = 0
 

@@ -127,7 +127,7 @@ class GrabberHolder(
     fun sendStat(analytics: Analytics) {
         analytics.sendEvent(
             category = "TCM_Stream",
-            name = "MaxDelayMS",
+            name = "Stream_MaxDelayMS",
             label = index.toString(),
             value = maxDelayMS.toInt())
         maxDelayMS = 0
