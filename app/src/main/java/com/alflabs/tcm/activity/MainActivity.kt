@@ -203,7 +203,7 @@ class MainActivity : AppCompatActivity() {
         hideNavigationBar()
         appMonitor.onActivityResume(this)
 
-        analytics.sendPageView("Main Activity", "/main")
+        analytics.sendActivityView("MainActivity", "Main")
     }
 
     // Next state is either onResume or onStop

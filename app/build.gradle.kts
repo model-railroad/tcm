@@ -169,6 +169,8 @@ dependencies {
     implementation(libs.androidx.preference.ktx)
     implementation(libs.material)
     implementation(libs.squareup.okhttp3)
+    implementation(libs.jackson.core)
+    implementation(libs.jackson.databind)
     // implementation(libs.kotlinx.coroutines) -- not currently used
     implementation(kotlin("reflect"))
 

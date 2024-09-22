@@ -73,7 +73,7 @@ class ExportActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        analytics.sendPageView("Export Activity", "/export")
+        analytics.sendActivityView("ExportActivity", "Export")
     }
 
     private fun prefsToText(): String {

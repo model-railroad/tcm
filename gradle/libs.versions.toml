@@ -16,6 +16,7 @@ okhttpVersion = "3.10.0"
 javacvPluginVersion = "1.5.10"      # Use latest JavaCV plugin, independent of JNI libs below.
 desugarVersion = "2.1.1"
 daggerVersion = "2.49"
+jacksonVersion = "2.17.2"
 
 # JavaCV Versions
 # ---------------
@@ -59,6 +60,8 @@ material = { group = "com.google.android.material", name = "material", version.r
 squareup-okhttp3 = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttpVersion" }
 dagger-dagger = { group = "com.google.dagger", name = "dagger", version.ref = "daggerVersion" }
 dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "daggerVersion" }
+jackson-core = { group = "com.fasterxml.jackson.core", name = "jackson-core", version.ref = "jacksonVersion" }
+jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jacksonVersion" }
 
 ffmpeg-platform = { group= "org.bytedeco", name= "ffmpeg-platform", version.ref = "ffmpegVersion" }
 javacv-platform = { group = "org.bytedeco", name = "javacv-platform", version.ref = "javacvVersion" }

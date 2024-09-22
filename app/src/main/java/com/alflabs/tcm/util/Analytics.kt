@@ -17,10 +17,9 @@
  */
 package com.alflabs.tcm.util
 
-import android.net.Uri
-import android.os.SystemClock
 import android.util.Log
 import com.alflabs.tcm.app.AppPrefsValues
+import com.fasterxml.jackson.databind.ObjectMapper
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -74,10 +73,6 @@ class Analytics @Inject constructor() : ThreadLoop() {
                 + (if (VERBOSE_DEBUG) "debug/" else "")
                 + "mp/collect")
 
-        // This is an _attempt_ at using the GA4 gtag.js page view mechanism.
-        // This does not seem to properly work yet: page view events are not showing in GA.
-        private val GA4_V2_URL = "https://www.google-analytics.com/g/collect"
-
         private val MEDIA_TYPE = MediaType.parse("text/plain")
     }
 
@@ -85,11 +80,6 @@ class Analytics @Inject constructor() : ThreadLoop() {
     private val mPayloads = LinkedBlockingDeque<Payload>()
     private val mExecutor = Executors.newSingleThreadScheduledExecutor()
     private var mErrorSleepMs = IDLE_SLEEP_MS
-
-    private var v2ClientId = ""    // filled when first page_view is sent
-    private var v2SessionId = ""    // filled when first page_view is sent
-    private var v2SessionCount = 0
-    private var v2SequenceNum = 0
 
     private var analyticsId = ""
     private var mGA4ClientId = ""
@@ -111,11 +101,6 @@ class Analytics @Inject constructor() : ThreadLoop() {
 
         if (DEBUG) Log.d(TAG, "Tracking ID: $analyticsId")
         if (DEBUG) Log.d(TAG, "GA4 Client : $mGA4ClientId")
-
-        // This is currently called each time the activity starts, which is a good
-        // indicator that a "new session" is starting
-        v2SessionId = ""
-        v2SessionCount++
     }
 
     @Throws(Exception::class)
@@ -217,8 +202,6 @@ class Analytics @Inject constructor() : ThreadLoop() {
             // GA4:
             // https://developers.google.com/analytics/devguides/collection/protocol/ga4
 
-            // TBD revisit later with a proper GA4 implementation.
-            // Nothing ever goes wrong generating JSON using a String.format, right?
             val formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
             val timeWithSeconds = LocalDateTime.now().format(formatter)
             val timeWithMinutes = timeWithSeconds.substring(0, timeWithSeconds.length - 2)
@@ -228,27 +211,30 @@ class Analytics @Inject constructor() : ThreadLoop() {
                 GA4_MP_URL, mGA4AppSecret, analyticsId
             )
 
-            var payload: String = String.format(
-                "{" +
-                        "'client_id':'%s'" +  // GA4 client id
-                        ",'events':[{'name':'%s'" +  // event action
-                        ",'params':{'items':[]" +
-                        ",'event_category':'%s'" +  // event category
-                        ",'event_label':'%s'" +  // event label
-                        ",'date_sec':'%s'" +  // date with seconds
-                        ",'date_min':'%s'",  // date with minutes
-                mGA4ClientId,
-                name,
-                category,
-                label,
-                timeWithSeconds,
-                timeWithMinutes
-            )
-
-            value?.let {
-                payload += String.format(Locale.US, ",'value':%d,'currency':'USD'", it)
+            val mapper = ObjectMapper()
+            val root = mapper.createObjectNode().apply {
+                put("client_id", mGA4ClientId)
+                putArray("events").apply {
+                    addObject().apply {
+                        put("name", name)                   // aka event_action in GA2
+                        putObject("params").apply {
+                            if (category.isNotEmpty()) {
+                                put("event_category", category)
+                            }
+                            if (label.isNotEmpty()) {
+                                put("event_label", label)
+                            }
+                            value?.let {
+                                put("value", it)
+                                put("currency", "USD")
+                            }
+                            put("date_sec", timeWithSeconds)
+                            put("date_min", timeWithMinutes)
+                        }
+                    }
+                }
             }
-            payload += "}}]}"
+            val payload = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root)
 
             mPayloads.offerFirst(
                 Payload(
@@ -265,13 +251,15 @@ class Analytics @Inject constructor() : ThreadLoop() {
 
 
     /**
-     * Logs a pageview. This is experimental, and actually currently doesn't seem to work
-     * with the GA4 page view analytics. These events can be found via Looker Studio.
+     * Logs a screen transition using Acitivty info.
+     *
+     * See GA4 screen_view:
+     * https://developers.google.com/analytics/devguides/collection/protocol/ga4/reference/events#screen_view
      */
     @Synchronized
-    fun sendPageView(
-        pageTitle: String,
-        pageLocation: String
+    fun sendActivityView(
+        activityClassName: String,
+        screenName: String
     ) {
         val analyticsId = analyticsId
         if (analyticsId.isEmpty()) {
@@ -280,47 +268,45 @@ class Analytics @Inject constructor() : ThreadLoop() {
         }
 
         try {
-            val _et = SystemClock.currentThreadTimeMillis().toString()
+            val formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
+            val timeWithSeconds = LocalDateTime.now().format(formatter)
+            val timeWithMinutes = timeWithSeconds.substring(0, timeWithSeconds.length - 2)
 
-            val _p = System.currentTimeMillis().toString()
+            val url = String.format(
+                "%s?api_secret=%s&measurement_id=%s",
+                GA4_MP_URL, mGA4AppSecret, analyticsId
+            )
 
-            if (v2SessionId.isEmpty()) {
-                v2SessionId = _p
+            val mapper = ObjectMapper()
+            val root = mapper.createObjectNode().apply {
+                put("client_id", mGA4ClientId)
+                putArray("events").apply {
+                    addObject().apply {
+                        put("name", "screen_view")
+                        putObject("params").apply {
+                            put("screen_class", activityClassName)
+                            put("screen_name", screenName)
+                            put("date_sec", timeWithSeconds)
+                            put("date_min", timeWithMinutes)
+                        }
+                    }
+                }
             }
-            if (v2ClientId.isEmpty()) {
-                v2ClientId = "$mGA4ClientId-$mGA4AppSecret".hashCode().toString()
-                v2ClientId = "$v2ClientId.$v2ClientId"
-            }
-
-            v2SequenceNum++
-
-            val url = GA4_V2_URL +
-                    "?v=2" +
-                    "&tid=$analyticsId" +
-                    "&en=page_view" +
-                    "&_p=$_p" +
-                    "&cid=$v2ClientId" +
-                    "&_s=$v2SequenceNum" +
-                    "&sid=$v2SessionId" +
-                    "&sct=$v2SessionCount" +
-                    "&dt=${Uri.encode(pageTitle)}" +
-                    "&dl=${Uri.encode(pageLocation)}" +
-                    "&_et=${_et}"
-
-            val payload = ""
+            val payload = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root)
 
             mPayloads.offerFirst(
                 Payload(
                     System.currentTimeMillis(),
                     url,
                     payload,
-                    "PageView [$pageTitle]"
+                    String.format("Event [screen_view %s %s]", activityClassName, screenName)
                 )
             )
         } catch (e: Exception) {
-            if (DEBUG) Log.d(TAG, "PageView Encoding ERROR: $e")
+            if (DEBUG) Log.d(TAG, "ActivityView Encoding ERROR: $e")
         }
     }
+
     private inner class Payload(
         private val createdWallTimeMS: Long,
         private val url: String,

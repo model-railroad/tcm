@@ -74,7 +74,7 @@ class PrefsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        analytics.sendPageView("Prefs Activity", "/prefs")
+        analytics.sendActivityView("PrefsActivity", "Prefs")
     }
 
     class SettingsFragment(
