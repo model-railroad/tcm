@@ -17,12 +17,10 @@
  */
 package com.alflabs.tcm.app
 
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import com.alflabs.tcm.activity.MainActivity
-import com.alflabs.tcm.dagger.AppQualifier
 import com.alflabs.tcm.record.GrabbersManagerThread
 import com.alflabs.tcm.util.AVUtils
 import com.alflabs.tcm.util.Analytics
@@ -36,6 +34,7 @@ class AppMonitor @Inject constructor(
     private val logger: ILogger,
     private val analytics: Analytics,
     private val appWakeLock: AppWakeLock,
+    private val appWifiLock: AppWifiLock,
     private val appPrefsValues: AppPrefsValues,
     private val batteryMonitorThread : BatteryMonitorThread,
 ) {
@@ -121,12 +120,14 @@ class AppMonitor @Inject constructor(
 
             grabbersManager?.start()
             appWakeLock.acquire()
+            appWifiLock.acquire()
         }
 
         stopStreamingRunnable = Runnable {
             // This executes in the appHandler on the main app UI thread.
             logger.log(TAG, "onStopStreaming")
 
+            appWifiLock.release()
             appWakeLock.release()
             grabbersManager?.requestStopAsync()
             grabbersManager = null

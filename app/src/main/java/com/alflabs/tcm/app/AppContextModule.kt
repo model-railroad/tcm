@@ -18,6 +18,7 @@
 package com.alflabs.tcm.app
 
 import android.content.Context
+import android.net.wifi.WifiManager
 import android.os.PowerManager
 import com.alflabs.tcm.dagger.AppQualifier
 import com.alflabs.tcm.util.ILogger
@@ -55,16 +56,16 @@ class AppContextModule(private val context: Context) {
         return context.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
     }
 
+    @Provides
+    @Singleton
+    fun providesWifiManager(): WifiManager {
+        return context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+    }
+
 //    @Provides
 //    @Singleton
 //    fun providesAlarmManager(): AlarmManager {
 //        return mContext.applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-//    }
-//
-//    @Provides
-//    @Singleton
-//    fun providesWifiManager(): WifiManager {
-//        return mContext.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 //    }
 //
 //    @Provides

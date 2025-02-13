@@ -1,6 +1,6 @@
 /*
  * Project: TCM
- * Copyright (C) 2024 alf.labs gmail com,
+ * Copyright (C) 2025 alf.labs gmail com,
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@
 package com.alflabs.tcm.app
 
 import android.annotation.SuppressLint
-import android.os.PowerManager
-import android.os.PowerManager.WakeLock
+import android.net.wifi.WifiManager
+import android.os.Build
 import android.util.Log
 import com.alflabs.tcm.util.GlobalDebug
 import com.alflabs.tcm.util.ILogger
@@ -27,42 +27,44 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AppWakeLock @Inject constructor(
+class AppWifiLock @Inject constructor(
     private val logger: ILogger,
-    private val powerManager: PowerManager,
+    private val wifiManager: WifiManager,
 ) {
     companion object {
-        private val TAG: String = AppWakeLock::class.java.simpleName
+        private val TAG: String = AppWifiLock::class.java.simpleName
         private val DEBUG: Boolean = GlobalDebug.DEBUG
-
-        const val USE_KEEP_SCREEN_ON = false
     }
 
-    private var wakeLock: WakeLock? = null
+    private var wifiLock: WifiManager.WifiLock? = null
 
     @SuppressLint("WakelockTimeout")
     fun acquire() {
-        if (wakeLock != null) return
+        if (wifiLock != null) return
         try {
-            wakeLock = powerManager.newWakeLock(
-                PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
-                "tcm:appWakeLock")
-            wakeLock?.acquire()
-            logger.log(TAG, "Wake Lock Acquire")
+            wifiLock = wifiManager.createWifiLock(
+                // WIFI_MODE_FULL_LOW_LATENCY replaces WIFI_MODE_FULL on API 29+.
+                if (Build.VERSION.SDK_INT >= 29)
+                    WifiManager.WIFI_MODE_FULL_LOW_LATENCY
+                else
+                    WifiManager.WIFI_MODE_FULL,
+                "tcl:appWifiLock")
+            wifiLock?.acquire()
+            logger.log(TAG, "Wifi Lock Acquire")
         } catch (e: Throwable) {
-            Log.e(TAG, "Wake Lock Acquire failed", e)
+            Log.e(TAG, "Wifi Lock Acquire failed", e)
         }
     }
 
     fun release() {
-        if (wakeLock == null) return
+        if (wifiLock == null) return
         try {
-            logger.log(TAG, "Wake Lock Release")
-            wakeLock?.release()
+            logger.log(TAG, "Wifi Lock Release")
+            wifiLock?.release()
         } catch (e: Throwable) {
-            Log.e(TAG, "Wake Lock Release failed", e)
+            Log.e(TAG, "Wifi Lock Release failed", e)
         }
-        wakeLock = null
+        wifiLock = null
     }
 
 }
