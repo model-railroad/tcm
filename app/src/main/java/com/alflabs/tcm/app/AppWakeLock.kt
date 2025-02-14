@@ -26,6 +26,7 @@ import com.alflabs.tcm.util.ILogger
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/** Wake lock management -- active with the main activity. */
 @Singleton
 class AppWakeLock @Inject constructor(
     private val logger: ILogger,

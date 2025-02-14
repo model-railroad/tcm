@@ -36,6 +36,7 @@ class AppMonitor @Inject constructor(
     private val appWakeLock: AppWakeLock,
     private val appWifiLock: AppWifiLock,
     private val appPrefsValues: AppPrefsValues,
+    private val appNetworkRequest: AppNetworkRequest,
     private val batteryMonitorThread : BatteryMonitorThread,
 ) {
     companion object {
@@ -87,7 +88,10 @@ class AppMonitor @Inject constructor(
      * The main activity has been started and/or resumed.
      */
     fun onActivityResume(activity: MainActivity) {
+        logger.log(TAG, "onActivityResume")
         activityResumed = true
+
+        appNetworkRequest.acquire()
 
         // The Analytics ID could have changed (e.g. if the Pref activity has been used in between).
         analytics.setAnalyticsId(appPrefsValues)
@@ -153,6 +157,7 @@ class AppMonitor @Inject constructor(
      * any moment, or goes back to [onActivityResume].
      */
     fun onActivityPause() {
+        logger.log(TAG, "onActivityPause")
         // One pause, we tear down existing process threads. However we only request them
         // to stop and then clear references (to reduce memory leaks) but we do not *wait*
         // for them.
@@ -160,6 +165,13 @@ class AppMonitor @Inject constructor(
         startStreamingRunnable = null
         stopStreamingRunnable = null
         activityResumed = false
+    }
+
+    /**
+     * The main activity is being stopped.
+     */
+    fun onActivityStop() {
+        appNetworkRequest.release()
     }
 
 }

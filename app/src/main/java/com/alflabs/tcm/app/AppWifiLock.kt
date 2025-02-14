@@ -26,6 +26,7 @@ import com.alflabs.tcm.util.ILogger
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/** Wifi lock management -- active with the main activity. */
 @Singleton
 class AppWifiLock @Inject constructor(
     private val logger: ILogger,

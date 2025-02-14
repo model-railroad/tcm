@@ -219,6 +219,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         if (DEBUG) Log.d(TAG, "onStop")
         super.onStop()
+        appMonitor.onActivityStop()
     }
 
     // The end of the activity

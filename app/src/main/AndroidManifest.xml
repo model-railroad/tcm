@@ -6,8 +6,10 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- For ACTION_BOOT_COMPLETED on API 28 and below. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <!-- For App Wake Lock. -->
+    <!-- For App Wake Lock and Wifi Lock. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- For App Network Request. -->
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 
     <application
             android:name=".app.MainApp"
