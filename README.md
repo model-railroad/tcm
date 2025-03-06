@@ -2,8 +2,9 @@
 
 ## What is it
 
-"TCM" (aka the "Track Cam Monitor") is a simple Android application that
-connects to two RTSP cameras and displays their video feed on-screen.
+"TCM" (a.k.a. 'Track Cam Monitor') is designed to monitor a train staging yard
+rr remote tracks out of sight.
+This "kiosk mode" Android application displays feeds from RTSP cameras.
 
 The application is tailored to view specific train tracks on the Randall Museum
 Model Railroad. In our case, the goal is to display the mainline that is on the
