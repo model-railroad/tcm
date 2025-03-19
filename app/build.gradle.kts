@@ -16,6 +16,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import com.android.build.gradle.internal.tasks.factory.dependsOn
+import java.nio.file.Path
+import kotlin.io.path.forEachDirectoryEntry
+import kotlin.io.path.pathString
 
 plugins {
     alias(libs.plugins.android.application)
@@ -122,6 +125,17 @@ tasks.register<Copy>("javacppExtract") {
 }
 
 android {
+    val keystorePath = findCustomDebugKeystorePath()
+    if (!keystorePath.isNullOrEmpty()) {
+        signingConfigs {
+            getByName("debug") {
+                storeFile = file(keystorePath)
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
+        }
+    }
     sourceSets["main"].jniLibs.srcDir("${layout.buildDirectory.get()}/javacpp/lib/")
     project.tasks.preBuild.dependsOn("javacppExtract")
 
@@ -180,4 +194,31 @@ dependencies {
     // testImplementation(libs.junit)
     // androidTestImplementation(libs.androidx.junit)
     // androidTestImplementation(libs.androidx.espresso.core)
+}
+
+fun findCustomDebugKeystorePath(): String? {
+    // Finds a custom debug key matching the specific pattern.
+    // Adjust for your OS/path as needed.
+    // Returns null if not found, in which case the default SDK debug key will be used.
+    var keystorePath: String? = null
+    arrayOf("HOME", "USERPROFILE").forEach { envKey ->
+        val envDir = System.getenv(envKey)
+        if (keystorePath == null && envDir != null) {
+            try {
+                val evnPath = Path.of(envDir)
+                evnPath.forEachDirectoryEntry("r*-debug-*.keystore") { path ->
+                    if (keystorePath == null) {
+                        keystorePath = path.pathString
+                        println("@@ Custom Debug Key: $keystorePath")
+                    }
+                }
+            } catch (_: Exception) {
+                // Ignore all invalid access, etc
+            }
+        }
+    }
+    if (keystorePath == null) {
+        println("@@ Custom Debug Key not found, using default.")
+    }
+    return keystorePath
 }
