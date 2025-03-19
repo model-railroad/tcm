@@ -54,11 +54,11 @@
     <string name="prefs__cameras_transform_3">Camera 3 - Transform</string>
 
     <string name="export__activity_title">Cameras Configuration</string>
-    <string name="export__load_title">Reload</string>
+    <string name="export__load_title">Import</string>
     <string name="export__share_title">Share</string>
     <string name="export__edit_hint">Text representation of camera configuration</string>
-    <string name="export__load_dlg_title">Reload Cameras Configuration</string>
-    <string name="export__load_dlg_msg">This will erase all current cameras configuration and reload them using the values listed here. This operation cannot be undone.</string>
+    <string name="export__load_dlg_title">Import New Cameras Configuration</string>
+    <string name="export__load_dlg_msg">This will erase all current cameras configuration and import them using the values listed here. This operation cannot be undone.</string>
     <string name="export__load_dlg_cancel">Cancel</string>
-    <string name="export__load_dlg_ok">Reload</string>
+    <string name="export__load_dlg_ok">Import</string>
 </resources>
