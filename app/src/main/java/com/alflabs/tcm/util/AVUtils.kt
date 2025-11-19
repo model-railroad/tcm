@@ -26,7 +26,7 @@ class AVUtils {
     companion object {
         private val TAG: String = AVUtils::class.java.simpleName
         private val DEBUG: Boolean = GlobalDebug.DEBUG
-        private val DEBUG_FFMPEG = false
+        private val DEBUG_FFMPEG = true
 
         // From https://www.ffmpeg.org/doxygen/4.0/group__lavu__log__constants.html
         const val AV_LOG_TRACE = 56

@@ -21,6 +21,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import com.alflabs.tcm.activity.MainActivity
+import com.alflabs.tcm.record.GrabberCamInfo
 import com.alflabs.tcm.record.GrabbersManagerThread
 import com.alflabs.tcm.util.AVUtils
 import com.alflabs.tcm.util.Analytics
@@ -107,9 +108,12 @@ class AppMonitor @Inject constructor(
             logger.log(TAG, "onStartStreaming")
             grabbersManager?.stopSync()
 
-            val camUrls = buildMap<Int, String> {
+            val camInfos = buildMap<Int, GrabberCamInfo> {
                 for (index in 1..camerasCount) {
-                    put(index, appPrefsValues.camerasUrl(index))
+                    put(index,
+                        GrabberCamInfo(
+                            appPrefsValues.camerasUrl(index),
+                            appPrefsValues.camerasParams(index)))
                 }
             }
 
@@ -119,7 +123,7 @@ class AppMonitor @Inject constructor(
                 logger,
                 analytics,
                 debugDisplay,
-                camUrls,
+                camInfos,
                 activity.videoViewHolders)
 
             grabbersManager?.start()

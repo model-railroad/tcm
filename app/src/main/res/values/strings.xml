@@ -49,6 +49,9 @@
     <string name="prefs__label_camera_1">Camera 1 - Label</string>
     <string name="prefs__label_camera_2">Camera 2 - Label</string>
     <string name="prefs__label_camera_3">Camera 3 - Label</string>
+    <string name="prefs__params_camera_1">Camera 1 - Stream Parameters</string>
+    <string name="prefs__params_camera_2">Camera 2 - Stream Parameters</string>
+    <string name="prefs__params_camera_3">Camera 3 - Stream Parameters</string>
     <string name="prefs__cameras_transform_1">Camera 1 - Transform</string>
     <string name="prefs__cameras_transform_2">Camera 2 - Transform</string>
     <string name="prefs__cameras_transform_3">Camera 3 - Transform</string>

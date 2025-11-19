@@ -75,6 +75,14 @@
                 android:maxLines="1"
                 app:useSimpleSummaryProvider="true" />
 
+        <EditTextPreference
+                app:key="pref_cameras__params_1"
+                app:title="@string/prefs__params_camera_1"
+                android:inputType="text"
+                android:singleLine="true"
+                android:maxLines="1"
+                app:useSimpleSummaryProvider="true" />
+
         <com.alflabs.tcm.activity.CameraTransformPref
                 app:key="pref_cameras__transform_1"
                 app:title="@string/prefs__cameras_transform_1"
@@ -96,6 +104,14 @@
                 android:maxLines="1"
                 app:useSimpleSummaryProvider="true" />
 
+        <EditTextPreference
+                app:key="pref_cameras__params_2"
+                app:title="@string/prefs__params_camera_2"
+                android:inputType="text"
+                android:singleLine="true"
+                android:maxLines="1"
+                app:useSimpleSummaryProvider="true" />
+
         <com.alflabs.tcm.activity.CameraTransformPref
                 app:key="pref_cameras__transform_2"
                 app:title="@string/prefs__cameras_transform_2"
@@ -112,6 +128,14 @@
         <EditTextPreference
                 app:key="pref_cameras__label_3"
                 app:title="@string/prefs__label_camera_3"
+                android:inputType="text"
+                android:singleLine="true"
+                android:maxLines="1"
+                app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+                app:key="pref_cameras__params_3"
+                app:title="@string/prefs__params_camera_3"
                 android:inputType="text"
                 android:singleLine="true"
                 android:maxLines="1"

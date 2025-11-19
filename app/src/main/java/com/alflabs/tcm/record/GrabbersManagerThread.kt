@@ -31,7 +31,7 @@ class GrabbersManagerThread(
     private val logger: ILogger,
     private val analytics: Analytics,
     private val debugDisplay: Boolean,
-    private val camUrls: Map<Int, String>,
+    private val camInfos: Map<Int, GrabberCamInfo>,
     private val viewHolders: List<VideoViewHolder>,
 ): ThreadLoop() {
 
@@ -66,12 +66,12 @@ class GrabbersManagerThread(
     override fun runInThreadLoop() {
         if (DEBUG) Log.d(TAG, "runInThreadLoop")
 
-        val cams = camUrls.map { entry ->
+        val cams = camInfos.map { entry ->
             GrabberHolder(
                 logger = logger,
                 analytics = analytics,
                 debugDisplay = debugDisplay,
-                camUrls = camUrls,
+                camInfos = camInfos,
                 index = entry.key,
                 viewHolder = viewHolders[entry.key - 1],
                 exGrabbers = exGrabbers,

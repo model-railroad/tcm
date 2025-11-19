@@ -103,6 +103,13 @@ class AppPrefsValues @Inject constructor(
             throw IndexOutOfBoundsException("Camera LABEL Index $index out of bounds")
         }
 
+    fun camerasParams(index: Int) : String =
+        if (PREF_CAMERAS__PARAMS.containsKey(index)) {
+            prefs.getString(PREF_CAMERAS__PARAMS[index], "") ?: ""
+        } else {
+            throw IndexOutOfBoundsException("Camera PARAMS Index $index out of bounds")
+        }
+
     fun camerasTransform(index: Int) : CamTransformValues =
         if (PREF_CAMERAS__TRANSFORM.containsKey(index)) {
             getTransform(PREF_CAMERAS__TRANSFORM[index]!!)
@@ -128,6 +135,11 @@ class AppPrefsValues @Inject constructor(
             1 to "pref_cameras__label_1",
             2 to "pref_cameras__label_2",
             3 to "pref_cameras__label_3",
+        )
+        val PREF_CAMERAS__PARAMS = mapOf(
+            1 to "pref_cameras__params_1",
+            2 to "pref_cameras__params_2",
+            3 to "pref_cameras__params_3",
         )
         val PREF_CAMERAS__TRANSFORM = mapOf(
             1 to "pref_cameras__transform_1",

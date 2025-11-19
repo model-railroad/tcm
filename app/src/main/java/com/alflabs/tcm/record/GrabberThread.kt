@@ -33,7 +33,7 @@ class GrabberThread(
     private val logger: ILogger,
     private val analytics: Analytics,
     private val camIndex: Int,
-    private val url: String,
+    private val camInfo: GrabberCamInfo,
     private val renderer : IGrabberRenderer
 ): ThreadLoop() {
 
@@ -71,21 +71,21 @@ class GrabberThread(
         val converter = AndroidFrameConverter()
 
         try {
-            logger.log(TAG, "GrabberThread $camIndex > Grabber for URL: $url")
+            logger.log(TAG, "GrabberThread $camIndex > Grabber for URL: ${camInfo.url}")
 
             renderer.setStatus("Connecting")
 
             // TBD all that setup below is highly dependend on the URL using RTSP.
-            grabber = FFmpegFrameGrabber(url)
-            grabber.format = "rtsp"
+            grabber = FFmpegFrameGrabber(camInfo.url)
+            grabber.format = camInfo.getParam("format", "rtsp")
             // http://ffmpeg.org/ffmpeg-all.html#rtsp
-            grabber.setOption("rtsp_transport", "tcp")  // "udp" or "tcp"
-            grabber.setOption("rw_timeout", FFMPEG_TIMEOUT_µS) // microseconds
-            grabber.setOption("stimeout"  , FFMPEG_TIMEOUT_µS) // microseconds
+            grabber.setOption("rtsp_transport", camInfo.getParam("rtsp_transport", "tcp"))  // "udp" or "tcp"
+            grabber.setOption("rw_timeout", camInfo.getParam("rw_timeout", FFMPEG_TIMEOUT_µS)) // microseconds
+            grabber.setOption("stimeout"  , camInfo.getParam("stimeout", FFMPEG_TIMEOUT_µS)) // microseconds
             if (AVUtils.instance.isJavaCV_1_5_9) {
                 // "timeout" isn't supported in older versions of FFMPEG for RTSP (before
                 // 6.1.1-1.5.10 although I don't exactly which version.)
-                grabber.setOption("timeout", FFMPEG_TIMEOUT_µS) // microseconds
+                grabber.setOption("timeout", camInfo.getParam("timeout", FFMPEG_TIMEOUT_µS)) // microseconds
             }
             // Match the Android Bitmap Config ARGB_8888, which speeds up the converter.
             grabber.pixelFormat = AVUtils.AV_PIX_FMT_ARGB

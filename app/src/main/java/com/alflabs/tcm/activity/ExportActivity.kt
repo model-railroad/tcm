@@ -90,6 +90,11 @@ class ExportActivity : AppCompatActivity() {
                 sb.append("L$i = $label")
                 sb.append('\n')
             }
+            val params = appPrefsValues.camerasParams(i)
+            if (params.isNotEmpty()) {
+                sb.append("P$i = $params")
+                sb.append('\n')
+            }
             val url = appPrefsValues.camerasUrl(i)
             if (url.isNotEmpty()) {
                 sb.append("U$i = $url")
@@ -148,6 +153,11 @@ class ExportActivity : AppCompatActivity() {
                     "L" -> if (versionAccepted && index >= 1 && index <= numCam) {
                         appPrefsValues.setString(
                             AppPrefsValues.PREF_CAMERAS__LABEL[index]!!,
+                            value)
+                    }
+                    "P" -> if (versionAccepted && index >= 1 && index <= numCam) {
+                        appPrefsValues.setString(
+                            AppPrefsValues.PREF_CAMERAS__PARAMS[index]!!,
                             value)
                     }
                     "U" -> if (versionAccepted && index >= 1 && index <= numCam) {

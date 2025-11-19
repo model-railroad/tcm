@@ -30,7 +30,7 @@ class GrabberHolder(
     private val logger: ILogger,
     private val analytics: Analytics,
     private val debugDisplay: Boolean,
-    private val camUrls: Map<Int, String>,
+    private val camInfos: Map<Int, GrabberCamInfo>,
     private val index : Int,
     internal val viewHolder: VideoViewHolder,
     private val exGrabbers: MutableList<GrabberThread>,
@@ -65,7 +65,7 @@ class GrabberHolder(
             logger,
             analytics,
             index,
-            camUrls[index]!!,
+            camInfos[index]!!,
             render!!,
         )
         grabber?.start("Grabber-$index-$countNewRender")
@@ -133,3 +133,4 @@ class GrabberHolder(
         maxDelayMS = 0
     }
 }
+
