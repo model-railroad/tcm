@@ -13,7 +13,7 @@ located at the main operating yard. In this case, a tablet is mounted to the fas
 of the layout where the operators are and that allows them to view the track on the
 other side of the layout.
 
-![Track Cam Monitor Running on a 10-inch Tablet](https://www.alfray.com/trains/blog/randall/2024-08-02_experiment_track_cam_monitor_549b913988a239288fc8cc33248014aba5828fd9i.jpg)
+![Track Cam Monitor Running on a 10-inch Tablet](distrib/preview1.jpg)
 
 For a description of the deployment on the Randall Museum Model Railroad,
 please check out the [blog announcement here](https://www.alfray.com/trains/blog/randall/2024-08-02_experiment_track_cam_monitor.html).
@@ -211,6 +211,7 @@ Phase 2:
 - ✅ App: GA hourly report of battery level.
 - ✅ App: Reintroduce Boot Receiver (for API 28 and lower).
 - ✅ App: Switch from View KeepScreenOn to app-wide Wake Lock (seems more stable as a Home app).
+- ✅ Main: Configure FFMpeg stream parameters (e.g. rtsp_transport=udp) via preferences.
 - ☐ Reintroduce preference to fill/fit in image view.
 
 Phase 3:
